@@ -1,0 +1,229 @@
+datasource db {
+  provider = "sqlite"
+}
+
+
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+// ----------------------------------------------------
+// 1. NextAuth Authentication Models
+// ----------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  cards         VCard[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? 
+  access_token      String? 
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? 
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ----------------------------------------------------
+// 2. SaaS Domain Models (Digital Business Cards)
+// ----------------------------------------------------
+
+model VCard {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Profile data directly embedded
+  firstName   String
+  lastName    String
+  displayName String?
+  jobTitle    String
+  headline    String?
+  bio         String?
+  pronouns    String?
+  avatarUrl   String?
+  
+  // Company info
+  companyName    String?
+  companyRole    String?
+  companyLogoUrl String?
+  companyWebsite String?
+  companyIndustry String?
+  companyTagline String?
+
+  // Settings
+  slug               String  @unique
+  isPublished        Boolean @default(false)
+  leadCaptureEnabled Boolean @default(true)
+  vcfDownloadEnabled Boolean @default(true)
+  showViewCount      Boolean @default(false)
+  seoTitle           String?
+  seoDescription     String?
+  language           String  @default("en")
+
+  // Theme settings
+  themePreset      String  @default("ocean-cyan")
+  backgroundStyle  String  @default("gradient")
+  colorPrimary     String  @default("#171717")
+  colorSecondary   String  @default("#3b82f6")
+  colorAccent      String  @default("#2563eb")
+  textColor        String  @default("#171717")
+  subtextColor     String  @default("#52525b")
+  layout           String  @default("classic")
+  headerGlass      Boolean @default(false)
+  avatarNeonRing   Boolean @default(false)
+  particles        Boolean @default(false)
+  coverImageUrl    String?
+  backgroundImageUrl String?
+
+  // Analytics
+  totalViews     Int @default(0)
+  uniqueViews    Int @default(0)
+  totalClicks    Int @default(0)
+  leadsCollected Int @default(0)
+  vcfDownloads   Int @default(0)
+
+  // Relationships (Nested Contacts & Links)
+  phones       PhoneEntry[]
+  emails       EmailEntry[]
+  addresses    AddressEntry[]
+  websites     WebsiteEntry[]
+  socialLinks  SocialLink[]
+  paymentLinks PaymentLink[]
+  actionLinks  ActionLink[]
+  mediaEmbeds  MediaEmbed[]
+}
+
+model PhoneEntry {
+  id        String  @id @default(cuid())
+  vcardId   String
+  vcard     VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  type      String
+  number    String
+  label     String?
+  whatsapp  Boolean @default(false)
+  sms       Boolean @default(true)
+  isPrimary Boolean @default(false)
+}
+
+model EmailEntry {
+  id        String  @id @default(cuid())
+  vcardId   String
+  vcard     VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  type      String
+  address   String
+  label     String?
+  isPrimary Boolean @default(false)
+}
+
+model AddressEntry {
+  id         String  @id @default(cuid())
+  vcardId    String
+  vcard      VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  type       String
+  label      String?
+  street     String?
+  city       String?
+  state      String?
+  postalCode String?
+  country    String?
+  mapUrl     String?
+}
+
+model WebsiteEntry {
+  id       String  @id @default(cuid())
+  vcardId  String
+  vcard    VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  label    String
+  url      String
+  featured Boolean @default(false)
+}
+
+model SocialLink {
+  id        String  @id @default(cuid())
+  vcardId   String
+  vcard     VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  platform  String
+  url       String
+  handle    String?
+  label     String?
+  order     Int     @default(0)
+  isVisible Boolean @default(true)
+}
+
+model PaymentLink {
+  id        String  @id @default(cuid())
+  vcardId   String
+  vcard     VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  platform  String
+  url       String
+  label     String?
+  note      String?
+  order     Int     @default(0)
+  isVisible Boolean @default(true)
+}
+
+model ActionLink {
+  id        String  @id @default(cuid())
+  vcardId   String
+  vcard     VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  platform  String
+  url       String
+  label     String
+  subtitle  String?
+  icon      String?
+  color     String?
+  order     Int     @default(0)
+  isVisible Boolean @default(true)
+}
+
+model MediaEmbed {
+  id           String  @id @default(cuid())
+  vcardId      String
+  vcard        VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  type         String
+  url          String
+  title        String?
+  thumbnailUrl String?
+  order        Int     @default(0)
+  isVisible    Boolean @default(true)
+}
