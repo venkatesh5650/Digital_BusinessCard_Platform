@@ -227,10 +227,16 @@
   font-weight: 700;
   font-size: 0.937rem;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .linkSub {
   font-size: 0.75rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── SOCIAL GRID ───────────────────────────── */
@@ -273,9 +279,17 @@
 .contactData {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  flex: 1;
 }
 .contactLabel { font-size: 0.65rem; font-weight: 700; color: #70757a; text-transform: uppercase; }
-.contactValue { font-size: 0.937rem; font-weight: 600; }
+.contactValue { 
+  font-size: 0.937rem; 
+  font-weight: 600; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* ── PUBLIC QR SECTION (Blinq Style) ────────────── */
 .publicQrSection {

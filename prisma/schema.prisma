@@ -131,6 +131,7 @@ model VCard {
   paymentLinks PaymentLink[]
   actionLinks  ActionLink[]
   mediaEmbeds  MediaEmbed[]
+  leads        Lead[]
 }
 
 model PhoneEntry {
@@ -226,4 +227,17 @@ model MediaEmbed {
   thumbnailUrl String?
   order        Int     @default(0)
   isVisible    Boolean @default(true)
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  vcardId   String
+  vcard     VCard    @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  name      String
+  email     String?
+  phone     String?
+  company   String?
+  jobTitle  String?
+  note      String?
 }

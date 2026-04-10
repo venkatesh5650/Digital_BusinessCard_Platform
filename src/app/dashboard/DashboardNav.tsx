@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CreditCard, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, CreditCard, Users, LogOut, ExternalLink } from "lucide-react";
 import styles from "./dashboard.module.css";
 
 type User = {
@@ -19,6 +19,7 @@ export default function DashboardNav({ user }: { user: User }) {
   const navItems = [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
     { href: "/dashboard/cards", label: "My Cards", icon: CreditCard },
+    { href: "/dashboard/leads", label: "Leads", icon: Users },
   ];
 
   const initials = (user.name ?? user.email ?? "U")

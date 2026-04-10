@@ -21,7 +21,8 @@ import {
   togglePublish,
   deleteCard,
 } from "@/lib/actions";
-import { Trash2, Plus, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { Trash2, Plus, Eye, EyeOff, CheckCircle, ArrowLeft, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import styles from "../../dashboard.module.css";
 import PublicCard from "@/components/card/PublicCard";
 import type { VCard } from "@/types";
@@ -150,6 +151,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [showDraftModal, setShowDraftModal] = useState(false);
 
   // Profile fields
   const [firstName, setFirstName] = useState(card.firstName);
@@ -245,6 +247,13 @@ export default function CardEditorClient({ card }: { card: Card }) {
   function handleDelete() {
     if (!confirm("Are you sure you want to delete this card? This cannot be undone.")) return;
     startTransition(async () => { await deleteCard(card.id); });
+  }
+
+  function handlePreviewClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (!isPublished) {
+      e.preventDefault();
+      setShowDraftModal(true);
+    }
   }
 
   // ── Phone handlers ──
@@ -502,7 +511,34 @@ export default function CardEditorClient({ card }: { card: Card }) {
   };
 
   return (
-    <div className={styles.editorLayout}>
+    <>
+      {/* ── Page Header ── */}
+      <div className={styles.pageHeader}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Link href="/dashboard" className={styles.btnSecondary} style={{ padding: "8px 12px" }}>
+            <ArrowLeft size={16} />
+          </Link>
+          <div>
+            <h1 className={styles.pageTitle}>Editing: {displayName || `${firstName} ${lastName}`}</h1>
+            <p className={styles.pageSubtitle}>
+              {isPublished
+                ? `🟢 Live at neonglass.me/${slug}`
+                : `⚫ Draft · not publicly visible`}
+            </p>
+          </div>
+        </div>
+        <a
+          href={`/${slug}`}
+          target="_blank"
+          onClick={handlePreviewClick}
+          className={styles.btnSecondary}
+          style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
+        >
+          <ExternalLink size={15} /> View Card
+        </a>
+      </div>
+
+      <div className={styles.editorLayout}>
       {/* ── Left: Editor Panels ── */}
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
@@ -985,12 +1021,49 @@ export default function CardEditorClient({ card }: { card: Card }) {
         <a
           href={`/${slug || card.slug}`}
           target="_blank"
+          onClick={handlePreviewClick}
           className={styles.btnSecondary}
           style={{ display: "block", textAlign: "center", marginTop: 12 }}
         >
           Open in New Tab ↗
         </a>
       </div>
-    </div>
+      </div>
+
+      {/* ── Draft Modal ── */}
+      {showDraftModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowDraftModal(false)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={() => setShowDraftModal(false)}>✕</button>
+            <div className={styles.modalHeader}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+              <h2 className={styles.modalTitle}>Card is Not Live!</h2>
+              <p className={styles.modalSubtitle} style={{ marginTop: 12, lineHeight: 1.5 }}>
+                Your card is currently set to <strong>Draft</strong>. You must publish it before you or anyone else can view the live link in a browser!
+              </p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
+              <button 
+                className={styles.btnPrimary} 
+                onClick={() => {
+                  handlePublishToggle(true);
+                  setShowDraftModal(false);
+                }} 
+                style={{ width: "100%", padding: "14px" }}
+              >
+                Make Card Live Now 🟢
+              </button>
+              <button 
+                className={styles.btnSecondary} 
+                onClick={() => setShowDraftModal(false)} 
+                style={{ width: "100%", padding: "14px" }}
+              >
+                Keep Editing in Draft
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

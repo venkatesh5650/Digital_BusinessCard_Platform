@@ -429,3 +429,28 @@ export async function deleteAction(cardId: string, actionId: string) {
   revalidatePath(`/dashboard/card/${cardId}`);
   return { success: true };
 }
+
+// ─── LEAD CAPTURE ─────────────────────────────────────────────────
+export async function captureLead(vcardId: string, formData: FormData) {
+  const name = formData.get("name") as string;
+  if (!name) return { error: "Name is required." };
+
+  await db.lead.create({
+    data: {
+      vcardId,
+      name,
+      email: formData.get("email") as string | null,
+      phone: formData.get("phone") as string | null,
+      company: formData.get("company") as string | null,
+      jobTitle: formData.get("jobTitle") as string | null,
+      note: formData.get("note") as string | null,
+    }
+  });
+
+  await db.vCard.update({
+    where: { id: vcardId },
+    data: { leadsCollected: { increment: 1 } }
+  });
+
+  return { success: true };
+}

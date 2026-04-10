@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import styles from "./card.module.css";
 import SocialIcon from "./SocialIcon";
+import LeadCapture from "./LeadCapture";
 import type { VCard } from "@/types";
 import {
   getDisplayName,
@@ -100,7 +101,7 @@ function ContactList({ card, trackClick }: { card: VCard, trackClick: () => void
       {card.phones.map((phone) => (
         <a key={phone.id} href={`tel:${phone.number}`} className={styles.linkCard} onClick={trackClick}>
           <div className={styles.linkIcon}><Phone size={20} /></div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div className={styles.linkTitle}>{phone.number}</div>
             <div className={styles.linkSub}>
               {phone.label || phone.type}
@@ -115,7 +116,7 @@ function ContactList({ card, trackClick }: { card: VCard, trackClick: () => void
       {card.emails.map((email) => (
         <a key={email.id} href={`mailto:${email.address}`} className={styles.linkCard} onClick={trackClick}>
           <div className={styles.linkIcon}><Mail size={20} /></div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div className={styles.linkTitle}>{email.address}</div>
             <div className={styles.linkSub}>
               {email.label || email.type}
@@ -141,7 +142,7 @@ function ContactList({ card, trackClick }: { card: VCard, trackClick: () => void
           onClick={trackClick}
         >
           <div className={styles.linkIcon}><MapPin size={20} /></div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div className={styles.linkTitle}>{address.label || address.city || "Address"}</div>
             <div className={styles.linkSub}>
               {[address.street, address.city, address.state, address.postalCode, address.country]
@@ -172,7 +173,7 @@ function WebsiteList({ card, trackClick }: { card: VCard, trackClick: () => void
           onClick={trackClick}
         >
           <div className={styles.linkIcon}><Globe size={20} /></div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div className={styles.linkTitle}>{website.label}</div>
             <div className={styles.linkSub}>
               {website.url.replace(/^https?:\/\//, "")}
@@ -267,6 +268,10 @@ export default function PublicCard({ card }: { card: VCard }) {
               </a>
             )}
             
+            {card.settings.leadCaptureEnabled && (
+              <LeadCapture vcardId={card.id} trackClick={trackClick} />
+            )}
+
             <div className={styles.secondaryRow}>
               <button 
                 className={styles.secondaryCta}
@@ -307,7 +312,7 @@ export default function PublicCard({ card }: { card: VCard }) {
               {actionLinks.map(link => (
                 <a key={link.id} href={link.url} className={styles.linkCard} target="_blank" onClick={trackClick}>
                   <div className={styles.linkIcon}><LinkIcon size={20} /></div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div className={styles.linkTitle}>{link.label}</div>
                     {link.subtitle && <div className={styles.linkSub}>{link.subtitle}</div>}
                   </div>
@@ -327,7 +332,7 @@ export default function PublicCard({ card }: { card: VCard }) {
               {paymentLinks.map(pay => (
                 <a key={pay.id} href={pay.url} className={styles.linkCard} target="_blank" onClick={trackClick}>
                   <div className={styles.linkIcon}><CreditCard size={20} /></div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div className={styles.linkTitle}>{pay.label || pay.platform}</div>
                     {pay.note && <div className={styles.linkSub}>{pay.note}</div>}
                   </div>
@@ -345,7 +350,7 @@ export default function PublicCard({ card }: { card: VCard }) {
                   <div className={styles.linkIcon}>
                     {embed.type === 'youtube' ? <Play size={20} /> : <FileText size={20} />}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div className={styles.linkTitle}>{embed.title || embed.type}</div>
                     <div className={styles.linkSub}>Tap to open</div>
                   </div>
