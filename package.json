@@ -9,7 +9,8 @@
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
     "clean": "taskkill /F /IM node.exe || echo No node process",
-    "start:prod": "npm run build && npm run start"
+    "start:prod": "npm run build && npm run start",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
