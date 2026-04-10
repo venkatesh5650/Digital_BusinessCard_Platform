@@ -1,26 +1,8 @@
 import "dotenv/config";
 import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import bcrypt from "bcryptjs";
-import path from "path";
-
-// Validate DATABASE_URL
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
-  throw new Error('❌ DATABASE_URL is not defined in your .env file');
-}
-
-// Convert to absolute path for reliability (especially with tsx)
-const dbPath = databaseUrl.startsWith('file:')
-  ? databaseUrl
-  : `file:${path.resolve(process.cwd(), databaseUrl.replace(/^file:/, ''))}`;
-
-const adapter = new PrismaBetterSqlite3({
-  url: dbPath,
-});
 
 const prisma = new PrismaClient({
-  adapter,
   log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
 });
 
