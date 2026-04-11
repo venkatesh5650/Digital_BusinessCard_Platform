@@ -7,7 +7,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Direct connection for migrations (non-pooled, port 5432)
-    url: process.env["POSTGRES_URL_NON_POOLING"],
+    // Vercel Serverless environment: standard Supabase pooler URL
+    url: process.env["DATABASE_URL"],
   },
 });
