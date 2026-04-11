@@ -1,12 +1,25 @@
 import { PrismaClient } from '@prisma/client';
+import { Pool, PoolConfig } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Antigravity: Pure Prisma Rust Engine. Zero Node `pg` Pool constraints.
-// Let Prisma natively utilize process.env.DATABASE_URL defined securely in Vercel.
+// Extremely resilient connection for Vercel Serverless
+const connectionString = process.env.DATABASE_URL;
+
+const poolConfig: PoolConfig = {
+  connectionString,
+  max: 1, // Keep local connection pool microscopic since Supabase pooler handles the rest
+  allowExitOnIdle: true, // Let Lambdas die gracefully
+};
+
+const pool = new Pool(poolConfig);
+const adapter = new PrismaPg(pool);
+
 const db = globalForPrisma.prisma ?? new PrismaClient({
+  adapter,
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 });
 
