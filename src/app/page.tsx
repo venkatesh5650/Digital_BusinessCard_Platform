@@ -1,14 +1,21 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import Navbar from "@/components/landing/Navbar";
+import Hero from "@/components/landing/Hero";
+import HowItWorks from "@/components/landing/HowItWorks";
+import FAQ from "@/components/landing/FAQ";
+import CTABanner from "@/components/landing/CTABanner";
+import Footer from "@/components/landing/Footer";
 
-export default async function HomePage() {
-  const session = await auth();
-
-  // If user is logged in → go to dashboard
-  if (session?.user) {
-    redirect("/dashboard");
-  }
-
-  // If user is NOT logged in → go to auth flow
-  redirect("/auth/signin");
+export default function LandingPage() {
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <HowItWorks />
+        <FAQ />
+        <CTABanner />
+      </main>
+      <Footer />
+    </>
+  );
 }

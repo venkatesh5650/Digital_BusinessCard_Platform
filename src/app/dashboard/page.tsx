@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { getCardsByUser } from "@/lib/db";
 import DashboardClient, { type DashboardStats } from "./DashboardClient";
 
-export const metadata = { title: "Dashboard | NeonGlass" };
+export const metadata = { title: "Dashboard | Imprint" };
 
 export default async function DashboardPage() {
   const session = await auth();

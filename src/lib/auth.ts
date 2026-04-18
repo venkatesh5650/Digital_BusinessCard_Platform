@@ -8,11 +8,17 @@ import bcrypt from "bcryptjs";
 const hasGoogleOAuth =
   Boolean(process.env.GOOGLE_CLIENT_ID) && Boolean(process.env.GOOGLE_CLIENT_SECRET);
 
+console.log("[Auth][Config] Google OAuth enabled:", hasGoogleOAuth);
+if (!hasGoogleOAuth) {
+  console.log("[Auth][Config] Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET");
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   trustHost: true,
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  debug: true,
+  secret: process.env.AUTH_SECRET || "neonglass-default-secret",
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",

@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import LeadsClient from "./LeadsClient";
 
-export const metadata = { title: "Leads — NeonGlass" };
+export const metadata = { title: "Leads — Imprint" };
 
 export default async function LeadsPage() {
   const session = await auth();

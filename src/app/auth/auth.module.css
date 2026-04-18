@@ -1,6 +1,5 @@
 /* ============================================================
-   AUTH PAGES — Shared CSS Module
-   NeonGlass — "Corporate Clean" Design System
+   IMPRINT — AUTH PAGES (Theme-aware)
    ============================================================ */
 
 .page {
@@ -8,21 +7,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f4f5f7 0%, #e8edf5 100%);
+  background: var(--bg-surface);
   padding: 24px 16px;
 }
 
 .card {
-  background: #ffffff;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
   border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
-  padding: 40px 36px 36px;
+  box-shadow: var(--shadow-lg);
+  padding: 44px 36px 36px;
   width: 100%;
   max-width: 420px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
 }
 
 /* ── Brand ── */
@@ -36,31 +35,31 @@
 .brandIcon {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #111111 0%, #2563eb 100%);
+  background: var(--accent);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: white;
   font-weight: 800;
   font-size: 18px;
-  font-family: var(--font-outfit, 'Outfit', sans-serif);
+  font-family: var(--font-display);
 }
 
 .brandName {
-  font-family: var(--font-outfit, 'Outfit', sans-serif);
+  font-family: var(--font-display);
   font-size: 20px;
-  font-weight: 700;
-  color: #111111;
+  font-weight: 800;
+  color: var(--text-1);
   letter-spacing: -0.3px;
 }
 
 /* ── Headings ── */
 .title {
-  font-family: var(--font-outfit, 'Outfit', sans-serif);
+  font-family: var(--font-display);
   font-size: 24px;
-  font-weight: 700;
-  color: #1a1b1e;
+  font-weight: 800;
+  color: var(--text-1);
   text-align: center;
   margin-bottom: 6px;
   letter-spacing: -0.4px;
@@ -68,7 +67,7 @@
 
 .subtitle {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-2);
   text-align: center;
   margin-bottom: 24px;
   line-height: 1.5;
@@ -81,22 +80,22 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 11px 20px;
-  border: 1.5px solid #e5e7eb;
+  padding: 12px 20px;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
-  background: #ffffff;
-  color: #111111;
+  background: var(--bg-elevated);
+  color: var(--text-1);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 150ms ease;
-  font-family: var(--font-inter, 'Inter', sans-serif);
+  transition: all 0.15s ease;
+  font-family: var(--font-body);
 }
 
 .googleBtn:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .googleBtn:disabled {
@@ -111,7 +110,7 @@
   width: 100%;
   margin: 20px 0;
   gap: 12px;
-  color: #9ca3af;
+  color: var(--text-3);
   font-size: 13px;
 }
 
@@ -120,7 +119,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: #e5e7eb;
+  background: var(--border);
 }
 
 /* ── Form ── */
@@ -140,52 +139,52 @@
 .field label {
   font-size: 13px;
   font-weight: 600;
-  color: #374151;
-  font-family: var(--font-inter, 'Inter', sans-serif);
+  color: var(--text-2);
+  font-family: var(--font-body);
 }
 
 .field input {
   width: 100%;
   padding: 11px 14px;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
   font-size: 14px;
-  color: #111111;
-  background: #fafafa;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
-  font-family: var(--font-inter, 'Inter', sans-serif);
+  color: var(--text-1);
+  background: var(--bg-surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: var(--font-body);
   outline: none;
 }
 
 .field input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-  background: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+  background: var(--bg-elevated);
 }
 
 .field input::placeholder {
-  color: #9ca3af;
+  color: var(--text-3);
 }
 
 /* ── Submit Button ── */
 .submitBtn {
   width: 100%;
   padding: 12px 20px;
-  background: #111111;
-  color: #ffffff;
+  background: var(--accent);
+  color: white;
   border: none;
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 150ms ease;
-  font-family: var(--font-inter, 'Inter', sans-serif);
+  transition: all 0.15s ease;
+  font-family: var(--font-body);
   margin-top: 4px;
 }
 
 .submitBtn:hover {
-  background: #2563eb;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  background: var(--accent-hover);
+  box-shadow: 0 4px 14px rgba(232, 80, 58, 0.3);
   transform: translateY(-1px);
 }
 
@@ -199,10 +198,10 @@
 .errorBanner {
   width: 100%;
   padding: 12px 16px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: rgba(232, 80, 58, 0.08);
+  border: 1px solid rgba(232, 80, 58, 0.2);
   border-radius: 10px;
-  color: #dc2626;
+  color: var(--accent);
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 16px;
@@ -212,10 +211,10 @@
 .successBanner {
   width: 100%;
   padding: 12px 16px;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: 10px;
-  color: #16a34a;
+  color: #10b981;
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 16px;
@@ -226,12 +225,12 @@
 .switchLink {
   margin-top: 20px;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-3);
   text-align: center;
 }
 
 .switchLink a {
-  color: #2563eb;
+  color: var(--accent);
   font-weight: 600;
   text-decoration: none;
 }
@@ -240,7 +239,7 @@
   text-decoration: underline;
 }
 
-/* ── Error Icon (error page) ── */
+/* ── Error Icon ── */
 .errorIcon {
   font-size: 48px;
   margin-bottom: 8px;

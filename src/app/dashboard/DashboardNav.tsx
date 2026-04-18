@@ -34,7 +34,7 @@ export default function DashboardNav({ user }: { user: User }) {
       {/* Logo */}
       <div className={styles.sidebarLogo}>
         <div className={styles.logoIcon}>N</div>
-        <span className={styles.logoText}>NeonGlass</span>
+        <span className={styles.logoText}>Imprint</span>
       </div>
 
       {/* Navigation */}

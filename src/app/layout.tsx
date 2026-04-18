@@ -1,14 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
+import ThemeProvider from "@/components/ThemeProvider";
 import "./globals.css";
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  display: "swap",
-});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,10 +11,17 @@ const inter = Inter({
   display: "swap",
 });
 
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "NeonGlass — Digital Business Cards",
-    template: "%s | NeonGlass",
+    default: "Imprint — Digital Business Cards",
+    template: "%s | Imprint",
   },
   description:
     "Create stunning digital business cards that leave a lasting impression. Share your professional identity with a single tap — no app required.",
@@ -31,26 +32,26 @@ export const metadata: Metadata = {
     "NFC card",
     "professional profile",
     "contact sharing",
-    "NeonGlass",
+    "Imprint",
   ],
-  authors: [{ name: "NeonGlass" }],
-  creator: "NeonGlass",
-  metadataBase: new URL("https://neonglass.me"),
+  authors: [{ name: "Imprint" }],
+  creator: "Imprint",
+  metadataBase: new URL("https://imprint.cards"),
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://neonglass.me",
-    siteName: "NeonGlass",
-    title: "NeonGlass — Digital Business Cards",
+    url: "https://imprint.cards",
+    siteName: "Imprint",
+    title: "Imprint — Digital Business Cards",
     description:
       "Create stunning digital business cards that leave a lasting impression. Share your professional identity with a single tap.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "NeonGlass — Digital Business Cards",
+    title: "Imprint — Digital Business Cards",
     description:
       "Create stunning digital business cards that leave a lasting impression.",
-    creator: "@neonglass",
+    creator: "@imprint",
   },
   robots: {
     index: true,
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#080b12",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -70,9 +71,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Prevent theme flash — runs before React hydration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var t = localStorage.getItem('theme') || 'light';
+                  document.documentElement.setAttribute('data-theme', t);
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <ThemeProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

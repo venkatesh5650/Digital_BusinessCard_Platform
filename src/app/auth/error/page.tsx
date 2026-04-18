@@ -24,8 +24,8 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.brand}>
-          <div className={styles.brandIcon}>N</div>
-          <span className={styles.brandName}>NeonGlass</span>
+          <div className={styles.brandIcon}>I</div>
+          <span className={styles.brandName}>Imprint</span>
         </div>
         <div className={styles.errorIcon}>⚠️</div>
         <h1 className={styles.title}>Sign-in Error</h1>
