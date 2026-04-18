@@ -41,11 +41,11 @@ export type DashboardStats = {
 // ── Avatar palette ─────────────────────────────────────────────────────────────
 
 const AVATAR_GRADIENTS = [
-  "linear-gradient(135deg, #00f5d4 0%, #0ea5e9 100%)",
-  "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
-  "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
-  "linear-gradient(135deg, #10b981 0%, #06b6d4 100%)",
-  "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+  "linear-gradient(135deg, #ff6b00 0%, #000000 100%)",
+  "linear-gradient(135deg, #ff8c3a 0%, #ff6b00 100%)",
+  "linear-gradient(135deg, #000000 0%, #333333 100%)",
+  "linear-gradient(135deg, #ff5c00 0%, #ff8c3a 100%)",
+  "linear-gradient(135deg, #111111 0%, #444444 100%)",
 ];
 
 // ── Greeting by time of day ────────────────────────────────────────────────────
@@ -161,29 +161,29 @@ export default function DashboardClient({
     {
       label: "Total Cards",
       value: stats.totalCards,
-      color: "#00f5d4",
-      dimColor: "rgba(0, 245, 212, 0.10)",
+      color: "#ff6b00",
+      dimColor: "rgba(255, 107, 0, 0.10)",
       Icon: CreditCard,
     },
     {
       label: "Total Views",
       value: stats.totalViews,
-      color: "#a855f7",
-      dimColor: "rgba(168, 85, 247, 0.10)",
+      color: "#ff6b00",
+      dimColor: "rgba(255, 107, 0, 0.10)",
       Icon: Eye,
     },
     {
       label: "Total Clicks",
       value: stats.totalClicks,
-      color: "#60a5fa",
-      dimColor: "rgba(96, 165, 250, 0.10)",
+      color: "#ff6b00",
+      dimColor: "rgba(255, 107, 0, 0.10)",
       Icon: MousePointerClick,
     },
     {
       label: "Leads Collected",
       value: stats.totalLeads,
-      color: "#34d399",
-      dimColor: "rgba(52, 211, 153, 0.10)",
+      color: "#ff6b00",
+      dimColor: "rgba(255, 107, 0, 0.10)",
       Icon: Users,
     },
   ];
@@ -314,21 +314,21 @@ export default function DashboardClient({
                   {/* Per-card analytics */}
                   <div className={styles.cardStats}>
                     <div className={styles.cardStat}>
-                      <Eye size={11} color="rgba(168, 85, 247, 0.55)" />
+                      <Eye size={16} color="#ff6b00" />
                       <div className={styles.cardStatValue}>
                         <AnimatedNumber value={card.totalViews} />
                       </div>
                       <div className={styles.cardStatLabel}>Views</div>
                     </div>
                     <div className={styles.cardStat}>
-                      <MousePointerClick size={11} color="rgba(96, 165, 250, 0.55)" />
+                      <MousePointerClick size={16} color="#ff6b00" />
                       <div className={styles.cardStatValue}>
                         <AnimatedNumber value={card.totalClicks} />
                       </div>
                       <div className={styles.cardStatLabel}>Clicks</div>
                     </div>
                     <div className={styles.cardStat}>
-                      <Users size={11} color="rgba(52, 211, 153, 0.55)" />
+                      <Users size={16} color="#ff6b00" />
                       <div className={styles.cardStatValue}>
                         <AnimatedNumber value={card.leadsCollected} />
                       </div>

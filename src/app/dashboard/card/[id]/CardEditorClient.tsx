@@ -21,7 +21,7 @@ import {
   togglePublish,
   deleteCard,
 } from "@/lib/actions";
-import { Trash2, Plus, Eye, EyeOff, CheckCircle, ArrowLeft, ExternalLink } from "lucide-react";
+import { Trash2, Plus, Eye, EyeOff, CheckCircle, ArrowLeft, ExternalLink, Image as ImageIcon, User, Briefcase, Mail, Phone as PhoneIcon, Link2, MapPin, Share2, Search, Settings, Building2, FileText, Medal, X, MessageSquare, Camera, Globe, Video } from "lucide-react";
 import Link from "next/link";
 import styles from "../../dashboard.module.css";
 import PublicCard from "@/components/card/PublicCard";
@@ -152,6 +152,11 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [showDraftModal, setShowDraftModal] = useState(false);
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+
+  // Additional Image States (Mocked for UI, or passed to theme if supported later)
+  const [companyLogoUrl, setCompanyLogoUrl] = useState("");
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState("");
 
   // Profile fields
   const [firstName, setFirstName] = useState(card.firstName);
@@ -490,6 +495,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       headerGlass: false,
       avatarNeonRing: false,
       particles: false,
+      coverImageUrl: coverPhotoUrl || undefined,
     },
     settings: {
       slug: slug || card.slug,
@@ -510,177 +516,102 @@ export default function CardEditorClient({ card }: { card: Card }) {
     },
   };
 
-  return (
-    <>
-      {/* ── Page Header ── */}
-      <div className={styles.pageHeader}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/dashboard" className={styles.btnSecondary} style={{ padding: "8px 12px" }}>
-            <ArrowLeft size={16} />
-          </Link>
+  const renderActiveModal = () => {
+    if (!activeModal) return null;
+
+    let modalTitle = "";
+    let modalContent = null;
+
+    switch (activeModal) {
+      case "companyLogo":
+        modalTitle = "Company Logo";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}>
+              <label>Logo Preview</label>
+              <AvatarUploader value={companyLogoUrl} onChange={setCompanyLogoUrl} />
+            </div>
+          </div>
+        );
+        break;
+      case "profilePicture":
+        modalTitle = "Profile Picture";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}>
+              <label>Avatar / Photo</label>
+              <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} />
+            </div>
+          </div>
+        );
+        break;
+      case "coverPhoto":
+        modalTitle = "Cover Photo";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}>
+              <label>Cover Banner</label>
+              <AvatarUploader value={coverPhotoUrl} onChange={setCoverPhotoUrl} />
+            </div>
+          </div>
+        );
+        break;
+      case "name":
+        modalTitle = "Personal Identity";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={styles.formField}><label>First Name *</label><input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Jane" /></div>
+            <div className={styles.formField}><label>Last Name *</label><input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Kumar" /></div>
+            <div className={`${styles.formField} ${styles.formGridFull}`}><label>Display Name</label><input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Jane Doe (optional)" /></div>
+            <div className={styles.formField}><label>Pronouns</label><input value={pronouns} onChange={e => setPronouns(e.target.value)} placeholder="he/him" /></div>
+          </div>
+        );
+        break;
+      case "jobTitle":
+        modalTitle = "Job Title";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}><label>Job Title *</label><input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="Founder & CEO" /></div>
+          </div>
+        );
+        break;
+      case "department":
+        modalTitle = "Department & Role";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}><label>Department / Your Role</label><input value={companyRole} onChange={e => setCompanyRole(e.target.value)} placeholder="Marketing Department" /></div>
+          </div>
+        );
+        break;
+      case "company":
+        modalTitle = "Company Details";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}><label>Company Name</label><input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Computer Port" /></div>
+            <div className={`${styles.formField} ${styles.formGridFull}`}><label>Tagline</label><input value={companyTagline} onChange={e => setCompanyTagline(e.target.value)} placeholder="Smart Solutions" /></div>
+          </div>
+        );
+        break;
+      case "accreditations":
+        modalTitle = "Accreditations (Bio)";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}><label>Bio / Accreditations</label><textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Certifications, degrees..." rows={3} /></div>
+          </div>
+        );
+        break;
+      case "headline":
+        modalTitle = "Headline";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}><label>Headline</label><input value={headline} onChange={e => setHeadline(e.target.value)} placeholder="Building the future of IT" /></div>
+          </div>
+        );
+        break;
+      case "email":
+        modalTitle = "Email Addresses";
+        modalContent = (
           <div>
-            <h1 className={styles.pageTitle}>Editing: {displayName || `${firstName} ${lastName}`}</h1>
-            <p className={styles.pageSubtitle}>
-              {isPublished
-                ? `🟢 Live at neonglass.me/${slug}`
-                : `⚫ Draft · not publicly visible`}
-            </p>
-          </div>
-        </div>
-        <a
-          href={`/${slug}`}
-          target="_blank"
-          onClick={handlePreviewClick}
-          className={styles.btnSecondary}
-          style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
-        >
-          <ExternalLink size={15} /> View Card
-        </a>
-      </div>
-
-      <div className={styles.editorLayout}>
-      {/* ── Left: Editor Panels ── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-
-        {/* Feedback */}
-        {feedback && (
-          <div className={feedback.type === "success" ? styles.formSuccess : styles.formError}>
-            {feedback.type === "success" ? <CheckCircle size={16} /> : "⚠️"}
-            {feedback.msg}
-          </div>
-        )}
-
-        {/* Publish Status Banner */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.toggleRow}>
-              <div>
-                <div style={{ fontWeight: 700, color: "#111", fontSize: 15 }}>
-                  {isPublished ? "🟢 Live" : "⚫ Draft"}
-                </div>
-                <div className={styles.toggleDesc}>
-                  {isPublished
-                    ? `Your card is publicly visible at neonglass.me/${slug}`
-                    : "Your card is hidden. Toggle to make it live."}
-                </div>
-              </div>
-              <Toggle id="toggle-publish" checked={isPublished} onChange={handlePublishToggle} />
-            </div>
-          </div>
-        </div>
-
-        {/* Profile */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>👤 Profile</div>
-            <div className={styles.formGrid}>
-              <div className={styles.formField}>
-                <label>First Name *</label>
-                <input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Jane" />
-              </div>
-              <div className={styles.formField}>
-                <label>Last Name *</label>
-                <input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Kumar" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Display Name</label>
-                <input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Jane Doe (optional)" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Job Title *</label>
-                <input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="Founder & CEO" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Headline</label>
-                <input value={headline} onChange={e => setHeadline(e.target.value)} placeholder="Building the future of IT Infrastructure" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Bio</label>
-                <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="A short description about yourself..." rows={3} />
-              </div>
-              <div className={styles.formField}>
-                <label>Pronouns</label>
-                <input value={pronouns} onChange={e => setPronouns(e.target.value)} placeholder="he/him" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Profile Picture / Avatar</label>
-                <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Company */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>🏢 Company</div>
-            <div className={styles.formGrid}>
-              <div className={styles.formField}>
-                <label>Company Name</label>
-                <input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Computer Port" />
-              </div>
-              <div className={styles.formField}>
-                <label>Your Role</label>
-                <input value={companyRole} onChange={e => setCompanyRole(e.target.value)} placeholder="Founder" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Company Website</label>
-                <input value={companyWebsite} onChange={e => setCompanyWebsite(e.target.value)} placeholder="https://computerport.in" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Tagline</label>
-                <input value={companyTagline} onChange={e => setCompanyTagline(e.target.value)} placeholder="Smart IT Solutions for Smart Businesses" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Phones */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>📞 Phone Numbers</div>
-            <div className={styles.entryList}>
-              {phones.map(p => (
-                <div key={p.id} className={styles.entryItem}>
-                  <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel}>{p.number}</div>
-                    <div className={styles.entryMeta}>{p.label || p.type}{p.whatsapp ? " · WhatsApp" : ""}{p.isPrimary ? " · Primary" : ""}</div>
-                  </div>
-                  <button className={styles.btnDanger} onClick={() => handleDeletePhone(p.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.formGrid} style={{ marginTop: 8 }}>
-              <div className={styles.formField}>
-                <label>Type</label>
-                <select value={newPhone.type} onChange={e => setNewPhone(p => ({ ...p, type: e.target.value }))}>
-                  <option value="mobile">Mobile</option>
-                  <option value="work">Work</option>
-                  <option value="home">Home</option>
-                  <option value="fax">Fax</option>
-                </select>
-              </div>
-              <div className={styles.formField}>
-                <label>Number</label>
-                <input value={newPhone.number} onChange={e => setNewPhone(p => ({ ...p, number: e.target.value }))} placeholder="+91-9876543210" />
-              </div>
-              <div className={styles.formField}>
-                <label>Label (optional)</label>
-                <input value={newPhone.label} onChange={e => setNewPhone(p => ({ ...p, label: e.target.value }))} placeholder="Mobile" />
-              </div>
-              <div className={styles.formField} style={{ justifyContent: "flex-end" }}>
-                <button className={styles.btnPrimary} onClick={handleAddPhone} disabled={isPending || !newPhone.number}>
-                  <Plus size={14} /> Add Phone
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Emails */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>✉️ Email Addresses</div>
             <div className={styles.entryList}>
               {emails.map(em => (
                 <div key={em.id} className={styles.entryItem}>
@@ -692,128 +623,44 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 </div>
               ))}
             </div>
-            <div className={styles.formGrid} style={{ marginTop: 8 }}>
-              <div className={styles.formField}>
-                <label>Type</label>
-                <select value={newEmail.type} onChange={e => setNewEmail(em => ({ ...em, type: e.target.value }))}>
-                  <option value="work">Work</option>
-                  <option value="personal">Personal</option>
-                </select>
-              </div>
-              <div className={styles.formField}>
-                <label>Email</label>
-                <input value={newEmail.address} onChange={e => setNewEmail(em => ({ ...em, address: e.target.value }))} placeholder="you@company.com" type="email" />
-              </div>
-              <div className={styles.formField}>
-                <label>Label (optional)</label>
-                <input value={newEmail.label} onChange={e => setNewEmail(em => ({ ...em, label: e.target.value }))} placeholder="Work" />
-              </div>
-              <div className={styles.formField} style={{ justifyContent: "flex-end" }}>
-                <button className={styles.btnPrimary} onClick={handleAddEmail} disabled={isPending || !newEmail.address}>
-                  <Plus size={14} /> Add Email
-                </button>
-              </div>
+            <div className={styles.formGrid} style={{ marginTop: 16 }}>
+              <div className={styles.formField}><label>Type</label><select value={newEmail.type} onChange={e => setNewEmail(em => ({ ...em, type: e.target.value }))}><option value="work">Work</option><option value="personal">Personal</option></select></div>
+              <div className={styles.formField}><label>Email</label><input value={newEmail.address} onChange={e => setNewEmail(em => ({ ...em, address: e.target.value }))} placeholder="you@company.com" type="email" /></div>
+              <div className={styles.formField}><label>Label</label><input value={newEmail.label} onChange={e => setNewEmail(em => ({ ...em, label: e.target.value }))} placeholder="Work" /></div>
+              <div className={styles.formField} style={{ justifyContent: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddEmail} disabled={isPending || !newEmail.address}><Plus size={14} /> Add</button></div>
             </div>
           </div>
-        </div>
-
-        {/* Social Links */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>🔗 Social Links</div>
+        );
+        break;
+      case "phone":
+        modalTitle = "Phone Numbers";
+        modalContent = (
+          <div>
             <div className={styles.entryList}>
-              {socials.map(s => (
-                <div key={s.id} className={styles.entryItem}>
-                  {s.isVisible ? <Eye size={14} color="#2563eb" /> : <EyeOff size={14} color="#9ca3af" />}
+              {phones.map(p => (
+                <div key={p.id} className={styles.entryItem}>
                   <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel}>{s.platform}</div>
-                    <div className={styles.entryMeta}>{s.handle || s.url}</div>
+                    <div className={styles.entryLabel}>{p.number}</div>
+                    <div className={styles.entryMeta}>{p.label || p.type}{p.whatsapp ? " · WhatsApp" : ""}</div>
                   </div>
-                  <button className={styles.btnDanger} onClick={() => handleDeleteSocial(s.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
+                  <button className={styles.btnDanger} onClick={() => handleDeletePhone(p.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
                 </div>
               ))}
             </div>
-            <div className={styles.formGrid} style={{ marginTop: 8 }}>
-              <div className={styles.formField}>
-                <label>Platform</label>
-                <select value={newSocial.platform} onChange={e => setNewSocial(s => ({ ...s, platform: e.target.value }))}>
-                  {SOCIAL_PLATFORMS.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
-                </select>
-              </div>
-              <div className={styles.formField}>
-                <label>Profile URL</label>
-                <input value={newSocial.url} onChange={e => setNewSocial(s => ({ ...s, url: e.target.value }))} placeholder="https://linkedin.com/in/..." />
-              </div>
-              <div className={styles.formField}>
-                <label>Handle (optional)</label>
-                <input value={newSocial.handle} onChange={e => setNewSocial(s => ({ ...s, handle: e.target.value }))} placeholder="@yourhandle" />
-              </div>
-              <div className={styles.formField} style={{ justifyContent: "flex-end" }}>
-                <button className={styles.btnPrimary} onClick={handleAddSocial} disabled={isPending || !newSocial.url}>
-                  <Plus size={14} /> Add Social
-                </button>
-              </div>
+            <div className={styles.formGrid} style={{ marginTop: 16 }}>
+              <div className={styles.formField}><label>Type</label><select value={newPhone.type} onChange={e => setNewPhone(p => ({ ...p, type: e.target.value }))}><option value="mobile">Mobile</option><option value="work">Work</option><option value="home">Home</option></select></div>
+              <div className={styles.formField}><label>Number</label><input value={newPhone.number} onChange={e => setNewPhone(p => ({ ...p, number: e.target.value }))} placeholder="+1..." /></div>
+              <div className={styles.formField}><label>Label</label><input value={newPhone.label} onChange={e => setNewPhone(p => ({ ...p, label: e.target.value }))} placeholder="Mobile" /></div>
+              <div className={styles.formField} style={{ justifyContent: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddPhone} disabled={isPending || !newPhone.number}><Plus size={14} /> Add</button></div>
             </div>
           </div>
-        </div>
-
-        {/* Addresses */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>📍 Addresses</div>
-            <div className={styles.entryList}>
-              {addresses.map(a => (
-                <div key={a.id} className={styles.entryItem}>
-                  <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel}>{a.label || a.city || a.street || "Address"}</div>
-                    <div className={styles.entryMeta}>{[a.street, a.city, a.country].filter(Boolean).join(", ")}</div>
-                  </div>
-                  <button className={styles.btnDanger} onClick={() => handleDeleteAddress(a.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.formGrid} style={{ marginTop: 8 }}>
-              <div className={styles.formField}>
-                <label>Type</label>
-                <select value={newAddress.type} onChange={e => setNewAddress(v => ({ ...v, type: e.target.value }))}>
-                  <option value="work">Work</option>
-                  <option value="home">Home</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div className={styles.formField}>
-                <label>Label (optional)</label>
-                <input value={newAddress.label} onChange={e => setNewAddress(v => ({ ...v, label: e.target.value }))} placeholder="Head Office" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Street</label>
-                <input value={newAddress.street} onChange={e => setNewAddress(v => ({ ...v, street: e.target.value }))} placeholder="Street address" />
-              </div>
-              <div className={styles.formField}>
-                <label>City</label>
-                <input value={newAddress.city} onChange={e => setNewAddress(v => ({ ...v, city: e.target.value }))} placeholder="Hyderabad" />
-              </div>
-              <div className={styles.formField}>
-                <label>Country</label>
-                <input value={newAddress.country} onChange={e => setNewAddress(v => ({ ...v, country: e.target.value }))} placeholder="India" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Map URL</label>
-                <input value={newAddress.mapUrl} onChange={e => setNewAddress(v => ({ ...v, mapUrl: e.target.value }))} placeholder="https://maps.google.com/..." />
-              </div>
-              <div className={styles.formField} style={{ justifyContent: "flex-end" }}>
-                <button className={styles.btnPrimary} onClick={handleAddAddress} disabled={isPending}>
-                  <Plus size={14} /> Add Address
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Websites */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>🌐 Websites & Custom URLs</div>
+        );
+        break;
+      case "companyUrl":
+      case "link":
+        modalTitle = "Websites & Links";
+        modalContent = (
+          <div>
             <div className={styles.entryList}>
               {websites.map(w => (
                 <div key={w.id} className={styles.entryItem}>
@@ -825,216 +672,280 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 </div>
               ))}
             </div>
-            <div className={styles.formGrid} style={{ marginTop: 8 }}>
-              <div className={styles.formField}>
-                <label>Label</label>
-                <input value={newWebsite.label} onChange={e => setNewWebsite(v => ({ ...v, label: e.target.value }))} placeholder="Portfolio" />
-              </div>
-              <div className={styles.formField}>
-                <label>URL</label>
-                <input value={newWebsite.url} onChange={e => setNewWebsite(v => ({ ...v, url: e.target.value }))} placeholder="https://..." />
-              </div>
-              <div className={styles.formField}>
-                <label style={{ opacity: 0 }}>feature</label>
-                <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13 }}>
-                  <input type="checkbox" checked={newWebsite.featured} onChange={e => setNewWebsite(v => ({ ...v, featured: e.target.checked }))} />
-                  Mark as featured
-                </label>
-              </div>
-              <div className={styles.formField} style={{ justifyContent: "flex-end" }}>
-                <button className={styles.btnPrimary} onClick={handleAddWebsite} disabled={isPending || !newWebsite.label || !newWebsite.url}>
-                  <Plus size={14} /> Add Website
-                </button>
-              </div>
+            <div className={styles.formGrid} style={{ marginTop: 16 }}>
+              <div className={styles.formField}><label>Label</label><input value={newWebsite.label} onChange={e => setNewWebsite(v => ({ ...v, label: e.target.value }))} placeholder="My Site" /></div>
+              <div className={styles.formField}><label>URL</label><input value={newWebsite.url} onChange={e => setNewWebsite(v => ({ ...v, url: e.target.value }))} placeholder="https://..." /></div>
+              <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddWebsite} disabled={isPending || !newWebsite.label || !newWebsite.url}><Plus size={14} /> Add</button></div>
             </div>
           </div>
-        </div>
-
-        {/* Payment Links */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>💳 Payment Links</div>
+        );
+        break;
+      case "address":
+        modalTitle = "Addresses";
+        modalContent = (
+          <div>
             <div className={styles.entryList}>
-              {payments.map(p => (
-                <div key={p.id} className={styles.entryItem}>
-                  <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel}>{p.label || p.platform}</div>
-                    <div className={styles.entryMeta}>{p.url}</div>
-                  </div>
-                  <button className={styles.btnDanger} onClick={() => handleDeletePayment(p.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.formGrid} style={{ marginTop: 8 }}>
-              <div className={styles.formField}>
-                <label>Platform</label>
-                <select value={newPayment.platform} onChange={e => setNewPayment(v => ({ ...v, platform: e.target.value }))}>
-                  {PAYMENT_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
-              <div className={styles.formField}>
-                <label>Label (optional)</label>
-                <input value={newPayment.label} onChange={e => setNewPayment(v => ({ ...v, label: e.target.value }))} placeholder="Pay via UPI" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Payment URL</label>
-                <input value={newPayment.url} onChange={e => setNewPayment(v => ({ ...v, url: e.target.value }))} placeholder="https://..." />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Note (optional)</label>
-                <input value={newPayment.note} onChange={e => setNewPayment(v => ({ ...v, note: e.target.value }))} placeholder="For quick consulting payment" />
-              </div>
-              <div className={styles.formField} style={{ justifyContent: "flex-end" }}>
-                <button className={styles.btnPrimary} onClick={handleAddPayment} disabled={isPending || !newPayment.url}>
-                  <Plus size={14} /> Add Payment
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Links */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>🚀 Action Links</div>
-            <div className={styles.entryList}>
-              {actions.map(a => (
+              {addresses.map(a => (
                 <div key={a.id} className={styles.entryItem}>
                   <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel}>{a.label}</div>
-                    <div className={styles.entryMeta}>{a.url}</div>
+                    <div className={styles.entryLabel}>{a.label || a.city || "Address"}</div>
+                    <div className={styles.entryMeta}>{[a.street, a.city, a.country].filter(Boolean).join(", ")}</div>
                   </div>
-                  <button className={styles.btnDanger} onClick={() => handleDeleteAction(a.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
+                  <button className={styles.btnDanger} onClick={() => handleDeleteAddress(a.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
                 </div>
               ))}
             </div>
-            <div className={styles.formGrid} style={{ marginTop: 8 }}>
-              <div className={styles.formField}>
-                <label>Platform</label>
-                <select value={newAction.platform} onChange={e => setNewAction(v => ({ ...v, platform: e.target.value }))}>
-                  {ACTION_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
-              <div className={styles.formField}>
-                <label>Label</label>
-                <input value={newAction.label} onChange={e => setNewAction(v => ({ ...v, label: e.target.value }))} placeholder="Book a Call" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Action URL</label>
-                <input value={newAction.url} onChange={e => setNewAction(v => ({ ...v, url: e.target.value }))} placeholder="https://calendly.com/..." />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Subtitle (optional)</label>
-                <input value={newAction.subtitle} onChange={e => setNewAction(v => ({ ...v, subtitle: e.target.value }))} placeholder="15-minute intro call" />
-              </div>
-              <div className={styles.formField} style={{ justifyContent: "flex-end" }}>
-                <button className={styles.btnPrimary} onClick={handleAddAction} disabled={isPending || !newAction.label || !newAction.url}>
-                  <Plus size={14} /> Add Action
-                </button>
-              </div>
+            <div className={styles.formGrid} style={{ marginTop: 16 }}>
+              <div className={styles.formField}><label>Type</label><select value={newAddress.type} onChange={e => setNewAddress(v => ({...v, type: e.target.value}))}><option value="work">Work</option><option value="home">Home</option></select></div>
+              <div className={styles.formField}><label>City</label><input value={newAddress.city} onChange={e => setNewAddress(v => ({...v, city: e.target.value}))} placeholder="City" /></div>
+              <div className={`${styles.formField} ${styles.formGridFull}`}><label>Street</label><input value={newAddress.street} onChange={e => setNewAddress(v => ({...v, street: e.target.value}))} placeholder="Street" /></div>
+              <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddAddress} disabled={isPending}><Plus size={14} /> Add</button></div>
             </div>
           </div>
-        </div>
-
-        {/* Settings */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>⚙️ Card Settings</div>
-            <div className={styles.formGrid}>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
+        );
+        break;
+      case "social":
+        modalTitle = "Social Links";
+        modalContent = (
+          <div>
+            <div className={styles.entryList}>
+              {socials.map(s => (
+                <div key={s.id} className={styles.entryItem}>
+                  <div className={styles.entryInfo}>
+                    <div className={styles.entryLabel} style={{ textTransform: "capitalize" }}>{s.platform}</div>
+                    <div className={styles.entryMeta}>{s.url}</div>
+                  </div>
+                  <button className={styles.btnDanger} onClick={() => handleDeleteSocial(s.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
+                </div>
+              ))}
+            </div>
+            <div className={styles.formGrid} style={{ marginTop: 16 }}>
+              <div className={styles.formField}><label>Platform</label><select value={newSocial.platform} onChange={e => setNewSocial(s => ({ ...s, platform: e.target.value }))}>{SOCIAL_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+              <div className={styles.formField}><label>URL</label><input value={newSocial.url} onChange={e => setNewSocial(s => ({ ...s, url: e.target.value }))} placeholder="https://..." /></div>
+              <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddSocial} disabled={isPending || !newSocial.url}><Plus size={14} /> Add</button></div>
+            </div>
+          </div>
+        );
+        break;
+      case "settings":
+        modalTitle = "Card Settings";
+        modalContent = (
+           <div className={styles.formGrid}>
+             <div className={`${styles.formField} ${styles.formGridFull}`}>
                 <label>Card URL Slug</label>
-                <input
-                  value={slug}
-                  onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-                  placeholder="ravi-kumar"
-                />
-                <span style={{ fontSize: 11, color: "#9ca3af" }}>neonglass.me/{slug}</span>
-              </div>
-            </div>
-            <div className={styles.toggleRow}>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 14 }}>Lead Capture</div>
-                <div className={styles.toggleDesc}>Show a contact form to capture visitor info</div>
-              </div>
-              <Toggle id="lead-capture" checked={leadCapture} onChange={setLeadCapture} />
-            </div>
-            <div className={styles.toggleRow}>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 14 }}>VCF Download</div>
-                <div className={styles.toggleDesc}>Allow visitors to save contact to phone</div>
-              </div>
-              <Toggle id="vcf-download" checked={vcfDownload} onChange={setVcfDownload} />
-            </div>
-          </div>
-        </div>
+                <input value={slug} onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} />
+             </div>
+             <div className={`${styles.formField} ${styles.formGridFull}`}>
+                <div className={styles.toggleRow}>
+                  <div><div style={{ fontWeight: 600, fontSize: 14 }}>Lead Capture</div><div className={styles.toggleDesc}>Show contact form</div></div>
+                  <Toggle id="lead-capture" checked={leadCapture} onChange={setLeadCapture} />
+                </div>
+             </div>
+             <div className={`${styles.formField} ${styles.formGridFull}`}>
+                <div className={styles.toggleRow}>
+                  <div><div style={{ fontWeight: 600, fontSize: 14 }}>VCF Download</div><div className={styles.toggleDesc}>Allow contact download</div></div>
+                  <Toggle id="vcf-download" checked={vcfDownload} onChange={setVcfDownload} />
+                </div>
+             </div>
+           </div>
+        );
+        break;
+    }
 
-        {/* SEO */}
-        <div className={styles.editorPanel}>
-          <div className={styles.editorSection}>
-            <div className={styles.editorSectionTitle}>🔍 SEO</div>
-            <div className={styles.formGrid}>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>SEO Title</label>
-                <input value={seoTitle} onChange={e => setSeoTitle(e.target.value)} placeholder="Jane Doe — Marketing Director" />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Meta Description</label>
-                <textarea value={seoDescription} onChange={e => setSeoDescription(e.target.value)} placeholder="A short description for search engines..." rows={2} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div style={{ display: "flex", gap: 12 }}>
-          <button
-            id="btn-save-card"
-            className={styles.btnPrimary}
-            onClick={handleSave}
-            disabled={isPending}
-            style={{ flex: 1, padding: "14px" }}
-          >
-            {isPending ? "Saving…" : "💾 Save Card"}
+    return (
+      <div className={styles.modalOverlay} onClick={() => { handleSave(); setActiveModal(null); }}>
+        <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+          <button className={styles.modalClose} onClick={() => { handleSave(); setActiveModal(null); }}>
+            <X size={18} />
           </button>
-          <button
-            id="btn-delete-card"
-            className={styles.btnDanger}
-            onClick={handleDelete}
-            disabled={isPending}
-            style={{ padding: "14px 20px" }}
-          >
-            <Trash2 size={16} />
-          </button>
+          <div className={styles.modalHeader} style={{ textAlign: "left", marginBottom: 20 }}>
+            <h2 className={styles.modalTitle}>{modalTitle}</h2>
+          </div>
+          {modalContent}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 24 }}>
+             <button className={styles.btnPrimary} onClick={() => { handleSave(); setActiveModal(null); }}>Done</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className={styles.editorPage}>
+      <div className={styles.pageHeader}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Link href="/dashboard" className={styles.btnSecondary} style={{ padding: "8px 12px" }}>
+            <ArrowLeft size={16} />
+          </Link>
+          <div>
+            <h1 className={styles.pageTitle}>Editing: {displayName || `${firstName} ${lastName}`}</h1>
+            <p className={styles.pageSubtitle}>
+              {isPublished ? `🟢 Live at neonglass.me/${slug}` : `⚫ Draft · not publicly visible`}
+            </p>
+          </div>
+        </div>
+        <div className={styles.headerActions}>
+           <button onClick={() => setActiveModal('settings')} className={styles.btnSecondary}><Settings size={15}/> Settings</button>
+           <a href={`/${slug}`} target="_blank" onClick={handlePreviewClick} className={styles.btnSecondary} style={{ display: "flex", gap: 6 }}>
+             <ExternalLink size={15} /> View
+           </a>
         </div>
       </div>
 
-      {/* ── Right: Live Preview ── */}
-      <div className={styles.previewPanel}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
-          Live Preview
-        </div>
-        <div className={styles.previewPhoneFrame}>
-          <div className={styles.previewIframe} style={{ overflow: "auto", background: "#070c17" }}>
-            <PublicCard card={livePreviewCard} />
+      <div className={styles.editorLayout}>
+        {/* ── Left: Grid Builder ── */}
+        <div className={styles.builderContainer}>
+          {feedback && (
+             <div className={feedback.type === "success" ? styles.formSuccess : styles.formError}>
+                {feedback.type === "success" ? <CheckCircle size={16} /> : "⚠️"} {feedback.msg}
+             </div>
+          )}
+
+          <div className={styles.builderHeader}>
+            <h2>Create your first card</h2>
+            <p>Ready to design your card? Pick a field below to get started!</p>
+          </div>
+
+          {/* Add Images Section */}
+          <div className={styles.builderSection}>
+            <div className={styles.builderSectionTitle}>Add images</div>
+            <div className={styles.builderGrid} style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}>
+               <div className={styles.builderGridImageItem} onClick={() => setActiveModal("companyLogo")}>
+                  <div className={styles.builderGridImageItemIcon}><Plus size={24} /></div>
+                  <div className={styles.builderGridImageItemLabel}>Company Logo</div>
+               </div>
+               <div className={styles.builderGridImageItem} onClick={() => setActiveModal("profilePicture")}>
+                  <div className={styles.builderGridImageItemIcon}><Plus size={24} /></div>
+                  <div className={styles.builderGridImageItemLabel}>Profile Picture</div>
+               </div>
+               <div className={styles.builderGridImageItem} onClick={() => setActiveModal("coverPhoto")}>
+                  <div className={styles.builderGridImageItemIcon}><Plus size={24} /></div>
+                  <div className={styles.builderGridImageItemLabel}>Cover Photo</div>
+               </div>
+            </div>
+          </div>
+
+          {/* Add your details Section */}
+          <div className={styles.builderSection} style={{ marginTop: 24 }}>
+            <div className={styles.builderSectionTitle}>Add your details</div>
+            
+            <div className={styles.builderSectionSubtitle}>Personal</div>
+            <div className={styles.builderGrid}>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("name")}>
+                  <div className={styles.builderGridItemIcon}><User size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Name</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("jobTitle")}>
+                  <div className={styles.builderGridItemIcon}><Medal size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Job title</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("department")}>
+                  <div className={styles.builderGridItemIcon}><Briefcase size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Department</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("company")}>
+                  <div className={styles.builderGridItemIcon}><Building2 size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Company name</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("accreditations")}>
+                  <div className={styles.builderGridItemIcon}><FileText size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Accreditations</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("headline")}>
+                  <div className={styles.builderGridItemIcon}><MessageSquare size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Headline</div>
+               </div>
+            </div>
+
+            <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>General</div>
+            <div className={styles.builderGrid}>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("email")}>
+                  <div className={styles.builderGridItemIcon}><Mail size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Email</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("phone")}>
+                  <div className={styles.builderGridItemIcon}><PhoneIcon size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Phone</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("companyUrl")}>
+                  <div className={styles.builderGridItemIcon}><Briefcase size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Company URL</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("link")}>
+                  <div className={styles.builderGridItemIcon}><Link2 size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Link</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("address")}>
+                  <div className={styles.builderGridItemIcon}><MapPin size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Address</div>
+               </div>
+            </div>
+
+            <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Social</div>
+            <div className={styles.builderGrid}>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
+                  <div className={styles.builderGridItemIcon}><MessageSquare size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>X</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
+                  <div className={styles.builderGridItemIcon}><Camera size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Instagram</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
+                  <div className={styles.builderGridItemIcon}><Briefcase size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>LinkedIn</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
+                  <div className={styles.builderGridItemIcon}><Globe size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>Facebook</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
+                  <div className={styles.builderGridItemIcon}><Video size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>YouTube</div>
+               </div>
+               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
+                  <div className={styles.builderGridItemIcon}><Share2 size={28} strokeWidth={1.5} /></div>
+                  <div className={styles.builderGridItemLabel}>More Socials</div>
+               </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 32, display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--border)", paddingTop: 20 }}>
+             <div className={styles.toggleRow} style={{ flex: 1, paddingRight: 40 }}>
+                <div>
+                   <div style={{ fontWeight: 700, color: "var(--text-1)", fontSize: 14 }}>{isPublished ? "🟢 Live" : "⚫ Draft"}</div>
+                   <div className={styles.toggleDesc}>
+                     {isPublished ? `Publicly visible at neonglass.me/${slug}` : "Hidden from public. Toggle to make live."}
+                   </div>
+                </div>
+                <Toggle id="toggle-publish" checked={isPublished} onChange={handlePublishToggle} />
+             </div>
+             <button id="btn-save-card" className={styles.btnPrimary} onClick={handleSave} disabled={isPending} style={{ padding: "12px 32px" }}>
+                {isPending ? "Saving…" : "Save & Next"}
+             </button>
           </div>
         </div>
-        <a
-          href={`/${slug || card.slug}`}
-          target="_blank"
-          onClick={handlePreviewClick}
-          className={styles.btnSecondary}
-          style={{ display: "block", textAlign: "center", marginTop: 12 }}
-        >
-          Open in New Tab ↗
-        </a>
+
+        {/* ── Right: Live Preview ── */}
+        <div className={styles.previewPanel}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
+            Live Preview
+          </div>
+          <div className={styles.previewPhoneFrame}>
+            <div className={styles.previewIframe} style={{ overflow: "auto", background: "#ffffff" }}>
+              <PublicCard card={livePreviewCard} />
+            </div>
+          </div>
+        </div>
       </div>
-      </div>
+
+      {renderActiveModal()}
 
       {/* ── Draft Modal ── */}
       {showDraftModal && (
         <div className={styles.modalOverlay} onClick={() => setShowDraftModal(false)}>
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-            <button className={styles.modalClose} onClick={() => setShowDraftModal(false)}>✕</button>
+            <button className={styles.modalClose} onClick={() => setShowDraftModal(false)}><X size={18} /></button>
             <div className={styles.modalHeader}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
               <h2 className={styles.modalTitle}>Card is Not Live!</h2>
@@ -1043,27 +954,16 @@ export default function CardEditorClient({ card }: { card: Card }) {
               </p>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
-              <button 
-                className={styles.btnPrimary} 
-                onClick={() => {
-                  handlePublishToggle(true);
-                  setShowDraftModal(false);
-                }} 
-                style={{ width: "100%", padding: "14px" }}
-              >
+              <button className={styles.btnPrimary} onClick={() => { handlePublishToggle(true); setShowDraftModal(false); }} style={{ width: "100%", padding: "14px" }}>
                 Make Card Live Now 🟢
               </button>
-              <button 
-                className={styles.btnSecondary} 
-                onClick={() => setShowDraftModal(false)} 
-                style={{ width: "100%", padding: "14px" }}
-              >
+              <button className={styles.btnSecondary} onClick={() => setShowDraftModal(false)} style={{ width: "100%", padding: "14px" }}>
                 Keep Editing in Draft
               </button>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -369,7 +369,7 @@ export default function PublicCard({ card }: { card: VCard }) {
               value={cardUrl} 
               size={136} 
               style={{ height: "auto", maxWidth: "100%", width: "100%" }} 
-              fgColor="#1a1a1a" 
+              fgColor="#000000" 
             />
           </div>
           <p className={styles.publicQrText}>Scan with phone camera</p>

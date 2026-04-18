@@ -30,7 +30,7 @@ export default function LeadCapture({ vcardId, trackClick }: { vcardId: string; 
     <>
       <button 
         className={styles.mainCta} 
-        style={{ marginTop: 12, background: "var(--bg-card)", color: "var(--brand-primary)", border: "2px solid var(--brand-primary)" }}
+        style={{ marginTop: 12, background: "#ffffff", color: "#000000", border: "2px solid #000000" }}
         onClick={() => { trackClick(); setIsOpen(true); }}
       >
         <Users size={20} /> Exchange Contacts
@@ -57,12 +57,12 @@ export default function LeadCapture({ vcardId, trackClick }: { vcardId: string; 
 
             {success ? (
               <div style={{ textAlign: "center", padding: "32px 0" }}>
-                <CheckCircle size={56} color="#10b981" style={{ margin: "0 auto 16px" }} />
+                <CheckCircle size={56} color="#ff6b00" style={{ margin: "0 auto 16px" }} />
                 <h3 style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 8px" }}>Info Sent!</h3>
-                <p style={{ color: "var(--text-secondary)", fontSize: "15px" }}>Your details were successfully shared.</p>
+                <p style={{ color: "#6b7280", fontSize: "15px" }}>Your details were successfully shared.</p>
                 <button 
                   className={styles.mainCta} 
-                  style={{ marginTop: 24 }}
+                  style={{ marginTop: 24, background: "#000000", color: "#ffffff" }}
                   onClick={() => setIsOpen(false)}
                 >
                   Done
@@ -76,14 +76,14 @@ export default function LeadCapture({ vcardId, trackClick }: { vcardId: string; 
                 {error && <div style={{ color: "#ef4444", background: "rgba(239,68,68,0.1)", padding: 12, borderRadius: 8, marginBottom: 16 }}>{error}</div>}
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  <input type="text" name="name" placeholder="Full Name *" required style={inputStyle} />
-                  <input type="email" name="email" placeholder="Email Address" style={inputStyle} />
-                  <input type="tel" name="phone" placeholder="Phone Number" style={inputStyle} />
+                  <input type="text" name="name" placeholder="Full Name *" required className="lead-input" style={inputStyle} />
+                  <input type="email" name="email" placeholder="Email Address" className="lead-input" style={inputStyle} />
+                  <input type="tel" name="phone" placeholder="Phone Number" className="lead-input" style={inputStyle} />
                   <div style={{ display: "flex", gap: 12 }}>
-                    <input type="text" name="company" placeholder="Company" style={inputStyle} />
-                    <input type="text" name="jobTitle" placeholder="Job Title" style={inputStyle} />
+                    <input type="text" name="company" placeholder="Company" className="lead-input" style={inputStyle} />
+                    <input type="text" name="jobTitle" placeholder="Job Title" className="lead-input" style={inputStyle} />
                   </div>
-                  <textarea name="note" placeholder="Add a note (optional)..." style={{ ...inputStyle, minHeight: 80, resize: "vertical" }} />
+                  <textarea name="note" placeholder="Add a note (optional)..." className="lead-input" style={{ ...inputStyle, minHeight: 80, resize: "vertical" }} />
                   
                   <button type="submit" className={styles.mainCta} disabled={isPending} style={{ marginTop: 8, opacity: isPending ? 0.7 : 1 }}>
                     {isPending ? "Sending..." : "Connect"}
@@ -96,6 +96,7 @@ export default function LeadCapture({ vcardId, trackClick }: { vcardId: string; 
       )}
       <style dangerouslySetInnerHTML={{__html:`
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .lead-input:focus { border-color: #ff6b00 !important; box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1) !important; }
       `}} />
     </>
   );
