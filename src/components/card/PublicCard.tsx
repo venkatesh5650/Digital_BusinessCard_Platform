@@ -109,7 +109,7 @@ function ContactList({ card, trackClick }: { card: VCard, trackClick: () => void
               {phone.whatsapp ? " · WhatsApp" : ""}
             </div>
           </div>
-          <ChevronRight size={16} color="#ccc" />
+          <ChevronRight size={14} color="var(--text-3, #a0aec0)" />
         </a>
       ))}
       
@@ -123,7 +123,7 @@ function ContactList({ card, trackClick }: { card: VCard, trackClick: () => void
               {email.isPrimary ? " · Primary" : ""}
             </div>
           </div>
-          <ChevronRight size={16} color="#ccc" />
+          <ChevronRight size={14} color="var(--text-3, #a0aec0)" />
         </a>
       ))}
 
@@ -150,7 +150,7 @@ function ContactList({ card, trackClick }: { card: VCard, trackClick: () => void
                 .join(", ")}
             </div>
           </div>
-          <ChevronRight size={16} color="#ccc" />
+          <ChevronRight size={14} color="var(--text-3, #a0aec0)" />
         </a>
       ))}
     </Section>
@@ -180,7 +180,7 @@ function WebsiteList({ card, trackClick }: { card: VCard, trackClick: () => void
               {website.featured ? " · Featured" : ""}
             </div>
           </div>
-          <ChevronRight size={16} color="#ccc" />
+          <ChevronRight size={14} color="var(--text-3, #a0aec0)" />
         </a>
       ))}
     </Section>
@@ -214,7 +214,7 @@ export default function PublicCard({ card }: { card: VCard }) {
   const paymentLinks = getVisiblePaymentLinks(card);
   const mediaEmbeds = getVisibleMediaEmbeds(card);
 
-  const [cardUrl, setCardUrl] = useState(`https://neonglass.me/${card.settings.slug}`);
+  const [cardUrl, setCardUrl] = useState(`https://imprint.com/${card.settings.slug}`);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -264,7 +264,7 @@ export default function PublicCard({ card }: { card: VCard }) {
           <div className={styles.quickRow}>
             {card.settings.vcfDownloadEnabled && (
               <a href={`/api/vcf/${card.settings.slug}`} className={styles.mainCta} onClick={trackClick}>
-                <Download size={20} /> Save Contact
+                <Download size={18} /> Save Contact
               </a>
             )}
             
@@ -277,7 +277,7 @@ export default function PublicCard({ card }: { card: VCard }) {
                 className={styles.secondaryCta}
                 onClick={handleDownloadImage}
               >
-                <ImageIcon size={18} /> Save as Image
+                <ImageIcon size={16} /> Save as Image
               </button>
 
               <button 
@@ -289,7 +289,7 @@ export default function PublicCard({ card }: { card: VCard }) {
                   }
                 }}
               >
-                <Share2 size={18} /> Share
+                <Share2 size={16} /> Share
               </button>
               
               {whatsappPhone?.whatsapp && (
@@ -300,43 +300,43 @@ export default function PublicCard({ card }: { card: VCard }) {
                   target="_blank"
                   onClick={trackClick}
                 >
-                  <MessageCircle size={18} /> Message via WhatsApp
+                  <MessageCircle size={16} /> WhatsApp
                 </a>
               )}
             </div>
           </div>
+
+          <ContactList card={card} trackClick={trackClick} />
+          <SocialConnect card={card} trackClick={trackClick} />
+          <WebsiteList card={card} trackClick={trackClick} />
 
           {/* Featured Links */}
           {actionLinks.length > 0 && (
             <Section title="Featured">
               {actionLinks.map(link => (
                 <a key={link.id} href={link.url} className={styles.linkCard} target="_blank" onClick={trackClick}>
-                  <div className={styles.linkIcon}><LinkIcon size={20} /></div>
+                  <div className={styles.linkIcon}><LinkIcon size={18} /></div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className={styles.linkTitle}>{link.label}</div>
                     {link.subtitle && <div className={styles.linkSub}>{link.subtitle}</div>}
                   </div>
-                  <ChevronRight size={16} color="#ccc" />
+                  <ChevronRight size={14} color="var(--text-3, #a0aec0)" />
                 </a>
               ))}
             </Section>
           )}
-
-          <ContactList card={card} trackClick={trackClick} />
-          <WebsiteList card={card} trackClick={trackClick} />
-          <SocialConnect card={card} trackClick={trackClick} />
 
           {/* Payment Section */}
           {paymentLinks.length > 0 && (
             <Section title="Payments">
               {paymentLinks.map(pay => (
                 <a key={pay.id} href={pay.url} className={styles.linkCard} target="_blank" onClick={trackClick}>
-                  <div className={styles.linkIcon}><CreditCard size={20} /></div>
+                  <div className={styles.linkIcon}><CreditCard size={18} /></div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className={styles.linkTitle}>{pay.label || pay.platform}</div>
                     {pay.note && <div className={styles.linkSub}>{pay.note}</div>}
                   </div>
-                  <ChevronRight size={16} color="#ccc" />
+                  <ChevronRight size={14} color="var(--text-3, #a0aec0)" />
                 </a>
               ))}
             </Section>
@@ -348,13 +348,13 @@ export default function PublicCard({ card }: { card: VCard }) {
               {mediaEmbeds.map(embed => (
                 <a key={embed.id} href={embed.url} className={styles.linkCard} target="_blank" onClick={trackClick}>
                   <div className={styles.linkIcon}>
-                    {embed.type === 'youtube' ? <Play size={20} /> : <FileText size={20} />}
+                    {embed.type === 'youtube' ? <Play size={18} /> : <FileText size={18} />}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className={styles.linkTitle}>{embed.title || embed.type}</div>
                     <div className={styles.linkSub}>Tap to open</div>
                   </div>
-                  <ChevronRight size={16} color="#ccc" />
+                  <ChevronRight size={14} color="var(--text-3, #a0aec0)" />
                 </a>
               ))}
             </Section>
@@ -362,14 +362,14 @@ export default function PublicCard({ card }: { card: VCard }) {
 
         </div>
 
-        {/* QR Code Section - Blinq Style */}
+        {/* QR Code Section */}
         <div className={styles.publicQrSection} suppressHydrationWarning>
           <div className={styles.publicQrBox}>
             <QRCode 
               value={cardUrl} 
-              size={144} 
+              size={136} 
               style={{ height: "auto", maxWidth: "100%", width: "100%" }} 
-              fgColor="#111111" 
+              fgColor="#1a1a1a" 
             />
           </div>
           <p className={styles.publicQrText}>Scan with phone camera</p>
@@ -377,9 +377,29 @@ export default function PublicCard({ card }: { card: VCard }) {
 
         <footer className={styles.footer}>
           <div className={styles.footerLabel}>Create your own digital card</div>
-          <div className={styles.footerLogo}>Imprint</div>
+          <a href="/" className={styles.footerLogo} style={{ textDecoration: 'none' }}>Imprint</a>
         </footer>
       </article>
+
+      {/* Sticky Mobile CTA */}
+      {card.settings.vcfDownloadEnabled && (
+        <div className={styles.stickyCtaBar}>
+          <a href={`/api/vcf/${card.settings.slug}`} className={styles.mainCta} onClick={trackClick}>
+            <Download size={18} /> Save Contact
+          </a>
+          <button 
+            className={styles.secondaryCta}
+            onClick={() => {
+              trackClick();
+              if (typeof navigator !== 'undefined' && navigator.share) {
+                navigator.share({ title: getDisplayName(card), url: window.location.href });
+              }
+            }}
+          >
+            <Share2 size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

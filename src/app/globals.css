@@ -49,6 +49,17 @@
   /* Navbar */
   --nav-bg:           rgba(255, 255, 255, 0.85);
   --nav-border:       rgba(0, 0, 0, 0.06);
+
+  /* Legacy aliases (used by dashboard & older components) */
+  --bg-card:          var(--bg-elevated);
+  --bg-page:          #ffffff;
+  --brand-primary:    var(--accent);
+  --brand-secondary:  var(--accent);
+  --text-primary:     var(--text-1);
+  --text-secondary:   var(--text-2);
+  --text-muted:       var(--text-3);
+  --radius-lg:        var(--r-md);
+  --radius-2xl:       var(--r-xl);
 }
 
 /* ── Dark Mode ────────────────────────────────────────────────── */
@@ -78,6 +89,14 @@
 
   --nav-bg:           rgba(15, 15, 15, 0.85);
   --nav-border:       rgba(255, 255, 255, 0.06);
+
+  /* Legacy aliases */
+  --bg-card:          var(--bg-elevated);
+  --brand-primary:    var(--accent);
+  --brand-secondary:  var(--accent);
+  --text-primary:     var(--text-1);
+  --text-secondary:   var(--text-2);
+  --text-muted:       var(--text-3);
 }
 
 /* ── Reset ────────────────────────────────────────────────────── */
