@@ -377,7 +377,7 @@ export default function PublicCard({ card }: { card: VCard }) {
 
         <footer className={styles.footer}>
           <div className={styles.footerLabel}>Create your own digital card</div>
-          <a href="/" className={styles.footerLogo} style={{ textDecoration: 'none' }}>Imprint</a>
+          <a href="/" className={styles.footerLogo} style={{ textDecoration: 'none', color: 'var(--text-1)' }}>Imprint</a>
         </footer>
       </article>
 

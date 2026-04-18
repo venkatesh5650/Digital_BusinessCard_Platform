@@ -9,10 +9,10 @@
 /* ── Light Mode (Default) ────────────────────────────────────── */
 :root {
   /* Brand */
-  --accent:           #E8503A;
-  --accent-hover:     #d4432f;
-  --accent-light:     rgba(232, 80, 58, 0.08);
-  --accent-border:    rgba(232, 80, 58, 0.20);
+  --accent:           #ff6b00;
+  --accent-hover:     #e05e00;
+  --accent-light:     rgba(255, 107, 0, 0.08);
+  --accent-border:    rgba(255, 107, 0, 0.20);
 
   /* Surfaces */
   --bg-page:          #ffffff;
@@ -64,31 +64,31 @@
 
 /* ── Dark Mode ────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --accent:           #E8503A;
-  --accent-hover:     #f06550;
-  --accent-light:     rgba(232, 80, 58, 0.12);
-  --accent-border:    rgba(232, 80, 58, 0.30);
+  --accent:           #ff6b00;
+  --accent-hover:     #ff8c3a;
+  --accent-light:     rgba(255, 107, 0, 0.12);
+  --accent-border:    rgba(255, 107, 0, 0.30);
 
-  --bg-page:          #0f0f0f;
-  --bg-surface:       #1a1a1a;
-  --bg-elevated:      #222222;
-  --bg-muted:         #171717;
-  --bg-hover:         #2a2a2a;
+  --bg-page:          #050505;
+  --bg-surface:       #111111;
+  --bg-elevated:      #181818;
+  --bg-muted:         #0c0c0c;
+  --bg-hover:         #222222;
 
-  --border:           #2a2a2a;
-  --border-strong:    #3a3a3a;
-  --shadow-sm:        0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md:        0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg:        0 12px 40px rgba(0,0,0,0.5);
-  --shadow-xl:        0 24px 60px rgba(0,0,0,0.6);
+  --border:           #222222;
+  --border-strong:    #333333;
+  --shadow-sm:        0 1px 2px rgba(0,0,0,0.5);
+  --shadow-md:        0 4px 12px rgba(0,0,0,0.6);
+  --shadow-lg:        0 12px 40px rgba(0,0,0,0.7);
+  --shadow-xl:        0 24px 60px rgba(0,0,0,0.8);
 
-  --text-1:           #f0f0f0;
-  --text-2:           #a0a0a0;
-  --text-3:           #666666;
-  --text-inverse:     #0f0f0f;
+  --text-1:           #f5f5f5;
+  --text-2:           #a3a3a3;
+  --text-3:           #737373;
+  --text-inverse:     #050505;
 
-  --nav-bg:           rgba(15, 15, 15, 0.85);
-  --nav-border:       rgba(255, 255, 255, 0.06);
+  --nav-bg:           rgba(5, 5, 5, 0.85);
+  --nav-border:       rgba(255, 255, 255, 0.08);
 
   /* Legacy aliases */
   --bg-card:          var(--bg-elevated);
@@ -159,7 +159,7 @@ img, video { max-width: 100%; display: block; }
 .btn-primary:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(232, 80, 58, 0.30);
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.30);
 }
 
 .btn-outline {

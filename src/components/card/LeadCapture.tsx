@@ -30,7 +30,12 @@ export default function LeadCapture({ vcardId, trackClick }: { vcardId: string; 
     <>
       <button 
         className={styles.mainCta} 
-        style={{ marginTop: 12, background: "#ffffff", color: "#000000", border: "2px solid #000000" }}
+        style={{ 
+          marginTop: 12, 
+          background: "var(--bg-elevated)", 
+          color: "var(--text-1)", 
+          border: "2px solid var(--text-1)" 
+        }}
         onClick={() => { trackClick(); setIsOpen(true); }}
       >
         <Users size={20} /> Exchange Contacts
@@ -62,7 +67,7 @@ export default function LeadCapture({ vcardId, trackClick }: { vcardId: string; 
                 <p style={{ color: "#6b7280", fontSize: "15px" }}>Your details were successfully shared.</p>
                 <button 
                   className={styles.mainCta} 
-                  style={{ marginTop: 24, background: "#000000", color: "#ffffff" }}
+                  style={{ marginTop: 24, background: "var(--text-1)", color: "var(--bg-page)" }}
                   onClick={() => setIsOpen(false)}
                 >
                   Done
@@ -103,6 +108,13 @@ export default function LeadCapture({ vcardId, trackClick }: { vcardId: string; 
 }
 
 const inputStyle = {
-  width: "100%", padding: "14px 16px", borderRadius: "12px", border: "1px solid #e1e4e8",
-  background: "#f8f9fa", fontSize: "15px", fontFamily: "inherit", outline: "none", color: "#111"
+  width: "100%", 
+  padding: "14px 16px", 
+  borderRadius: "12px", 
+  border: "1px solid var(--border)",
+  background: "var(--bg-muted)", 
+  fontSize: "15px", 
+  fontFamily: "inherit", 
+  outline: "none", 
+  color: "var(--text-1)"
 };

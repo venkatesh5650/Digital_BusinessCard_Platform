@@ -3,8 +3,9 @@
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CreditCard, Users, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, CreditCard, Users, LogOut, ExternalLink, Moon, Sun } from "lucide-react";
 import styles from "./dashboard.module.css";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type User = {
   id?: string;
@@ -55,6 +56,13 @@ export default function DashboardNav({ user }: { user: User }) {
             {label}
           </Link>
         ))}
+
+        <div className={styles.navDivider} />
+        
+        <div className={styles.navItem} style={{ cursor: 'default' }}>
+          <ThemeToggle />
+          <span style={{ marginLeft: '12px', fontSize: '14px', fontWeight: 500 }}>Switch Theme</span>
+        </div>
       </nav>
 
       <div className={styles.sidebarFooter}>
