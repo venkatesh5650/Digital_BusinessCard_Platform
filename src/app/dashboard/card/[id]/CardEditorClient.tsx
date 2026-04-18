@@ -576,7 +576,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
             <div className={styles.formGrid}>
               <div className={styles.formField}>
                 <label>First Name *</label>
-                <input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Ravi" />
+                <input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Jane" />
               </div>
               <div className={styles.formField}>
                 <label>Last Name *</label>
@@ -584,7 +584,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
               </div>
               <div className={`${styles.formField} ${styles.formGridFull}`}>
                 <label>Display Name</label>
-                <input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Ravi Kumar Tenneti (optional)" />
+                <input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Jane Doe (optional)" />
               </div>
               <div className={`${styles.formField} ${styles.formGridFull}`}>
                 <label>Job Title *</label>
@@ -975,7 +975,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
             <div className={styles.formGrid}>
               <div className={`${styles.formField} ${styles.formGridFull}`}>
                 <label>SEO Title</label>
-                <input value={seoTitle} onChange={e => setSeoTitle(e.target.value)} placeholder="Ravi Kumar — Founder & CEO at Computer Port" />
+                <input value={seoTitle} onChange={e => setSeoTitle(e.target.value)} placeholder="Jane Doe — Marketing Director" />
               </div>
               <div className={`${styles.formField} ${styles.formGridFull}`}>
                 <label>Meta Description</label>

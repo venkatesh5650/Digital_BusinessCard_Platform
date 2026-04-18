@@ -82,7 +82,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
             <label htmlFor="name">Full name</label>
-            <input id="name" name="name" type="text" placeholder="Ravi Kumar" required autoComplete="name" />
+            <input id="name" name="name" type="text" placeholder="John Doe" required autoComplete="name" />
           </div>
           <div className={styles.field}>
             <label htmlFor="email">Email address</label>
