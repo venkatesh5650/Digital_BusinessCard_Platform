@@ -25,6 +25,7 @@ import { Trash2, Plus, Eye, EyeOff, CheckCircle, ArrowLeft, ExternalLink, Image 
 import Link from "next/link";
 import styles from "../../dashboard.module.css";
 import PublicCard from "@/components/card/PublicCard";
+import { PlatformIcon } from "@/components/card/SocialIcon";
 import type { VCard } from "@/types";
 
 type Phone = { id: string; type: string; number: string; label: string | null; whatsapp: boolean; sms: boolean; isPrimary: boolean };
@@ -50,6 +51,8 @@ type Card = {
   companyRole: string | null;
   companyWebsite: string | null;
   companyTagline: string | null;
+  companyLogoUrl: string | null;
+  coverImageUrl: string | null;
   isPublished: boolean;
   leadCaptureEnabled: boolean;
   vcfDownloadEnabled: boolean;
@@ -75,7 +78,7 @@ function Toggle({ id, checked, onChange }: { id: string; checked: boolean; onCha
 }
 
 // ── Avatar Uploader Component ─────────────────────────────────────
-function AvatarUploader({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function AvatarUploader({ value, onChange, isBanner = false }: { value: string; onChange: (v: string) => void, isBanner?: boolean }) {
   const [mode, setMode] = useState<"upload" | "url">("upload");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,22 +91,43 @@ function AvatarUploader({ value, onChange }: { value: string; onChange: (v: stri
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 256;
-        const MAX_HEIGHT = 256;
+        // Higher resolution for banners
+        const targetW = isBanner ? 1200 : 400;
+        const targetH = isBanner ? 600 : 400;
+        
         let width = img.width;
         let height = img.height;
+        const ratio = width / height;
 
+        if (isBanner) {
+          // Fixed wide aspect for banners
+          canvas.width = 1200;
+          canvas.height = 600;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            const scale = Math.max(1200 / width, 600 / height);
+            const x = (1200 - width * scale) / 2;
+            const y = (600 - height * scale) / 2;
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, 1200, 600);
+            ctx.drawImage(img, x, y, width * scale, height * scale);
+            onChange(canvas.toDataURL("image/jpeg", 0.9));
+          }
+          return;
+        }
+
+        // Standard square for avatars/logos
         if (width > height) {
-          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+          if (width > targetW) { height = Math.round((height * targetW) / width); width = targetW; }
         } else {
-          if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
+          if (height > targetH) { width = Math.round((width * targetH) / height); height = targetH; }
         }
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          onChange(canvas.toDataURL("image/jpeg", 0.8)); // Output standard lightweight format
+          onChange(canvas.toDataURL("image/jpeg", 0.9));
         }
       };
       img.src = event.target?.result as string;
@@ -112,34 +136,60 @@ function AvatarUploader({ value, onChange }: { value: string; onChange: (v: stri
   };
 
   return (
-    <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-      {value ? (
-        <img src={value} alt="Avatar Preview" style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", border: "2px solid #e1e4e8", flexShrink: 0 }} />
-      ) : (
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#f1f3f4", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: "2px dashed #ccc" }}>
-          <span style={{ fontSize: 24, color: "#9ca3af" }}>👤</span>
-        </div>
-      )}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button type="button" onClick={() => setMode("upload")} style={{ padding: "4px 12px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: 600, background: mode === "upload" ? "#171717" : "#f1f3f4", color: mode === "upload" ? "#fff" : "#70757a", border: "none", cursor: "pointer" }}>Upload File</button>
-          <button type="button" onClick={() => setMode("url")} style={{ padding: "4px 12px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: 600, background: mode === "url" ? "#171717" : "#f1f3f4", color: mode === "url" ? "#fff" : "#70757a", border: "none", cursor: "pointer" }}>Web URL</button>
+    <div style={{ display: "flex", gap: "20px", alignItems: "center", padding: "12px", background: "rgba(255,107,0,0.03)", borderRadius: "16px", border: "1px solid rgba(255,107,0,0.1)" }}>
+      <div style={{ position: "relative" }}>
+        {value ? (
+          <img src={value} alt="Preview" style={{ width: 80, height: 80, borderRadius: "12px", objectFit: "cover", border: "2px solid #fff", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+        ) : (
+          <div style={{ width: 80, height: 80, borderRadius: "12px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", border: "2px dashed #d1d5db" }}>
+            <Camera size={24} color="#9ca3af" />
+          </div>
+        )}
+      </div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <button type="button" onClick={() => setMode("upload")} style={{ padding: "6px 14px", borderRadius: "8px", fontSize: "0.75rem", fontWeight: 700, background: mode === "upload" ? "#000" : "#fff", color: mode === "upload" ? "#fff" : "#4b5563", border: "1px solid " + (mode === "upload" ? "#000" : "#e5e7eb"), cursor: "pointer", transition: "all 0.2s" }}>Upload File</button>
+          <button type="button" onClick={() => setMode("url")} style={{ padding: "6px 14px", borderRadius: "8px", fontSize: "0.75rem", fontWeight: 700, background: mode === "url" ? "#000" : "#fff", color: mode === "url" ? "#fff" : "#4b5563", border: "1px solid " + (mode === "url" ? "#000" : "#e5e7eb"), cursor: "pointer", transition: "all 0.2s" }}>Web URL</button>
+          {value && (
+            <button 
+              type="button" 
+              onClick={() => onChange("")} 
+              style={{ 
+                padding: "6px 14px", 
+                borderRadius: "8px", 
+                fontSize: "0.75rem", 
+                fontWeight: 700, 
+                background: "rgba(239, 68, 68, 0.1)", 
+                color: "#ef4444", 
+                border: "1px solid rgba(239, 68, 68, 0.2)", 
+                cursor: "pointer", 
+                transition: "all 0.2s",
+                marginLeft: "auto"
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)")}
+              onMouseOut={(e) => (e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)")}
+            >
+              Remove
+            </button>
+          )}
         </div>
         
         {mode === "url" ? (
           <input 
             value={value || ""} 
             onChange={e => onChange(e.target.value)} 
-            placeholder="https://example.com/photo.jpg" 
-            style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: "1px solid #e1e4e8", fontSize: "0.9rem" }}
+            placeholder="https://images.com/photo.jpg" 
+            style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #e5e7eb", fontSize: "0.85rem", background: "#fff" }}
           />
         ) : (
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleFileChange}
-            style={{ width: "100%", fontSize: "0.85rem", color: "#70757a", padding: "4px 0" }}
-          />
+          <div style={{ position: "relative", width: "100%" }}>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleFileChange}
+              style={{ width: "100%", fontSize: "0.8rem", color: "#6b7280", cursor: "pointer" }}
+            />
+          </div>
         )}
       </div>
     </div>
@@ -154,9 +204,9 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
-  // Additional Image States (Mocked for UI, or passed to theme if supported later)
-  const [companyLogoUrl, setCompanyLogoUrl] = useState("");
-  const [coverPhotoUrl, setCoverPhotoUrl] = useState("");
+  // Additional Image States
+  const [companyLogoUrl, setCompanyLogoUrl] = useState(card.companyLogoUrl ?? "");
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState(card.coverImageUrl ?? "");
 
   // Profile fields
   const [firstName, setFirstName] = useState(card.firstName);
@@ -197,8 +247,16 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [newAddress, setNewAddress] = useState({ type: "work", label: "", street: "", city: "", state: "", postalCode: "", country: "", mapUrl: "" });
   const [newWebsite, setNewWebsite] = useState({ label: "", url: "", featured: false });
   const [newSocial, setNewSocial] = useState({ platform: "linkedin", url: "", handle: "" });
-  const [newPayment, setNewPayment] = useState({ platform: "paypal", url: "", label: "", note: "" });
   const [newAction, setNewAction] = useState({ platform: "calendly", url: "", label: "", subtitle: "" });
+  const [newPayment, setNewPayment] = useState({ platform: "paypal", url: "", label: "", note: "" });
+
+  // Helper to open modal with platform pre-selected
+  const openPlatformModal = (modalType: "social" | "payment" | "action", platform: string) => {
+    setActiveModal(modalType);
+    if (modalType === "social") setNewSocial(prev => ({ ...prev, platform }));
+    if (modalType === "payment") setNewPayment(prev => ({ ...prev, platform }));
+    if (modalType === "action") setNewAction(prev => ({ ...prev, platform }));
+  };
 
   function showFeedback(type: "success" | "error", msg: string) {
     setFeedback({ type, msg });
@@ -221,6 +279,8 @@ export default function CardEditorClient({ card }: { card: Card }) {
       fd.append("companyRole", companyRole);
       fd.append("companyWebsite", companyWebsite);
       fd.append("companyTagline", companyTagline);
+      fd.append("companyLogoUrl", companyLogoUrl);
+      fd.append("coverImageUrl", coverPhotoUrl);
       fd.append("slug", slug);
       fd.append("isPublished", isPublished.toString());
       fd.append("leadCaptureEnabled", leadCapture.toString());
@@ -395,9 +455,9 @@ export default function CardEditorClient({ card }: { card: Card }) {
     });
   }
 
-  const SOCIAL_PLATFORMS = ["linkedin", "twitter", "instagram", "github", "youtube", "facebook", "telegram", "threads", "tiktok", "pinterest", "snapchat", "discord"];
-  const PAYMENT_PLATFORMS = ["paypal", "stripe", "venmo", "gpay", "upi", "buymeacoffee", "patreon"];
-  const ACTION_PLATFORMS = ["calendly", "zoom", "meet", "booking", "typeform", "shopify", "custom"];
+  const SOCIAL_PLATFORMS = ["linkedin", "twitter", "instagram", "facebook", "github", "youtube", "tiktok", "whatsapp", "telegram", "discord", "twitch", "signal", "skype", "threads", "bluesky", "pinterest", "snapchat", "reddit", "yelp"];
+  const PAYMENT_PLATFORMS = ["paypal", "stripe", "venmo", "cashapp", "gpay", "whatsapppay", "wise", "upi", "razorpay", "bank_transfer", "buymeacoffee", "patreon", "kofi"];
+  const ACTION_PLATFORMS = ["calendly", "cal", "zoom", "meet", "teams", "booking", "typeform", "shopify", "custom"];
   const livePreviewCard: VCard = {
     id: card.id,
     userId: "preview-user",
@@ -412,10 +472,11 @@ export default function CardEditorClient({ card }: { card: Card }) {
       bio: bio || undefined,
       pronouns: pronouns || undefined,
       avatarUrl: avatarUrl || "",
-      company: companyName
+      company: (companyName || companyLogoUrl)
         ? {
-            name: companyName,
+            name: companyName || "",
             role: companyRole || undefined,
+            logoUrl: companyLogoUrl || undefined,
             website: companyWebsite || undefined,
             tagline: companyTagline || undefined,
           }
@@ -551,7 +612,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
           <div className={styles.formGrid}>
             <div className={`${styles.formField} ${styles.formGridFull}`}>
               <label>Cover Banner</label>
-              <AvatarUploader value={coverPhotoUrl} onChange={setCoverPhotoUrl} />
+              <AvatarUploader value={coverPhotoUrl} onChange={setCoverPhotoUrl} isBanner={true} />
             </div>
           </div>
         );
@@ -809,106 +870,256 @@ export default function CardEditorClient({ card }: { card: Card }) {
           {/* Add Images Section */}
           <div className={styles.builderSection}>
             <div className={styles.builderSectionTitle}>Add images</div>
-            <div className={styles.builderGrid} style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}>
-               <div className={styles.builderGridImageItem} onClick={() => setActiveModal("companyLogo")}>
-                  <div className={styles.builderGridImageItemIcon}><Plus size={24} /></div>
-                  <div className={styles.builderGridImageItemLabel}>Company Logo</div>
-               </div>
-               <div className={styles.builderGridImageItem} onClick={() => setActiveModal("profilePicture")}>
-                  <div className={styles.builderGridImageItemIcon}><Plus size={24} /></div>
-                  <div className={styles.builderGridImageItemLabel}>Profile Picture</div>
-               </div>
-               <div className={styles.builderGridImageItem} onClick={() => setActiveModal("coverPhoto")}>
-                  <div className={styles.builderGridImageItemIcon}><Plus size={24} /></div>
-                  <div className={styles.builderGridImageItemLabel}>Cover Photo</div>
-               </div>
+            <div className={styles.builderGrid} style={{ gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))" }}>
+                <div className={styles.builderGridImageItem} onClick={() => setActiveModal("companyLogo")} style={{ position: "relative", border: companyLogoUrl ? "1px solid var(--orange)" : undefined, background: companyLogoUrl ? "rgba(255,107,0,0.02)" : undefined }}>
+                   {companyLogoUrl && (
+                     <button 
+                       className={styles.gridItemQuickRemove} 
+                       onClick={(e) => { e.stopPropagation(); setCompanyLogoUrl(""); }}
+                       title="Remove Logo"
+                     >
+                       <X size={14} />
+                     </button>
+                   )}
+                   <div className={styles.builderGridImageItemIcon}>
+                     {companyLogoUrl ? <img src={companyLogoUrl} alt="Logo" style={{ width: 44, height: 44, borderRadius: "8px", objectFit: "cover" }} /> : <Plus size={24} />}
+                   </div>
+                   <div className={styles.builderGridImageItemLabel}>Company Logo</div>
+                   {companyLogoUrl && <div style={{ fontSize: 10, color: "var(--orange)", fontWeight: 700, marginTop: -4 }}>SET</div>}
+                </div>
+                <div className={styles.builderGridImageItem} onClick={() => setActiveModal("profilePicture")} style={{ position: "relative", border: avatarUrl ? "1px solid var(--orange)" : undefined, background: avatarUrl ? "rgba(255,107,0,0.02)" : undefined }}>
+                   {avatarUrl && (
+                     <button 
+                       className={styles.gridItemQuickRemove} 
+                       onClick={(e) => { e.stopPropagation(); setAvatarUrl(""); }}
+                       title="Remove Avatar"
+                     >
+                       <X size={14} />
+                     </button>
+                   )}
+                   <div className={styles.builderGridImageItemIcon}>
+                     {avatarUrl ? <img src={avatarUrl} alt="Avatar" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} /> : <Plus size={24} />}
+                   </div>
+                   <div className={styles.builderGridImageItemLabel}>Profile Picture</div>
+                   {avatarUrl && <div style={{ fontSize: 10, color: "var(--orange)", fontWeight: 700, marginTop: -4 }}>SET</div>}
+                </div>
+                <div className={styles.builderGridImageItem} onClick={() => setActiveModal("coverPhoto")} style={{ position: "relative", border: coverPhotoUrl ? "1px solid var(--orange)" : undefined, background: coverPhotoUrl ? "rgba(255,107,0,0.02)" : undefined }}>
+                   {coverPhotoUrl && (
+                     <button 
+                       className={styles.gridItemQuickRemove} 
+                       onClick={(e) => { e.stopPropagation(); setCoverPhotoUrl(""); }}
+                       title="Remove Cover"
+                     >
+                       <X size={14} />
+                     </button>
+                   )}
+                   <div className={styles.builderGridImageItemIcon}>
+                     {coverPhotoUrl ? <img src={coverPhotoUrl} alt="Cover" style={{ width: 44, height: 44, borderRadius: "6px", objectFit: "cover" }} /> : <Plus size={24} />}
+                   </div>
+                   <div className={styles.builderGridImageItemLabel}>Cover Photo</div>
+                   {coverPhotoUrl && <div style={{ fontSize: 10, color: "var(--orange)", fontWeight: 700, marginTop: -4 }}>SET</div>}
+                </div>
             </div>
           </div>
 
-          {/* Add your details Section */}
-          <div className={styles.builderSection} style={{ marginTop: 24 }}>
-            <div className={styles.builderSectionTitle}>Add your details</div>
-            
-            <div className={styles.builderSectionSubtitle}>Personal</div>
-            <div className={styles.builderGrid}>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("name")}>
-                  <div className={styles.builderGridItemIcon}><User size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Name</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("jobTitle")}>
-                  <div className={styles.builderGridItemIcon}><Medal size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Job title</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("department")}>
-                  <div className={styles.builderGridItemIcon}><Briefcase size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Department</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("company")}>
-                  <div className={styles.builderGridItemIcon}><Building2 size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Company name</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("accreditations")}>
-                  <div className={styles.builderGridItemIcon}><FileText size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Accreditations</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("headline")}>
-                  <div className={styles.builderGridItemIcon}><MessageSquare size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Headline</div>
-               </div>
-            </div>
+           {/* Add your details Section */}
+           <div className={styles.builderSection} style={{ marginTop: 24 }}>
+             <div className={styles.builderSectionTitle}>Customize your card</div>
+             
+             <div className={styles.builderSectionSubtitle}>Messaging</div>
+             <div className={styles.builderGrid}>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "whatsapp")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(37, 211, 102, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="whatsapp" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>WhatsApp</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "telegram")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(34, 158, 217, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="telegram" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Telegram</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "signal")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(58, 118, 240, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="signal" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Signal</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "discord")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(88, 101, 242, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="discord" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Discord</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "skype")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 175, 240, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="skype" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Skype</div>
+                </div>
+             </div>
 
-            <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>General</div>
-            <div className={styles.builderGrid}>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("email")}>
-                  <div className={styles.builderGridItemIcon}><Mail size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Email</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("phone")}>
-                  <div className={styles.builderGridItemIcon}><PhoneIcon size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Phone</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("companyUrl")}>
-                  <div className={styles.builderGridItemIcon}><Briefcase size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Company URL</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("link")}>
-                  <div className={styles.builderGridItemIcon}><Link2 size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Link</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("address")}>
-                  <div className={styles.builderGridItemIcon}><MapPin size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Address</div>
-               </div>
-            </div>
+             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Identity</div>
+             <div className={styles.builderGrid}>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("name")}>
+                   <div className={styles.builderGridItemIcon}><User size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Name</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("jobTitle")}>
+                   <div className={styles.builderGridItemIcon}><Medal size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Job title</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("department")}>
+                   <div className={styles.builderGridItemIcon}><Briefcase size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Department</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("company")}>
+                   <div className={styles.builderGridItemIcon}><Building2 size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Company</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("accreditations")}>
+                   <div className={styles.builderGridItemIcon}><FileText size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Bio</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("headline")}>
+                   <div className={styles.builderGridItemIcon}><MessageSquare size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Headline</div>
+                </div>
+             </div>
 
-            <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Social</div>
-            <div className={styles.builderGrid}>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
-                  <div className={styles.builderGridItemIcon}><MessageSquare size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>X</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
-                  <div className={styles.builderGridItemIcon}><Camera size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Instagram</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
-                  <div className={styles.builderGridItemIcon}><Briefcase size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>LinkedIn</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
-                  <div className={styles.builderGridItemIcon}><Globe size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>Facebook</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
-                  <div className={styles.builderGridItemIcon}><Video size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>YouTube</div>
-               </div>
-               <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
-                  <div className={styles.builderGridItemIcon}><Share2 size={28} strokeWidth={1.5} /></div>
-                  <div className={styles.builderGridItemLabel}>More Socials</div>
-               </div>
-            </div>
-          </div>
+             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Communication</div>
+             <div className={styles.builderGrid}>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("email")}>
+                   <div className={styles.builderGridItemIcon}><Mail size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Email</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("phone")}>
+                   <div className={styles.builderGridItemIcon}><PhoneIcon size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Phone</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("address")}>
+                   <div className={styles.builderGridItemIcon}><MapPin size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Address</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("link")}>
+                   <div className={styles.builderGridItemIcon}><Link2 size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>Website</div>
+                </div>
+             </div>
+
+             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Professional</div>
+             <div className={styles.builderGrid}>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "linkedin")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(10, 102, 194, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="linkedin" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>LinkedIn</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "github")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(36, 41, 46, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="github" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>GitHub</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("action", "calendly")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 107, 255, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="calendly" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Calendly</div>
+                </div>
+             </div>
+
+             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Payments</div>
+             <div className={styles.builderGrid}>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "paypal")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 48, 135, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="paypal" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>PayPal</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "venmo")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(61, 149, 206, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="venmo" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Venmo</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "cashapp")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 214, 79, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="cashapp" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>CashApp</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "gpay")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(66, 133, 244, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="gpay" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>GPay</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "whatsapppay")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(37, 211, 102, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="whatsapppay" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>WA Pay</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "wise")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 185, 255, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="wise" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Wise</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "bank_transfer")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(113, 128, 150, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="bank_transfer" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>NEFT/IMPS</div>
+                </div>
+             </div>
+
+             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Social & Entertainment</div>
+             <div className={styles.builderGrid}>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "instagram")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(228, 64, 95, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="instagram" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Instagram</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "twitter")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="twitter" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>X</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "facebook")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(24, 119, 242, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="facebook" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Facebook</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "youtube")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(255, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="youtube" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>YouTube</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "tiktok")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="tiktok" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>TikTok</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "twitch")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(145, 70, 255, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="twitch" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Twitch</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
+                   <div className={styles.builderGridItemIcon}><Plus size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>More</div>
+                </div>
+             </div>
+           </div>
 
           <div style={{ marginTop: 32, display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--border)", paddingTop: 20 }}>
              <div className={styles.toggleRow} style={{ flex: 1, paddingRight: 40 }}>

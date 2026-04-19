@@ -109,6 +109,8 @@ export async function updateCard(cardId: string, formData: FormData) {
       companyRole: (formData.get("companyRole") as string) || null,
       companyWebsite: (formData.get("companyWebsite") as string) || null,
       companyTagline: (formData.get("companyTagline") as string) || null,
+      companyLogoUrl: (formData.get("companyLogoUrl") as string) || null,
+      coverImageUrl: (formData.get("coverImageUrl") as string) || null,
       slug: newSlug || card.slug,
       isPublished: formData.get("isPublished") === "true",
       leadCaptureEnabled: formData.get("leadCaptureEnabled") === "true",

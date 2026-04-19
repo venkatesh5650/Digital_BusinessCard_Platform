@@ -57,6 +57,8 @@ export async function getCardsByUser(userId: string) {
       displayName: true,
       jobTitle: true,
       avatarUrl: true,
+      companyLogoUrl: true,
+      coverImageUrl: true,
       isPublished: true,
       totalViews: true,
       totalClicks: true,

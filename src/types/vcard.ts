@@ -34,6 +34,8 @@ export type SocialPlatform =
   | "signal"
   | "threads"
   | "bluesky"
+  | "skype"
+  | "yelp"
   | "website"
   | "portfolio"
   | "custom";
@@ -49,7 +51,10 @@ export type PaymentPlatform =
   | "upi"
   | "buymeacoffee"
   | "patreon"
-  | "kofi";
+  | "kofi"
+  | "whatsapppay"
+  | "wise"
+  | "bank_transfer";
 
 /** Scheduling & action link types */
 export type ActionPlatform =

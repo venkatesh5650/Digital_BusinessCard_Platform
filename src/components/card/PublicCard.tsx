@@ -57,27 +57,40 @@ function CardHeader({ card }: { card: VCard }) {
     <header className={styles.header}>
       <div 
         className={styles.headerBanner}
-        style={{ backgroundImage: profile.company?.logoUrl ? `url(${profile.company.logoUrl})` : undefined }}
-      />
-      
-      <div className={styles.avatarOverlay}>
-        <Avatar src={profile.avatarUrl} name={name} />
-      </div>
-
-      <div className={styles.headerContent}>
-        <h1 className={styles.name}>{name}</h1>
-        <p className={styles.jobTitle}>{profile.jobTitle}</p>
-        {profile.company && (
-          <a href={profile.company.website} className={styles.companyName}>
-            {profile.company.name}
-          </a>
-        )}
-        {profile.pronouns && (
-          <div style={{ marginTop: "4px" }}>
-            <span className={styles.pronounsBadge}>{profile.pronouns}</span>
+        style={{ 
+          backgroundImage: card.theme.coverImageUrl ? `url(${card.theme.coverImageUrl})` : undefined,
+        }}
+      >
+        {card.profile.company?.logoUrl && (
+          <div className={styles.companyLogoOverlay}>
+            <div className={styles.logoPillIcon}>
+              <img src={card.profile.company.logoUrl} alt="Logo" />
+            </div>
+            <span className={styles.logoPillText}>
+              {card.profile.company.name || "Company"}
+            </span>
           </div>
         )}
-        {profile.bio && <p className={styles.bio}>{profile.bio}</p>}
+      </div>
+      
+      <div className={styles.headerAlignmentWrap}>
+        <div className={styles.avatarOverlay}>
+          <Avatar src={profile.avatarUrl} name={name} />
+        </div>
+
+        <div className={styles.headerContent}>
+          <h1 className={styles.name}>{name}</h1>
+          <p className={styles.jobTitle}>{profile.jobTitle}</p>
+          {profile.company?.name && (
+            <p className={styles.companySubtext}>{profile.company.name}</p>
+          )}
+          {profile.pronouns && (
+            <div style={{ marginTop: "4px" }}>
+              <span className={styles.pronounsBadge}>{profile.pronouns}</span>
+            </div>
+          )}
+          {profile.bio && <p className={styles.bio}>{profile.bio}</p>}
+        </div>
       </div>
     </header>
   );

@@ -139,9 +139,9 @@ export function dbCardToVCard(db: DbCard): VCardType {
       bio: db.bio ?? undefined,
       pronouns: db.pronouns ?? undefined,
       avatarUrl: db.avatarUrl ?? "",
-      company: db.companyName
+      company: (db.companyName || db.companyLogoUrl)
         ? {
-            name: db.companyName,
+            name: db.companyName || "",
             role: db.companyRole ?? undefined,
             logoUrl: db.companyLogoUrl ?? undefined,
             website: db.companyWebsite ?? undefined,

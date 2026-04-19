@@ -1188,11 +1188,15 @@
 }
 
 .builderSectionSubtitle {
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
-  margin-top: 8px;
-  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-3);
+  margin-top: 24px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 4px;
+  border-left: 3px solid var(--orange);
 }
 
 .builderGrid {
@@ -1202,44 +1206,52 @@
 }
 
 .builderGridItem {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 16px 12px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  padding: 20px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 110px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  min-height: 120px;
   text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .builderGridItem:hover {
-  background: #f9fafb;
-  border-color: #0ea5e9;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.10);
+  background: #ffffff;
+  border-color: var(--orange);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(255, 107, 0, 0.12);
 }
 
 .builderGridItemIcon {
-  color: #374151;
+  color: var(--text-2);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease;
+  transition: all 0.3s ease;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .builderGridItem:hover .builderGridItemIcon {
-  color: #0ea5e9;
+  color: var(--orange);
+  transform: rotate(-5deg);
 }
 
 .builderGridItemLabel {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1a1a2e;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
 }
 
 .builderGridImageItem {
@@ -1327,4 +1339,32 @@
   .pageHeader { flex-direction: column; align-items: flex-start; }
 
   .headerActions { width: 100%; justify-content: space-between; }
+}
+
+.gridItemQuickRemove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.gridItemQuickRemove:hover {
+  background: #ef4444;
+  color: #ffffff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
