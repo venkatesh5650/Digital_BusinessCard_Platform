@@ -8,15 +8,25 @@
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   background: var(--bg-surface, #f8f9fa);
   padding: 0;
+}
+
+.sharedElements {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-elevated, #ffffff);
 }
 @media (min-width: 520px) {
   .wrapper {
     padding: 40px 24px;
-    align-items: flex-start;
+  }
+  .sharedElements {
+    border-radius: 0 0 var(--r-xl, 24px) var(--r-xl, 24px);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl, 0 24px 60px rgba(0,0,0,0.12));
   }
 }
 
