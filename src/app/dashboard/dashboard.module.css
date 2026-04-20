@@ -818,8 +818,8 @@
     z-index: 150;
     background: #ffffff;
     border-bottom: 1px solid var(--border);
-    margin: 0 -20px 24px;
-    padding: 12px 20px;
+    margin: 0 0 16px 0;
+    padding: 12px 0;
     gap: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   }
@@ -872,8 +872,9 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 
-  /* Hide one of the panels based on mobile grid override */
+  /* Hide one of the panels based on mobile tab */
   .editorPanel.mobileHidden,
+  .builderContainer.mobileHidden,
   .previewPanel.mobileHidden {
     display: none !important;
   }

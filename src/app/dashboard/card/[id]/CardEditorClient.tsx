@@ -985,26 +985,27 @@ export default function CardEditorClient({ card }: { card: Card }) {
         </div>
       </div>
 
+      {/* ── Mobile Tab Switcher — always visible on mobile ── */}
+      <div className={styles.mobileSwitcher}>
+        <button 
+          type="button"
+          className={`${styles.mobileTab} ${activeMobileTab === "edit" ? styles.mobileTabActive : ""}`}
+          onClick={() => setActiveMobileTab("edit")}
+        >
+          <FileText size={18} /> Edit
+        </button>
+        <button 
+          type="button"
+          className={`${styles.mobileTab} ${activeMobileTab === "preview" ? styles.mobileTabActive : ""}`}
+          onClick={() => setActiveMobileTab("preview")}
+        >
+          <Eye size={18} /> Preview
+        </button>
+      </div>
+
       <div className={styles.editorLayout}>
         {/* ── Left: Grid Builder ── */}
         <div className={`${styles.builderContainer} ${activeMobileTab === "preview" ? styles.mobileHidden : ""}`}>
-          {/* ── Mobile Tab Switcher ── */}
-          <div className={styles.mobileSwitcher}>
-            <button 
-              type="button"
-              className={`${styles.mobileTab} ${activeMobileTab === "edit" ? styles.mobileTabActive : ""}`}
-              onClick={() => setActiveMobileTab("edit")}
-            >
-              <FileText size={18} /> Edit
-            </button>
-            <button 
-              type="button"
-              className={`${styles.mobileTab} ${activeMobileTab === "preview" ? styles.mobileTabActive : ""}`}
-              onClick={() => setActiveMobileTab("preview")}
-            >
-              <Eye size={18} /> Preview
-            </button>
-          </div>
           {feedback && (
              <div className={feedback.type === "success" ? styles.formSuccess : styles.formError}>
                 {feedback.type === "success" ? <CheckCircle size={16} /> : "⚠️"} {feedback.msg}
