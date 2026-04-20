@@ -280,6 +280,9 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [newAction, setNewAction] = useState({ platform: "calendly", url: "", label: "", subtitle: "" });
   const [newPayment, setNewPayment] = useState({ platform: "paypal", url: "", label: "", note: "" });
 
+  // ── Mobile Responsive State ──
+  const [activeMobileTab, setActiveMobileTab] = useState<"edit" | "preview">("edit");
+
   // Helper to open modal with platform pre-selected
   const openPlatformModal = (modalType: "social" | "payment" | "action", platform: string) => {
     setActiveModal(modalType);
@@ -971,8 +974,26 @@ export default function CardEditorClient({ card }: { card: Card }) {
       </div>
 
       <div className={styles.editorLayout}>
+        {/* ── Mobile Tab Switcher ── */}
+        <div className={styles.mobileSwitcher}>
+          <button 
+            type="button"
+            className={`${styles.mobileTab} ${activeMobileTab === "edit" ? styles.mobileTabActive : ""}`}
+            onClick={() => setActiveMobileTab("edit")}
+          >
+            <Settings size={18} /> Edit
+          </button>
+          <button 
+            type="button"
+            className={`${styles.mobileTab} ${activeMobileTab === "preview" ? styles.mobileTabActive : ""}`}
+            onClick={() => setActiveMobileTab("preview")}
+          >
+            <Eye size={18} /> Preview
+          </button>
+        </div>
+
         {/* ── Left: Grid Builder ── */}
-        <div className={styles.builderContainer}>
+        <div className={`${styles.builderContainer} ${activeMobileTab === "preview" ? styles.mobileHidden : ""}`}>
           {feedback && (
              <div className={feedback.type === "success" ? styles.formSuccess : styles.formError}>
                 {feedback.type === "success" ? <CheckCircle size={16} /> : "⚠️"} {feedback.msg}
@@ -1264,7 +1285,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
         </div>
 
         {/* ── Right: Live Preview ── */}
-        <div className={styles.previewPanel}>
+        <div className={`${styles.previewPanel} ${activeMobileTab === "edit" ? styles.mobileHidden : ""}`}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
             Live Preview
           </div>

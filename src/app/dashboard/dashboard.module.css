@@ -767,6 +767,70 @@
   --cyan-dim:     rgba(14, 165, 233, 0.08);
 }
 
+@media (max-width: 1024px) {
+  .editorLayout {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.mobileSwitcher {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobileSwitcher {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 150;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    margin: -36px -40px 24px;
+    padding: 12px 40px;
+    gap: 12px;
+  }
+
+  .mobileTab {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--bg-hover);
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .mobileTabActive {
+    background: #000000;
+    color: #ffffff;
+    border-color: #000000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  /* Hide one of the panels based on mobile grid override */
+  .editorPanel.mobileHidden,
+  .previewPanel.mobileHidden {
+    display: none !important;
+  }
+
+  /* Adjust padding for mobile panels */
+  .editorPanel, .previewPanel {
+    margin-bottom: 32px;
+  }
+  
+  .previewPanel {
+    padding: 0;
+  }
+}
+
 .editorPanel {
   background: var(--bg-elevated, #ffffff);
   border-radius: var(--r-xl, 24px);

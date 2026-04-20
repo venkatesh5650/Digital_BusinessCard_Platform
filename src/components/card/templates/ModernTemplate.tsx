@@ -45,16 +45,16 @@ export default function ModernTemplate({ card, trackClick, handleDownloadImage }
             <Avatar src={card?.profile?.avatarUrl} name={name} />
           </div>
           <div className={styles.headerContent}>
-            <h1 className={styles.name} style={{ fontSize: "2rem", marginBottom: "4px" }}>{name}</h1>
-            <p className={styles.jobTitle} style={{ fontSize: "1.1rem", opacity: 0.9 }}>{card?.profile?.jobTitle}</p>
-            {card?.profile?.company?.name && <p className={styles.companySubtext} style={{ fontSize: "0.95rem" }}>{card?.profile?.company.name}</p>}
+            <h1 className={styles.name}>{name}</h1>
+            <p className={styles.jobTitle}>{card?.profile?.jobTitle}</p>
+            {card?.profile?.company?.name && <p className={styles.companySubtext}>{card?.profile?.company.name}</p>}
             
             <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "12px" }}>
               {card?.profile?.pronouns && <span className={styles.pronounsBadge}>{card.profile.pronouns}</span>}
               {card?.profile?.company?.role && <span className={styles.pronounsBadge} style={{ background: "rgba(0,0,0,0.05)" }}>{card.profile.company.role}</span>}
             </div>
             
-            {card?.profile?.bio && <p className={styles.bio} style={{ maxWidth: "320px", margin: "16px auto 0" }}>{card.profile.bio}</p>}
+            {card?.profile?.bio && <p className={styles.bio}>{card.profile.bio}</p>}
           </div>
         </div>
       </header>
