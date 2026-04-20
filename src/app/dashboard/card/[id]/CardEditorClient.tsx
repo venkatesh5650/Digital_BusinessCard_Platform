@@ -34,12 +34,13 @@ type Phone = { id: string; type: string; number: string; label: string | null; w
 type Email = { id: string; type: string; address: string; label: string | null; isPrimary: boolean };
 type Address = { id: string; type: string; label: string | null; street: string | null; city: string | null; state: string | null; postalCode: string | null; country: string | null; mapUrl: string | null };
 type Website = { id: string; label: string; url: string; featured: boolean };
-type Social = { id: string; platform: string; url: string; handle: string | null; order: number; isVisible: boolean };
+type Social = { id: string; platform: string; url: string; handle: string | null; label: string | null; order: number; isVisible: boolean };
 type Payment = { id: string; platform: string; url: string; label: string | null; note: string | null; order: number; isVisible: boolean };
 type Action = { id: string; platform: string; url: string; label: string; subtitle: string | null; icon: string | null; color: string | null; order: number; isVisible: boolean };
 
 type Card = {
   id: string;
+  userId: string;
   slug: string;
   firstName: string;
   lastName: string;
@@ -51,15 +52,31 @@ type Card = {
   avatarUrl: string | null;
   companyName: string | null;
   companyRole: string | null;
-  companyWebsite: string | null;
-  companyTagline: string | null;
   companyLogoUrl: string | null;
+  companyWebsite: string | null;
+  companyIndustry: string | null;
+  companyTagline: string | null;
   coverImageUrl: string | null;
+  backgroundImageUrl: string | null;
   isPublished: boolean;
   leadCaptureEnabled: boolean;
   vcfDownloadEnabled: boolean;
+  showViewCount: boolean;
   seoTitle: string | null;
   seoDescription: string | null;
+  language: string;
+  themePreset: string;
+  backgroundStyle: string;
+  colorPrimary: string;
+  colorSecondary: string;
+  colorAccent: string;
+  textColor: string;
+  subtextColor: string;
+  layout: string;
+  headerGlass: boolean;
+  avatarNeonRing: boolean;
+  particles: boolean;
+
   phones: Phone[];
   emails: Email[];
   addresses: Address[];
@@ -259,14 +276,14 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [newEmail, setNewEmail] = useState({ type: "work", address: "", label: "" });
   const [newAddress, setNewAddress] = useState({ type: "work", label: "", street: "", city: "", state: "", postalCode: "", country: "", mapUrl: "" });
   const [newWebsite, setNewWebsite] = useState({ label: "", url: "", featured: false });
-  const [newSocial, setNewSocial] = useState({ platform: "linkedin", url: "", handle: "" });
+  const [newSocial, setNewSocial] = useState({ platform: "linkedin", url: "", handle: "", label: "" });
   const [newAction, setNewAction] = useState({ platform: "calendly", url: "", label: "", subtitle: "" });
   const [newPayment, setNewPayment] = useState({ platform: "paypal", url: "", label: "", note: "" });
 
   // Helper to open modal with platform pre-selected
   const openPlatformModal = (modalType: "social" | "payment" | "action", platform: string) => {
     setActiveModal(modalType);
-    if (modalType === "social") setNewSocial({ platform, url: "", handle: "" });
+    if (modalType === "social") setNewSocial({ platform, url: "", handle: "", label: "" });
     if (modalType === "payment") setNewPayment({ platform, url: "", label: "", note: "" });
     if (modalType === "action") setNewAction({ platform, url: "", label: "", subtitle: "" });
   };
@@ -441,8 +458,8 @@ export default function CardEditorClient({ card }: { card: Card }) {
     startTransition(async () => {
       const result = await upsertSocial(card.id, { ...newSocial, order: socials.length, isVisible: true });
       if (result?.error) { showFeedback("error", result.error); return; }
-      setSocials(prev => [...prev, { id: Date.now().toString(), ...newSocial, order: prev.length, isVisible: true, handle: newSocial.handle || null }]);
-      setNewSocial({ platform: "linkedin", url: "", handle: "" });
+      setSocials(prev => [...prev, { id: Date.now().toString(), ...newSocial, order: prev.length, isVisible: true, handle: newSocial.handle || null, label: newSocial.label || null }]);
+      setNewSocial({ platform: "linkedin", url: "", handle: "", label: "" });
       router.refresh();
     });
   }

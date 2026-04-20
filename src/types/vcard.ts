@@ -83,7 +83,7 @@ export type BackgroundStyle =
   | "neon";
 
 /** Card layout variant */
-export type CardLayout = "classic" | "compact" | "bold" | "minimal" | "cyber";
+export type CardLayout = "classic" | "compact" | "bold" | "minimal" | "cyber" | "modern" | "glass";
 
 /** Color theme preset names */
 export type ThemePreset =
