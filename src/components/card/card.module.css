@@ -11,7 +11,7 @@
   flex-direction: column;
   align-items: center;
   background: var(--bg-surface, #f8f9fa);
-  padding: 0;
+  padding: 24px 16px;
 }
 
 .sharedElements {
@@ -37,12 +37,10 @@
   align-items: flex-start !important;
 }
 
-/* Ensure the card itself fits the preview frame perfectly */
+/* Ensure the card fits well in the editor preview (but keeps its physical look) */
 .editorWrapper .card {
   min-height: unset !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  margin: 0 !important;
+  margin: 0 auto !important;
 }
 
 /* ── Main Card Shell ─────────────────────────── */
@@ -50,18 +48,15 @@
   width: 100%;
   max-width: 440px;
   background: var(--bg-elevated, #ffffff);
-  min-height: 100vh;
-  min-height: 100dvh;
   margin: 0 auto;
   position: relative;
-  box-shadow: none;
+  border-radius: var(--r-xl, 24px);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg, 0 12px 40px rgba(0,0,0,0.10));
 }
 @media (min-width: 520px) {
   .card {
-    min-height: unset;
-    border-radius: var(--r-xl, 24px);
-    box-shadow: var(--shadow-lg, 0 12px 40px rgba(0,0,0,0.10));
-    overflow: hidden;
+    /* Styles are now applied globally for physical card look */
   }
 }
 
@@ -392,13 +387,26 @@
 
 /* ── QR Section ──────────────────────────────── */
 .publicQrSection {
-  padding: 28px 24px;
+  padding: 0 24px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--bg-elevated, #ffffff);
-  border-top: 1px dashed var(--border, #e9ecef);
-  margin-top: 8px;
+  background: transparent;
+  border-bottom: none;
+  width: 100%;
+  max-width: 440px;
+}
+
+/* On desktop, push QR below the card */
+@media (min-width: 520px) {
+  .publicQrSection {
+    order: 2;
+    background: var(--bg-elevated, #ffffff);
+    border-bottom: none;
+    border-top: 1px dashed var(--border, #e9ecef);
+    border-radius: 0 0 var(--r-xl, 24px) var(--r-xl, 24px);
+    box-shadow: var(--shadow-xl, 0 24px 60px rgba(0,0,0,0.12));
+  }
 }
 
 .publicQrBox {

@@ -74,24 +74,26 @@ export default function PublicCard({ card, isEditor = false }: { card: VCard, is
 
   return (
     <div className={`${styles.wrapper} ${isEditor ? styles.editorWrapper : ""}`}>
+      {/* QR Code — renders above the card on mobile */}
+      {!isEditor && (
+        <div className={styles.publicQrSection} suppressHydrationWarning>
+          <div className={styles.publicQrBox}>
+            <QRCode 
+              value={cardUrl} 
+              size={136} 
+              style={{ height: "auto", maxWidth: "100%", width: "100%" }} 
+              fgColor="#000000" 
+            />
+          </div>
+          <p className={styles.publicQrText}>Scan with phone camera</p>
+        </div>
+      )}
+
       {renderTemplate()}
 
       {/* ── SHARED FOOTER BLOCKS (Hidden in Editor) ── */}
       {!isEditor && (
         <div className={styles.sharedElements}>
-          {/* QR Code Section */}
-          <div className={styles.publicQrSection} suppressHydrationWarning>
-            <div className={styles.publicQrBox}>
-              <QRCode 
-                value={cardUrl} 
-                size={136} 
-                style={{ height: "auto", maxWidth: "100%", width: "100%" }} 
-                fgColor="#000000" 
-              />
-            </div>
-            <p className={styles.publicQrText}>Scan with phone camera</p>
-          </div>
-
           <footer className={styles.footer}>
             <div className={styles.footerLabel}>Create your own digital card</div>
             <a href="/" className={styles.footerLogo} style={{ textDecoration: 'none', color: 'var(--text-1)' }}>NeonGlass</a>
