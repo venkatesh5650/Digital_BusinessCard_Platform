@@ -973,7 +973,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
           <div>
             <h1 className={styles.pageTitle}>Editing: {displayName || `${firstName} ${lastName}`}</h1>
             <p className={styles.pageSubtitle}>
-              {isPublished ? `🟢 Live at neonglass.me/${slug}` : `⚫ Draft · not publicly visible`}
+              {isPublished ? `🟢 Live at imprint.cards/${slug}` : `⚫ Draft · not publicly visible`}
             </p>
           </div>
         </div>
@@ -1285,7 +1285,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 <div>
                    <div style={{ fontWeight: 700, color: "var(--text-1)", fontSize: 14 }}>{isPublished ? "🟢 Live" : "⚫ Draft"}</div>
                    <div className={styles.toggleDesc}>
-                     {isPublished ? `Publicly visible at neonglass.me/${slug}` : "Hidden from public. Toggle to make live."}
+                     {isPublished ? `Publicly visible at imprint.cards/${slug}` : "Hidden from public. Toggle to make live."}
                    </div>
                 </div>
                 <Toggle id="toggle-publish" checked={isPublished} onChange={handlePublishToggle} />

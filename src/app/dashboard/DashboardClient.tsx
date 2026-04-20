@@ -344,7 +344,7 @@ export default function DashboardClient({
                       rel="noopener noreferrer"
                       onClick={(e) => handlePreviewClick(e, card)}
                     >
-                      neonglass.me/{card.slug}
+                      imprint.cards/{card.slug}
                     </a>
                   </div>
 

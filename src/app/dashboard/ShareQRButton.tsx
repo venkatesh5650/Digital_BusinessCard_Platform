@@ -12,7 +12,7 @@ export default function ShareQRButton({ slug }: { slug: string }) {
   const cardUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/${slug}`
-      : `https://neonglass.me/${slug}`;
+      : `https://imprint.cards/${slug}`;
 
   const handleDownloadQR = () => {
     const svg = document.getElementById(`qr-code-${slug}`);

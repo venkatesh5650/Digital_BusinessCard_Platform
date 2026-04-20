@@ -15,7 +15,7 @@ import GlassTemplate from "./templates/GlassTemplate";
 import MinimalTemplate from "./templates/MinimalTemplate";
 
 export default function PublicCard({ card, isEditor = false }: { card: VCard, isEditor?: boolean }) {
-  const [cardUrl, setCardUrl] = useState(`https://neonglass.me/${card?.settings?.slug || ""}`);
+  const [cardUrl, setCardUrl] = useState(`https://imprint.cards/${card?.settings?.slug || ""}`);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -74,29 +74,31 @@ export default function PublicCard({ card, isEditor = false }: { card: VCard, is
 
   return (
     <div className={`${styles.wrapper} ${isEditor ? styles.editorWrapper : ""}`}>
-      {/* QR Code — renders above the card on mobile */}
-      {!isEditor && (
-        <div className={styles.publicQrSection} suppressHydrationWarning>
-          <div className={styles.publicQrBox}>
-            <QRCode 
-              value={cardUrl} 
-              size={136} 
-              style={{ height: "auto", maxWidth: "100%", width: "100%" }} 
-              fgColor="#000000" 
-            />
+      <div className={styles.cardContainer}>
+        {/* QR Code — renders above the card on mobile */}
+        {!isEditor && (
+          <div className={styles.publicQrSection} suppressHydrationWarning>
+            <div className={styles.publicQrBox}>
+              <QRCode 
+                value={cardUrl} 
+                size={136} 
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }} 
+                fgColor="#000000" 
+              />
+            </div>
+            <p className={styles.publicQrText}>Scan with phone camera</p>
           </div>
-          <p className={styles.publicQrText}>Scan with phone camera</p>
-        </div>
-      )}
+        )}
 
-      {renderTemplate()}
+        {renderTemplate()}
+      </div>
 
       {/* ── SHARED FOOTER BLOCKS (Hidden in Editor) ── */}
       {!isEditor && (
         <div className={styles.sharedElements}>
           <footer className={styles.footer}>
             <div className={styles.footerLabel}>Create your own digital card</div>
-            <a href="/" className={styles.footerLogo} style={{ textDecoration: 'none', color: 'var(--text-1)' }}>NeonGlass</a>
+            <a href="/" className={styles.footerLogo} style={{ textDecoration: 'none', color: 'var(--text-1)' }}>Imprint</a>
           </footer>
 
           {/* Sticky Mobile CTA */}
