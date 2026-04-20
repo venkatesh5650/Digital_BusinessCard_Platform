@@ -283,6 +283,18 @@ export default function CardEditorClient({ card }: { card: Card }) {
   // ── Mobile Responsive State ──
   const [activeMobileTab, setActiveMobileTab] = useState<"edit" | "preview">("edit");
 
+  // Toggle page-level immersive class for full top-to-bottom mobile preview
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (activeMobileTab === "preview") {
+        document.body.classList.add("mobile-immersive-active");
+      } else {
+        document.body.classList.remove("mobile-immersive-active");
+      }
+    }
+    return () => document.body.classList.remove("mobile-immersive-active");
+  }, [activeMobileTab]);
+
   // Helper to open modal with platform pre-selected
   const openPlatformModal = (modalType: "social" | "payment" | "action", platform: string) => {
     setActiveModal(modalType);
@@ -952,8 +964,8 @@ export default function CardEditorClient({ card }: { card: Card }) {
   };
 
   return (
-    <div className={styles.editorPage}>
-      <div className={styles.pageHeader}>
+    <div className={`${styles.editorPage} ${activeMobileTab === "preview" ? styles.immersiveMode : ""}`}>
+      <div className={`${styles.pageHeader} ${activeMobileTab === "preview" ? styles.mobileHidden : ""}`}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <Link href="/dashboard" className={styles.btnSecondary} style={{ padding: "8px 12px" }}>
             <ArrowLeft size={16} />
@@ -974,26 +986,25 @@ export default function CardEditorClient({ card }: { card: Card }) {
       </div>
 
       <div className={styles.editorLayout}>
-        {/* ── Mobile Tab Switcher ── */}
-        <div className={styles.mobileSwitcher}>
-          <button 
-            type="button"
-            className={`${styles.mobileTab} ${activeMobileTab === "edit" ? styles.mobileTabActive : ""}`}
-            onClick={() => setActiveMobileTab("edit")}
-          >
-            <Settings size={18} /> Edit
-          </button>
-          <button 
-            type="button"
-            className={`${styles.mobileTab} ${activeMobileTab === "preview" ? styles.mobileTabActive : ""}`}
-            onClick={() => setActiveMobileTab("preview")}
-          >
-            <Eye size={18} /> Preview
-          </button>
-        </div>
-
         {/* ── Left: Grid Builder ── */}
         <div className={`${styles.builderContainer} ${activeMobileTab === "preview" ? styles.mobileHidden : ""}`}>
+          {/* ── Mobile Tab Switcher ── */}
+          <div className={styles.mobileSwitcher}>
+            <button 
+              type="button"
+              className={`${styles.mobileTab} ${activeMobileTab === "edit" ? styles.mobileTabActive : ""}`}
+              onClick={() => setActiveMobileTab("edit")}
+            >
+              <FileText size={18} /> Edit
+            </button>
+            <button 
+              type="button"
+              className={`${styles.mobileTab} ${activeMobileTab === "preview" ? styles.mobileTabActive : ""}`}
+              onClick={() => setActiveMobileTab("preview")}
+            >
+              <Eye size={18} /> Preview
+            </button>
+          </div>
           {feedback && (
              <div className={feedback.type === "success" ? styles.formSuccess : styles.formError}>
                 {feedback.type === "success" ? <CheckCircle size={16} /> : "⚠️"} {feedback.msg}
@@ -1294,6 +1305,16 @@ export default function CardEditorClient({ card }: { card: Card }) {
               <PublicCard card={livePreviewCard} isEditor={true} />
             </div>
           </div>
+          
+          {/* Subtle Floating Button to return to Edit mode */}
+          <button 
+            type="button"
+            className={styles.mobileFab}
+            onClick={() => setActiveMobileTab("edit")}
+            title="Return to Editor"
+          >
+            <Settings size={22} />
+          </button>
         </div>
       </div>
 
