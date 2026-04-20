@@ -828,6 +828,29 @@
   
   .previewPanel {
     padding: 0;
+    margin: 0;
+  }
+
+  .previewPanel .previewPhoneFrame {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .previewPanel .previewPhoneFrame::after {
+    display: none;
+  }
+
+  .previewPanel h3, 
+  .previewPanel .previewLabel { /* targeting the 'Live Preview' text if it had a class, I'll add one */
+     display: none;
+  }
+
+  /* Hide the 'Live Preview' label specifically */
+  .previewHeaderLabel {
+    display: none;
   }
 }
 
@@ -1377,28 +1400,6 @@
   .main { padding: 20px; }
 
   .editorLayout { grid-template-columns: 1fr; }
-
-  .previewPanel {
-    position: fixed;
-    top: 100%;
-    left: 0;
-    right: 0;
-    height: 90vh;
-    background: var(--bg-elevated);
-    z-index: 900;
-    padding: 24px;
-    border-top-left-radius: 24px;
-    border-top-right-radius: 24px;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
-  }
-
-  .previewPanel.isOpen {
-    transform: translateY(-100%);
-  }
-
-  .mobilePreviewToggle {
-    display: flex;
-  }
 
   .pageHeader { flex-direction: column; align-items: flex-start; }
 

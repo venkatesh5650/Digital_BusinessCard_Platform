@@ -1286,7 +1286,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
 
         {/* ── Right: Live Preview ── */}
         <div className={`${styles.previewPanel} ${activeMobileTab === "edit" ? styles.mobileHidden : ""}`}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
+          <div className={styles.previewHeaderLabel} style={{ fontSize: 12, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
             Live Preview
           </div>
           <div className={styles.previewPhoneFrame}>
