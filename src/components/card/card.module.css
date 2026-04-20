@@ -19,6 +19,21 @@
   }
 }
 
+.editorWrapper {
+  min-height: unset !important;
+  background: transparent !important;
+  padding: 0 !important;
+  align-items: flex-start !important;
+}
+
+/* Ensure the card itself fits the preview frame perfectly */
+.editorWrapper .card {
+  min-height: unset !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+}
+
 /* ── Main Card Shell ─────────────────────────── */
 .card {
   width: 100%;
@@ -59,45 +74,41 @@
 
 .companyLogoOverlay {
   position: absolute;
-  bottom: -22px;
+  bottom: -32px;
   right: 24px;
-  min-width: 100px;
-  height: 48px;
-  background: #1a1a1a;
-  backdrop-filter: blur(12px);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 8px 16px 8px 8px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  border: 2px solid #ffffff;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 30;
-  gap: 12px;
-}
-
-.companyLogoOverlay:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
-}
-
-.logoPillIcon {
-  width: 32px;
-  height: 32px;
-  background: #fff;
-  border-radius: 8px;
+  width: 68px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 4px;
+  background: var(--bg-surface, #ffffff);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 30;
+  overflow: hidden;
+}
+
+.companyLogoOverlay:hover {
+  transform: translateY(-4px) scale(1.05);
+}
+
+.logoPillIcon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
 }
 
 .logoPillIcon img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .logoPillText {
@@ -499,7 +510,85 @@
 }
 
 .body > *:nth-child(1) { animation-delay: 0.05s; }
-.body > *:nth-child(2) { animation-delay: 0.1s; }
+.body > *:nth-child(4) { animation-delay: 0.2s; }
+.body > *:nth-child(5) { animation-delay: 0.25s; }
+
+/* ── MODERN TEMPLATE ────────────────────────── */
+.cardModern .headerAlignmentWrap {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.cardModern .headerContent {
+  margin-top: 12px;
+}
+
+.cardModern .avatarOverlay {
+  position: relative;
+  margin: -60px auto 0;
+  width: 120px;
+  height: 120px;
+}
+
+.cardModern .avatarInner {
+  border: 4px solid var(--bg-elevated);
+}
+
+/* ── GLASS TEMPLATE ─────────────────────────── */
+.cardGlass {
+  background: var(--glass-bg, rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.cardGlass .headerBanner {
+  height: 160px;
+  filter: brightness(0.9);
+}
+
+.cardGlass .linkCard {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.cardGlass .linkCard:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* ── MINIMAL TEMPLATE ────────────────────────── */
+.cardMinimal .headerBanner {
+  height: 120px;
+  background-image: none !important;
+  background-color: var(--bg-surface);
+}
+
+.cardMinimal .headerAlignmentWrap {
+  padding-top: 0;
+  margin-top: -30px;
+}
+
+.cardMinimal .avatarOverlay {
+  width: 80px;
+  height: 80px;
+}
+
+.cardMinimal .sectionLabel {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
+.cardMinimal .linkCard {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 16px 0;
+}
+
 .body > *:nth-child(3) { animation-delay: 0.15s; }
 .body > *:nth-child(4) { animation-delay: 0.2s; }
 .body > *:nth-child(5) { animation-delay: 0.25s; }

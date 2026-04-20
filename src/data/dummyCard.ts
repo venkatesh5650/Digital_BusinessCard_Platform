@@ -33,7 +33,7 @@ export const DUMMY_CARD: VCard = {
     company: {
       name: "Computer Port",
       role: "Founder",
-      logoUrl: "/assets/logo-placeholder.svg",
+      logoUrl: "/globe.svg",
       website: "https://computerport.in",
       industry: "Information Technology",
       tagline: "Smart IT Solutions for Smart Businesses",

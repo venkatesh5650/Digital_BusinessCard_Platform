@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   updateCard,
@@ -26,6 +26,8 @@ import Link from "next/link";
 import styles from "../../dashboard.module.css";
 import PublicCard from "@/components/card/PublicCard";
 import { PlatformIcon } from "@/components/card/SocialIcon";
+import { COVER_PRESETS } from "@/data/coverPresets";
+import { ATTR_TEMPLATES } from "@/data/templates";
 import type { VCard } from "@/types";
 
 type Phone = { id: string; type: string; number: string; label: string | null; whatsapp: boolean; sms: boolean; isPrimary: boolean };
@@ -108,10 +110,9 @@ function AvatarUploader({ value, onChange, isBanner = false }: { value: string; 
             const scale = Math.max(1200 / width, 600 / height);
             const x = (1200 - width * scale) / 2;
             const y = (600 - height * scale) / 2;
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(0, 0, 1200, 600);
+            ctx.clearRect(0, 0, 1200, 600);
             ctx.drawImage(img, x, y, width * scale, height * scale);
-            onChange(canvas.toDataURL("image/jpeg", 0.9));
+            onChange(canvas.toDataURL("image/webp", 0.9));
           }
           return;
         }
@@ -127,7 +128,7 @@ function AvatarUploader({ value, onChange, isBanner = false }: { value: string; 
         const ctx = canvas.getContext("2d");
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          onChange(canvas.toDataURL("image/jpeg", 0.9));
+          onChange(canvas.toDataURL("image/webp", 0.9));
         }
       };
       img.src = event.target?.result as string;
@@ -139,7 +140,17 @@ function AvatarUploader({ value, onChange, isBanner = false }: { value: string; 
     <div style={{ display: "flex", gap: "20px", alignItems: "center", padding: "12px", background: "rgba(255,107,0,0.03)", borderRadius: "16px", border: "1px solid rgba(255,107,0,0.1)" }}>
       <div style={{ position: "relative" }}>
         {value ? (
-          <img src={value} alt="Preview" style={{ width: 80, height: 80, borderRadius: "12px", objectFit: "cover", border: "2px solid #fff", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+          <img 
+            src={value} 
+            alt="Preview" 
+            style={{ 
+              width: 80, 
+              height: 80, 
+              borderRadius: "12px", 
+              objectFit: "contain", 
+              background: "transparent"
+            }} 
+          />
         ) : (
           <div style={{ width: 80, height: 80, borderRadius: "12px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", border: "2px dashed #d1d5db" }}>
             <Camera size={24} color="#9ca3af" />
@@ -205,8 +216,11 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
   // Additional Image States
-  const [companyLogoUrl, setCompanyLogoUrl] = useState(card.companyLogoUrl ?? "");
+  const [avatarUrl, setAvatarUrl] = useState(card.avatarUrl ?? "");
   const [coverPhotoUrl, setCoverPhotoUrl] = useState(card.coverImageUrl ?? "");
+  const [companyLogoUrl, setCompanyLogoUrl] = useState(card.companyLogoUrl ?? "");
+  const [layout, setLayout] = useState(card.layout || "classic");
+  const [coverMode, setCoverMode] = useState<"gallery" | "upload" | "url">("gallery");
 
   // Profile fields
   const [firstName, setFirstName] = useState(card.firstName);
@@ -216,7 +230,6 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [headline, setHeadline] = useState(card.headline ?? "");
   const [bio, setBio] = useState(card.bio ?? "");
   const [pronouns, setPronouns] = useState(card.pronouns ?? "");
-  const [avatarUrl, setAvatarUrl] = useState(card.avatarUrl ?? "");
 
   // Company fields
   const [companyName, setCompanyName] = useState(card.companyName ?? "");
@@ -253,9 +266,9 @@ export default function CardEditorClient({ card }: { card: Card }) {
   // Helper to open modal with platform pre-selected
   const openPlatformModal = (modalType: "social" | "payment" | "action", platform: string) => {
     setActiveModal(modalType);
-    if (modalType === "social") setNewSocial(prev => ({ ...prev, platform }));
-    if (modalType === "payment") setNewPayment(prev => ({ ...prev, platform }));
-    if (modalType === "action") setNewAction(prev => ({ ...prev, platform }));
+    if (modalType === "social") setNewSocial({ platform, url: "", handle: "" });
+    if (modalType === "payment") setNewPayment({ platform, url: "", label: "", note: "" });
+    if (modalType === "action") setNewAction({ platform, url: "", label: "", subtitle: "" });
   };
 
   function showFeedback(type: "success" | "error", msg: string) {
@@ -281,6 +294,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       fd.append("companyTagline", companyTagline);
       fd.append("companyLogoUrl", companyLogoUrl);
       fd.append("coverImageUrl", coverPhotoUrl);
+      fd.append("layout", layout);
       fd.append("slug", slug);
       fd.append("isPublished", isPublished.toString());
       fd.append("leadCaptureEnabled", leadCapture.toString());
@@ -320,6 +334,68 @@ export default function CardEditorClient({ card }: { card: Card }) {
       setShowDraftModal(true);
     }
   }
+
+  // ── Live Preview Mapping (Senior Architect Fix) ──
+  const livePreviewCard = useMemo(() => {
+    return {
+      id: card.id,
+      userId: card.userId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      profile: {
+        firstName,
+        lastName,
+        displayName: displayName || undefined,
+        jobTitle,
+        headline: headline || undefined,
+        bio: bio || undefined,
+        pronouns: pronouns || undefined,
+        avatarUrl,
+        company: {
+          name: companyName,
+          role: companyRole || undefined,
+          logoUrl: companyLogoUrl || undefined,
+          website: companyWebsite || undefined,
+          tagline: companyTagline || undefined,
+        }
+      },
+      phones: phones.map(p => ({ ...p, label: p.label || undefined })),
+      emails: emails.map(e => ({ ...e, label: e.label || undefined })),
+      addresses: addresses.map(a => ({ ...a, label: a.label || undefined, street: a.street || undefined, city: a.city || undefined, state: a.state || undefined, postalCode: a.postalCode || undefined, country: a.country || undefined, mapUrl: a.mapUrl || undefined })),
+      websites: websites.map(w => ({ ...w })),
+      socialLinks: socials.map(s => ({ ...s, handle: s.handle || undefined, label: s.label || undefined })),
+      paymentLinks: payments.map(p => ({ ...p, label: p.label || undefined, note: p.note || undefined })),
+      actionLinks: actions.map(a => ({ ...a, subtitle: a.subtitle || undefined })),
+      mediaEmbeds: [], // Not currently edited in this builder
+      theme: {
+        preset: "custom",
+        backgroundStyle: "gradient",
+        colorPrimary: "#171717",
+        colorSecondary: "#3b82f6",
+        colorAccent: "#f97316",
+        textColor: "#171717",
+        subtextColor: "#52525b",
+        layout: layout as any,
+        headerGlass: false,
+        avatarNeonRing: false,
+        particles: false,
+        coverImageUrl: coverPhotoUrl || undefined,
+      },
+      settings: {
+        slug,
+        isPublished,
+        leadCaptureEnabled: leadCapture,
+        vcfDownloadEnabled: vcfDownload,
+        showViewCount: false,
+        language: "en"
+      }
+    } as VCard;
+  }, [
+    card.id, card.userId, firstName, lastName, displayName, jobTitle, headline, bio, pronouns, avatarUrl,
+    companyName, companyRole, companyLogoUrl, companyWebsite, companyTagline,
+    phones, emails, addresses, websites, socials, payments, actions,
+    layout, coverPhotoUrl, slug, isPublished, leadCapture, vcfDownload
+  ]);
 
   // ── Phone handlers ──
   function handleAddPhone() {
@@ -458,124 +534,6 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const SOCIAL_PLATFORMS = ["linkedin", "twitter", "instagram", "facebook", "github", "youtube", "tiktok", "whatsapp", "telegram", "discord", "twitch", "signal", "skype", "threads", "bluesky", "pinterest", "snapchat", "reddit", "yelp"];
   const PAYMENT_PLATFORMS = ["paypal", "stripe", "venmo", "cashapp", "gpay", "whatsapppay", "wise", "upi", "razorpay", "bank_transfer", "buymeacoffee", "patreon", "kofi"];
   const ACTION_PLATFORMS = ["calendly", "cal", "zoom", "meet", "teams", "booking", "typeform", "shopify", "custom"];
-  const livePreviewCard: VCard = {
-    id: card.id,
-    userId: "preview-user",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    profile: {
-      firstName: firstName || "Your",
-      lastName: lastName || "Name",
-      displayName: displayName || undefined,
-      jobTitle: jobTitle || "Your Job Title",
-      headline: headline || undefined,
-      bio: bio || undefined,
-      pronouns: pronouns || undefined,
-      avatarUrl: avatarUrl || "",
-      company: (companyName || companyLogoUrl)
-        ? {
-            name: companyName || "",
-            role: companyRole || undefined,
-            logoUrl: companyLogoUrl || undefined,
-            website: companyWebsite || undefined,
-            tagline: companyTagline || undefined,
-          }
-        : undefined,
-    },
-    phones: phones.map((p) => ({
-      id: p.id,
-      type: p.type as VCard["phones"][number]["type"],
-      number: p.number,
-      label: p.label || undefined,
-      whatsapp: p.whatsapp,
-      sms: p.sms,
-      isPrimary: p.isPrimary,
-    })),
-    emails: emails.map((e) => ({
-      id: e.id,
-      type: e.type as VCard["emails"][number]["type"],
-      address: e.address,
-      label: e.label || undefined,
-      isPrimary: e.isPrimary,
-    })),
-    addresses: addresses.map((a) => ({
-      id: a.id,
-      type: a.type as VCard["addresses"][number]["type"],
-      label: a.label || undefined,
-      street: a.street || undefined,
-      city: a.city || undefined,
-      state: a.state || undefined,
-      postalCode: a.postalCode || undefined,
-      country: a.country || undefined,
-      mapUrl: a.mapUrl || undefined,
-    })),
-    websites: websites.map((w) => ({
-      id: w.id,
-      label: w.label,
-      url: w.url,
-      featured: w.featured,
-    })),
-    socialLinks: socials.map((s, idx) => ({
-      id: s.id,
-      platform: s.platform as VCard["socialLinks"][number]["platform"],
-      url: s.url,
-      handle: s.handle || undefined,
-      order: s.order ?? idx,
-      isVisible: s.isVisible,
-    })),
-    paymentLinks: payments.map((p, idx) => ({
-      id: p.id,
-      platform: p.platform as VCard["paymentLinks"][number]["platform"],
-      url: p.url,
-      label: p.label || undefined,
-      note: p.note || undefined,
-      order: p.order ?? idx,
-      isVisible: p.isVisible,
-    })),
-    actionLinks: actions.map((a, idx) => ({
-      id: a.id,
-      platform: a.platform as VCard["actionLinks"][number]["platform"],
-      url: a.url,
-      label: a.label,
-      subtitle: a.subtitle || undefined,
-      icon: a.icon || undefined,
-      color: a.color || undefined,
-      order: a.order ?? idx,
-      isVisible: a.isVisible,
-    })),
-    mediaEmbeds: [],
-    theme: {
-      preset: "ocean-cyan",
-      backgroundStyle: "gradient",
-      colorPrimary: "#171717",
-      colorSecondary: "#3b82f6",
-      colorAccent: "#2563eb",
-      textColor: "#171717",
-      subtextColor: "#52525b",
-      layout: "classic",
-      headerGlass: false,
-      avatarNeonRing: false,
-      particles: false,
-      coverImageUrl: coverPhotoUrl || undefined,
-    },
-    settings: {
-      slug: slug || card.slug,
-      isPublished,
-      leadCaptureEnabled: leadCapture,
-      vcfDownloadEnabled: vcfDownload,
-      showViewCount: false,
-      seoTitle: seoTitle || undefined,
-      seoDescription: seoDescription || undefined,
-      language: "en",
-    },
-    analytics: {
-      totalViews: 0,
-      uniqueViews: 0,
-      totalClicks: 0,
-      leadsCollected: 0,
-      vcfDownloads: 0,
-    },
-  };
 
   const renderActiveModal = () => {
     if (!activeModal) return null;
@@ -607,13 +565,70 @@ export default function CardEditorClient({ card }: { card: Card }) {
         );
         break;
       case "coverPhoto":
-        modalTitle = "Cover Photo";
+        modalTitle = "Cover Photo Design";
         modalContent = (
-          <div className={styles.formGrid}>
-            <div className={`${styles.formField} ${styles.formGridFull}`}>
-              <label>Cover Banner</label>
-              <AvatarUploader value={coverPhotoUrl} onChange={setCoverPhotoUrl} isBanner={true} />
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid var(--border)", paddingBottom: "12px" }}>
+              <button 
+                type="button" 
+                onClick={() => setCoverMode("gallery")} 
+                style={{ 
+                  padding: "8px 16px", 
+                  borderRadius: "8px", 
+                  fontSize: "0.85rem", 
+                  fontWeight: 600, 
+                  background: coverMode === "gallery" ? "var(--orange)" : "transparent",
+                  color: coverMode === "gallery" ? "#fff" : "var(--text-1)",
+                  border: "none",
+                  cursor: "pointer"
+                }}
+              >
+                Design Gallery
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setCoverMode("upload")} 
+                style={{ 
+                  padding: "8px 16px", 
+                  borderRadius: "8px", 
+                  fontSize: "0.85rem", 
+                  fontWeight: 600, 
+                  background: coverMode === "upload" ? "var(--orange)" : "transparent",
+                  color: coverMode === "upload" ? "#fff" : "var(--text-1)",
+                  border: "none",
+                  cursor: "pointer"
+                }}
+              >
+                Upload / URL
+              </button>
             </div>
+
+            {coverMode === "gallery" ? (
+              <div className={styles.galleryGrid}>
+                {COVER_PRESETS.map((preset) => (
+                  <div 
+                    key={preset.id} 
+                    className={`${styles.galleryItem} ${coverPhotoUrl === preset.url ? styles.galleryItemActive : ""}`}
+                    onClick={() => setCoverPhotoUrl(preset.url)}
+                  >
+                    <img src={preset.url} alt={preset.name} className={styles.galleryImage} />
+                    <div className={styles.galleryLabel}>{preset.name}</div>
+                    {coverPhotoUrl === preset.url && (
+                      <div className={styles.galleryCheck}>
+                        <CheckCircle size={16} />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.formGrid}>
+                <div className={`${styles.formField} ${styles.formGridFull}`}>
+                  <label>Custom Cover Banner</label>
+                  <AvatarUploader value={coverPhotoUrl} onChange={setCoverPhotoUrl} isBanner={true} />
+                </div>
+              </div>
+            )}
           </div>
         );
         break;
@@ -782,9 +797,94 @@ export default function CardEditorClient({ card }: { card: Card }) {
             </div>
             <div className={styles.formGrid} style={{ marginTop: 16 }}>
               <div className={styles.formField}><label>Platform</label><select value={newSocial.platform} onChange={e => setNewSocial(s => ({ ...s, platform: e.target.value }))}>{SOCIAL_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-              <div className={styles.formField}><label>URL</label><input value={newSocial.url} onChange={e => setNewSocial(s => ({ ...s, url: e.target.value }))} placeholder="https://..." /></div>
+              <div className={styles.formField}><label>URL / Handle</label><input value={newSocial.url} onChange={e => setNewSocial(s => ({ ...s, url: e.target.value }))} placeholder="https://..." /></div>
               <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddSocial} disabled={isPending || !newSocial.url}><Plus size={14} /> Add</button></div>
             </div>
+          </div>
+        );
+        break;
+      case "payment": {
+        const getPaymentConfig = (p: string) => {
+          switch (p) {
+            case "paypal": return { label: "PayPal.me Link", ph: "https://paypal.me/username" };
+            case "upi": return { label: "UPI ID / VPA", ph: "username@bank" };
+            case "venmo": return { label: "Venmo Username", ph: "@username" };
+            case "cashapp": return { label: "Cashtag", ph: "$username" };
+            case "stripe": return { label: "Payment Link", ph: "https://buy.stripe.com/..." };
+            case "bank_transfer": return { label: "Account Details", ph: "Account No, IFSC, etc." };
+            case "wise": return { label: "Wise Pay Link", ph: "https://wise.com/pay/me/..." };
+            case "razorpay": return { label: "Payment Page", ph: "https://rzp.io/l/..." };
+            case "buymeacoffee": return { label: "BMC Link", ph: "https://buymeacoffee.com/user" };
+            default: return { label: "Payment URL / ID", ph: "https://..." };
+          }
+        };
+        const config = getPaymentConfig(newPayment.platform);
+        modalTitle = "Payment Links";
+        modalContent = (
+          <div>
+            <div className={styles.entryList}>
+              {payments.map(p => (
+                <div key={p.id} className={styles.entryItem}>
+                  <div className={styles.entryInfo}>
+                    <div className={styles.entryLabel} style={{ textTransform: "capitalize" }}>{p.platform.replace('_', ' ')}</div>
+                    <div className={styles.entryMeta}>{p.url}</div>
+                  </div>
+                  <button className={styles.btnDanger} onClick={() => handleDeletePayment(p.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
+                </div>
+              ))}
+            </div>
+            <div className={styles.formGrid} style={{ marginTop: 16 }}>
+              <div className={styles.formField}><label>Platform</label><select value={newPayment.platform} onChange={e => setNewPayment(v => ({ ...v, platform: e.target.value }))}>{PAYMENT_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+              <div className={styles.formField}><label>{config.label}</label><input value={newPayment.url} onChange={e => setNewPayment(v => ({ ...v, url: e.target.value }))} placeholder={config.ph} /></div>
+              <div className={styles.formField}><label>Display Label</label><input value={newPayment.label} onChange={e => setNewPayment(v => ({ ...v, label: e.target.value }))} placeholder="Optional (e.g. My PayPal)" /></div>
+              <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddPayment} disabled={isPending || !newPayment.url}><Plus size={14} /> Add</button></div>
+            </div>
+          </div>
+        );
+        break;
+      }
+      case "action":
+        modalTitle = "Action Links";
+        modalContent = (
+          <div>
+            <div className={styles.entryList}>
+              {actions.map(a => (
+                <div key={a.id} className={styles.entryItem}>
+                  <div className={styles.entryInfo}>
+                    <div className={styles.entryLabel}>{a.label}</div>
+                    <div className={styles.entryMeta}>{a.url} ({a.platform})</div>
+                  </div>
+                  <button className={styles.btnDanger} onClick={() => handleDeleteAction(a.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
+                </div>
+              ))}
+            </div>
+            <div className={styles.formGrid} style={{ marginTop: 16 }}>
+              <div className={styles.formField}><label>Platform</label><select value={newAction.platform} onChange={e => setNewAction(v => ({ ...v, platform: e.target.value }))}>{ACTION_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+              <div className={styles.formField}><label>Link / URL</label><input value={newAction.url} onChange={e => setNewAction(v => ({ ...v, url: e.target.value }))} placeholder="https://..." /></div>
+              <div className={styles.formField}><label>Button Text</label><input value={newAction.label} onChange={e => setNewAction(v => ({ ...v, label: e.target.value }))} placeholder="e.g. Book a Call" /></div>
+              <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddAction} disabled={isPending || !newAction.url || !newAction.label}><Plus size={14} /> Add</button></div>
+            </div>
+          </div>
+        );
+        break;
+      case "templates":
+        modalTitle = "Choose Your Template";
+        modalContent = (
+          <div className={styles.galleryGrid}>
+            {ATTR_TEMPLATES.map((tmpl) => (
+              <div 
+                key={tmpl.id} 
+                className={`${styles.galleryItem} ${layout === tmpl.id ? styles.galleryItemActive : ""}`}
+                onClick={() => setLayout(tmpl.id as any)}
+                style={{ height: "auto", minHeight: "120px" }}
+              >
+                <div style={{ padding: "16px", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", background: layout === tmpl.id ? "rgba(255,107,0,0.05)" : "var(--bg-surface)" }}>
+                  <div style={{ fontWeight: 800, fontSize: "1.1rem", marginBottom: "4px" }}>{tmpl.name}</div>
+                  <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{tmpl.description}</div>
+                </div>
+                {layout === tmpl.id && <div className={styles.galleryCheck}><CheckCircle size={16} /></div>}
+              </div>
+            ))}
           </div>
         );
         break;
@@ -862,9 +962,18 @@ export default function CardEditorClient({ card }: { card: Card }) {
              </div>
           )}
 
-          <div className={styles.builderHeader}>
-            <h2>Create your first card</h2>
-            <p>Ready to design your card? Pick a field below to get started!</p>
+          <div className={styles.builderHeader} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <h2>Create your first card</h2>
+              <p>Ready to design your card? Pick a field below to get started!</p>
+            </div>
+            <button 
+              className={styles.btnPrimary} 
+              style={{ background: "#000", fontSize: "0.8rem" }}
+              onClick={() => setActiveModal("templates")}
+            >
+              <ImageIcon size={14} /> Templates
+            </button>
           </div>
 
           {/* Add Images Section */}
@@ -1144,7 +1253,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
           </div>
           <div className={styles.previewPhoneFrame}>
             <div className={styles.previewIframe} style={{ overflow: "auto", background: "#ffffff" }}>
-              <PublicCard card={livePreviewCard} />
+              <PublicCard card={livePreviewCard} isEditor={true} />
             </div>
           </div>
         </div>

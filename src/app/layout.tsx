@@ -75,6 +75,7 @@ export default function RootLayout({
       <head>
         {/* Prevent theme flash — runs before React hydration */}
         <script
+          id="theme-prevention"
           dangerouslySetInnerHTML={{
             __html: `
               (function() {

@@ -117,6 +117,7 @@ export async function updateCard(cardId: string, formData: FormData) {
       vcfDownloadEnabled: formData.get("vcfDownloadEnabled") === "true",
       seoTitle: (formData.get("seoTitle") as string) || null,
       seoDescription: (formData.get("seoDescription") as string) || null,
+      layout: (formData.get("layout") as string) || card.layout,
     },
   });
 
