@@ -238,7 +238,7 @@ export function dbCardToVCard(db: DbCard): VCardType {
       colorAccent: db.colorAccent,
       textColor: db.textColor,
       subtextColor: db.subtextColor,
-      layout: db.layout as import("@/types").CardLayout,
+      layout: (["classic", "wave", "diagonal"].includes(db.layout) ? db.layout : "classic") as import("@/types").CardLayout,
       headerGlass: db.headerGlass,
       avatarNeonRing: db.avatarNeonRing,
       particles: db.particles,

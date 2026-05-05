@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import { Download, Share2, MessageCircle, Link as LinkIcon, Play, FileText, CreditCard, ChevronRight, Image as ImageIcon } from "lucide-react";
+import { Download, Share2, MessageCircle, Link as LinkIcon, Play, FileText, CreditCard, Image as ImageIcon } from "lucide-react";
 import styles from "../card.module.css";
-import { Avatar } from "../fragments/Avatar";
 import { Section, ContactList, WebsiteList } from "../fragments/Sections";
 import { SocialConnect } from "../fragments/SocialConnect";
 import LeadCapture from "../LeadCapture";
@@ -16,43 +15,69 @@ interface TemplateProps {
   handleDownloadImage: () => void;
 }
 
-export default function ClassicTemplate({ card, trackClick, handleDownloadImage }: TemplateProps) {
+export default function WaveTemplate({ card, trackClick, handleDownloadImage }: TemplateProps) {
   const name = getDisplayName(card);
   const actionLinks = getVisibleActionLinks(card);
   const paymentLinks = getVisiblePaymentLinks(card);
   const mediaEmbeds = getVisibleMediaEmbeds(card);
   const whatsappPhone = card.phones.find((p) => p.whatsapp);
+  const avatarBg = card?.profile?.avatarUrl || "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
 
   return (
     <article 
-      className={`${styles.card} ${styles.cardClassic}`} 
+      className={`${styles.card} ${styles.cardWave}`} 
       id={`public-vcard-container-${card.id}`}
-      style={{ "--classic-primary": card.theme?.colorPrimary || "#157e70" } as React.CSSProperties}
+      style={{ "--wave-primary": card.theme?.colorPrimary || "#ff6b00" } as React.CSSProperties}
     >
-      {/* ── HEADER ── */}
-      <header className={styles.classicHeader}>
-        {/* Slanted green background */}
-        <div className={styles.classicHeaderBg}></div>
+      {/* ── WAVE HEADER (FULL IMAGE BG) ── */}
+      <header 
+        className={styles.waveHeader}
+        style={{ backgroundImage: `url(${avatarBg})` }}
+      >
+        <div className={styles.waveHeaderGradient} />
         
-        <div className={styles.classicHeaderContent}>
-          {/* Left-aligned text */}
-          <div className={styles.classicHeaderText}>
-            <h1 className={styles.name}>{name}</h1>
-            <p className={styles.jobTitle}>{card?.profile?.jobTitle}</p>
-            {card?.profile?.company?.role && <p className={styles.jobTitle}>{card.profile.company.role}</p>}
-            {card?.profile?.company?.name && <p className={styles.jobTitle}>{card.profile.company.name}</p>}
-          </div>
+        {/* The Wave Separator */}
+        <div className={styles.waveSeparator}>
+          <svg viewBox="0 0 1440 320" preserveAspectRatio="none" className={styles.waveSvg}>
+            {/* The Green Border (Higher up on the left) */}
+            <path 
+              fill="var(--wave-primary)" 
+              d="M0,120 C480,120 960,320 1440,200 L1440,320 L0,320 Z"
+            ></path>
+            {/* The White Body (Lower down on the left, converging on the right) */}
+            <path 
+              fill="#ffffff" 
+              d="M0,220 C480,220 960,320 1440,205 L1440,320 L0,320 Z"
+            ></path>
+          </svg>
           
-          {/* Right-aligned avatar overlapping the slant */}
-          <div className={styles.classicAvatarWrap}>
-            <Avatar src={card?.profile?.avatarUrl} name={name} />
-          </div>
+          {/* Company Logo placed overlapping the white body & green wave */}
+          {card?.profile?.company?.logoUrl && (
+            <div className={styles.waveCompanyLogo}>
+              <img src={card.profile.company.logoUrl} alt={card.profile.company.name || "Company Logo"} />
+            </div>
+          )}
         </div>
       </header>
       
       <div className={styles.body}>
-        {/* Bio */}
-        {card?.profile?.bio && <p className={styles.classicBio}>{card.profile.bio}</p>}
+        {/* ── TYPOGRAPHY ── */}
+        <div className={styles.waveTextContent}>
+          <h1 className={styles.name}>{name}</h1>
+          <p className={styles.jobTitle}>{card?.profile?.jobTitle}</p>
+          {card?.profile?.company?.name && (
+             <p className={styles.companySubtext}>
+               <span className={styles.companyRoleText}>{card.profile.company.role || "Support"}</span>
+               <br />
+               {card.profile.company.name}
+             </p>
+          )}
+          
+          {/* Bio */}
+          {card?.profile?.bio && <p className={styles.waveBio}>{card.profile.bio}</p>}
+          
+          {card?.profile?.pronouns && <p className={styles.pronounText}>Goes by {card.profile.firstName} ({card.profile.pronouns})</p>}
+        </div>
 
         {/* ── ACTIONS ── */}
         <div className={styles.quickRow}>
@@ -63,7 +88,7 @@ export default function ClassicTemplate({ card, trackClick, handleDownloadImage 
           )}
           {card?.settings?.leadCaptureEnabled && <LeadCapture vcardId={card.id} trackClick={trackClick} />}
           <div className={styles.secondaryRow}>
-            <button className={styles.secondaryCta} onClick={handleDownloadImage}><ImageIcon size={16} /> Save as Image</button>
+            <button className={styles.secondaryCta} onClick={handleDownloadImage}><ImageIcon size={16} /> Save Image</button>
             <button className={styles.secondaryCta} onClick={() => {
               trackClick();
               if (navigator.share) navigator.share({ title: name, url: window.location.href });
@@ -123,7 +148,6 @@ export default function ClassicTemplate({ card, trackClick, handleDownloadImage 
 
         <WebsiteList card={card} trackClick={trackClick} />
         
-        {/* Moved Social Connect to the bottom for this design */}
         <SocialConnect card={card} trackClick={trackClick} />
       </div>
     </article>

@@ -7,32 +7,26 @@ export interface CardTemplate {
   id: string;
   name: string;
   description: string;
-  category: "Professional" | "Modern" | "Premium" | "Minimal";
+  category: "Professional" | "Modern" | "Premium";
 }
 
 export const ATTR_TEMPLATES: CardTemplate[] = [
   {
     id: "classic",
     name: "Classic Professional",
-    description: "The standard trusted layout for corporate roles.",
+    description: "Slanted header with clean contact rows — the HiHello standard.",
     category: "Professional",
   },
   {
-    id: "bold",
-    name: "Modern & Bold",
-    description: "Centered layout with large typography for personal branding.",
+    id: "wave",
+    name: "Wave Gradient",
+    description: "Smooth wave header with vibrant gradients for personal branding.",
     category: "Modern",
   },
   {
-    id: "cyber",
-    name: "Cyber Glass",
-    description: "Premium glassmorphism and neon effects for tech founders.",
+    id: "diagonal",
+    name: "Diagonal Stripe",
+    description: "Diagonal-patterned header with centered hierarchy and action bar.",
     category: "Premium",
-  },
-  {
-    id: "minimal",
-    name: "Minimalist",
-    description: "Ultra-clean layout with refined typography and whitespace.",
-    category: "Minimal",
   },
 ];

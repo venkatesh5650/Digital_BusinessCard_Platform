@@ -288,7 +288,7 @@ export const DUMMY_CARD: VCard = {
     colorAccent: "#f59e0b",
     textColor: "#f1f5f9",
     subtextColor: "#94a3b8",
-    layout: "cyber",
+    layout: "diagonal",
     headerGlass: true,
     avatarNeonRing: true,
     particles: false,

@@ -1,9 +1,9 @@
-/* =============================================
-   IMPRINT — Public Card Styles
+﻿/* =============================================
+   IMPRINT â€” Public Card Styles
    Blinq-inspired clean corporate aesthetic
    ============================================= */
 
-/* ── Wrapper ────────────────────────────────── */
+/* â”€â”€ Wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .wrapper {
   min-height: 100vh;
   min-height: 100dvh;
@@ -58,7 +58,7 @@
   margin: 0 auto !important;
 }
 
-/* ── Main Card Shell ─────────────────────────── */
+/* â”€â”€ Main Card Shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .card {
   width: 100%;
   max-width: 440px;
@@ -77,7 +77,7 @@
   }
 }
 
-/* ── Header & Banner ─────────────────────────── */
+/* â”€â”€ Header & Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .header {
   position: relative;
   display: flex;
@@ -252,7 +252,7 @@
   max-width: 100%;
 }
 
-/* ── Body Sections ───────────────────────────── */
+/* â”€â”€ Body Sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .body {
   padding: 0 24px 32px;
   display: flex;
@@ -271,7 +271,7 @@
   margin-bottom: 10px;
 }
 
-/* ── CTA Buttons ─────────────────────────────── */
+/* â”€â”€ CTA Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .quickRow {
   display: flex;
   flex-direction: column;
@@ -331,7 +331,7 @@
   border-color: var(--border-strong, #dee2e6);
 }
 
-/* ── Link Cards ──────────────────────────────── */
+/* â”€â”€ Link Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .linkCard {
   display: flex;
   align-items: center;
@@ -378,7 +378,7 @@
   text-overflow: ellipsis;
 }
 
-/* ── Social Grid ─────────────────────────────── */
+/* â”€â”€ Social Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .socialGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
@@ -402,7 +402,7 @@
   transform: translateY(-2px);
 }
 
-/* ── QR Section ──────────────────────────────── */
+/* â”€â”€ QR Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .publicQrSection {
   padding: 0 24px 28px;
   display: flex;
@@ -451,7 +451,7 @@
   text-align: center;
 }
 
-/* ── Footer ──────────────────────────────────── */
+/* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .footer {
   padding: 28px 24px;
   text-align: center;
@@ -472,7 +472,7 @@
   letter-spacing: -0.01em;
 }
 
-/* ── Sticky Save Contact (Mobile) ────────────── */
+/* â”€â”€ Sticky Save Contact (Mobile) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .stickyCtaBar {
   display: none;
 }
@@ -509,7 +509,7 @@
   }
 }
 
-/* ── Lead Capture Modal (clean overlay) ──────── */
+/* â”€â”€ Lead Capture Modal (clean overlay) â”€â”€â”€â”€â”€â”€â”€â”€ */
 .leadOverlay {
   position: fixed;
   inset: 0;
@@ -531,7 +531,7 @@
   box-shadow: var(--shadow-xl, 0 24px 60px rgba(0,0,0,0.12));
 }
 
-/* ── Entrance Animations ─────────────────────── */
+/* â”€â”€ Entrance Animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -553,91 +553,686 @@
 .body > *:nth-child(4) { animation-delay: 0.2s; }
 .body > *:nth-child(5) { animation-delay: 0.25s; }
 
-/* ── MODERN TEMPLATE ────────────────────────── */
-.cardModern .headerAlignmentWrap {
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   CLASSIC TEMPLATE (HiHello Style)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.cardClassic {
+  background: #ffffff;
+}
+
+.classicHeader {
+  position: relative;
+  min-height: 220px;
+  overflow: visible;
+  padding: 0;
+}
+
+.classicHeaderBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 220px;
+  background: var(--classic-primary, #157e70);
+  clip-path: polygon(0 0, 100% 0, 100% 65%, 0 100%);
+  z-index: 1;
+}
+
+.classicHeaderContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  padding: 32px 24px 0;
+  justify-content: space-between;
+}
+
+.classicHeaderText {
+  flex: 1;
+  padding-right: 16px;
+  padding-top: 8px;
+}
+
+.classicHeaderText .name {
+  color: #ffffff;
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.classicHeaderText .jobTitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+.classicAvatarWrap {
+  margin-top: 16px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #fff;
+  padding: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+  z-index: 3;
+}
+.classicAvatarWrap .avatarOuter {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  box-shadow: none;
+  border: none;
+}
+.classicAvatarWrap .avatarInner {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.classicBio {
+  font-style: italic;
+  color: #4a5568;
+  font-size: 0.9rem;
+  padding: 16px 24px 8px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.cardClassic .sectionLabel {
+  display: none;
+}
+
+.cardClassic .body {
+  padding-left: 0;
+  padding-right: 0;
+  gap: 0;
+}
+
+.cardClassic .quickRow {
+  padding: 16px 24px;
+}
+
+.cardClassic .mainCta {
+  background: var(--classic-primary, #157e70);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.cardClassic .mainCta:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cardClassic .linkCard {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 12px 24px;
+  gap: 16px;
+  box-shadow: none !important;
+  transition: background 0.15s ease;
+}
+.cardClassic .linkCard:hover {
+  background: rgba(0,0,0,0.03);
+  transform: none;
+  border-color: transparent;
+}
+
+.cardClassic .linkIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--classic-primary, #157e70);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cardClassic .linkIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cardClassic .linkTitle {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+.cardClassic .linkSub {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  margin-top: 2px;
+}
+
+.cardClassic .socialGrid {
+  padding: 0 24px 24px;
+}
+.cardClassic .socialBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--classic-primary, #157e70);
+}
+.cardClassic .socialBtn:hover {
+  background: var(--classic-primary, #157e70);
+  color: #ffffff;
+  border-color: var(--classic-primary, #157e70);
+}
+
+
+/* ══════════════════════════════════════════════
+   WAVE TEMPLATE (Step 2)
+   ══════════════════════════════════════════════ */
+.cardWave {
+  background: #ffffff;
+}
+
+.waveHeader {
+  position: relative;
+  min-height: 480px;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+}
+
+.waveHeaderGradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,0.3) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.waveSeparator {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  z-index: 2;
+  transform: translateY(1px); /* prevent 1px gap */
+}
+
+.waveSvg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.waveCompanyLogo {
+  position: absolute;
+  right: 15%; /* Inside the white space on the right */
+  bottom: 50px;
+  width: 52px;
+  height: 52px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 3;
+}
+.waveCompanyLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.waveTextContent {
+  text-align: left;
+  padding: 8px 24px 0;
+}
+
+.waveTextContent .name {
+  color: #1a1a1a;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.waveTextContent .jobTitle {
+  color: #4a5568;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.waveTextContent .companyRoleText {
+  color: var(--wave-primary, #16a34a);
+  font-weight: 700;
+}
+
+.companySubtext {
+  font-size: 0.95rem;
+  color: #718096;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.waveBio {
+  font-size: 0.9rem;
+  color: #718096;
+  line-height: 1.6;
+  margin-top: 16px;
+}
+
+.pronounText {
+  font-size: 0.85rem;
+  color: #a0aec0;
+  margin-top: 12px;
+  font-style: italic;
+}
+
+.cardWave .sectionLabel {
+  color: var(--wave-primary, #16a34a);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0 24px;
+  margin-bottom: 12px;
+}
+
+.cardWave .body {
+  padding-left: 0;
+  padding-right: 0;
+  gap: 24px;
+  margin-top: 0px;
+}
+
+.cardWave .quickRow {
+  padding: 0 24px;
+}
+
+.cardWave .mainCta {
+  background: var(--wave-primary, #16a34a);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+.cardWave .mainCta:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cardWave .linkCard {
+  border: none;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 12px 24px;
+  gap: 16px;
+  margin: 0;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+.cardWave .linkCard:hover {
+  transform: translateY(-2px);
+  background: #f8f9fa;
+}
+
+.cardWave .linkIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--wave-primary, #16a34a);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.cardWave .linkIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.cardWave .linkTitle {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+.cardWave .linkSub {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 2px;
+}
+
+.cardWave .socialGrid {
+  padding: 0 24px 24px;
+}
+.cardWave .socialBtn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.cardWave .socialBtn:hover {
+  background: var(--wave-primary, #16a34a);
+  color: #ffffff;
+  border-color: var(--wave-primary, #16a34a);
+  transform: translateY(-2px);
+}
+
+/* ══════════════════════════════════════════════
+   DIAGONAL TEMPLATE (Step 3) - ACTUAL IMPLEMENTATION
+   ══════════════════════════════════════════════ */
+.cardDiagonal {
+  background: #f8f9fa; /* slightly off-white for the floating contact card effect */
+}
+
+.diagonalHeader {
+  position: relative;
+  min-height: 180px;
+  overflow: visible;
+  padding: 0;
+  display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.diagonalHeaderBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--diagonal-primary, #111827),
+    var(--diagonal-primary, #111827) 20px,
+    rgba(0,0,0,0.85) 20px,
+    rgba(0,0,0,0.85) 40px
+  );
+  z-index: 1;
+}
+
+.diagonalCompanyLogo {
+  position: relative;
+  z-index: 2;
+  margin-top: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #fff;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.diagonalCompanyLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.diagonalAvatarSection {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: -60px;
+}
+
+.diagonalAvatarWrap {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: #fff;
+  padding: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  position: relative;
+}
+.diagonalAvatarWrap .avatarOuter {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  box-shadow: none;
+  border: none;
+}
+.diagonalAvatarWrap .avatarInner {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.diagonalTextContent {
+  text-align: center;
+  padding: 8px 24px 0;
+}
+
+.diagonalTextContent .name {
+  color: #1a1a1a;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.diagonalTextContent .jobTitle {
+  color: #4a5568;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.diagonalBio {
+  font-size: 0.9rem;
+  color: #718096;
+  line-height: 1.6;
+  margin-top: 16px;
   text-align: center;
 }
 
-.cardModern .headerContent {
-  margin-top: 12px;
+.quickActionBar {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 0 24px;
 }
 
-.cardModern .avatarOverlay {
+.quickActionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: #4a5568;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.quickActionBtn:hover {
+  transform: translateY(-2px);
+  color: var(--diagonal-primary, #111827);
+}
+
+.quickActionBtn:hover .quickActionIcon {
+  background: var(--diagonal-primary, #111827);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.quickActionIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--diagonal-primary, #111827);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.2s ease;
+}
+
+.quickActionBtn span {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.contactCardBlock {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 0 8px;
+  margin: 16px 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
   position: relative;
-  margin: -60px auto 0;
-  width: 120px;
-  height: 120px;
+  border: 1px solid rgba(0,0,0,0.03);
 }
 
-.cardModern .avatarInner {
-  border: 4px solid var(--bg-elevated);
-}
-
-.cardModern .bio {
-  max-width: 380px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* ── GLASS TEMPLATE ─────────────────────────── */
-.cardGlass {
-  background: var(--glass-bg, rgba(255, 255, 255, 0.7));
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.cardGlass .headerBanner {
-  height: 160px;
-  filter: brightness(0.9);
-}
-
-.cardGlass .linkCard {
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-}
-
-.cardGlass .linkCard:hover {
-  background: rgba(255, 255, 255, 0.6);
-}
-
-/* ── MINIMAL TEMPLATE ────────────────────────── */
-.cardMinimal .headerBanner {
-  height: 120px;
-  background-image: none !important;
-  background-color: var(--bg-surface);
-}
-
-.cardMinimal .headerAlignmentWrap {
-  padding-top: 0;
-  margin-top: -30px;
-}
-
-.cardMinimal .avatarOverlay {
-  width: 80px;
-  height: 80px;
-}
-
-.cardMinimal .sectionLabel {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
+.contactCardPill {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: #ffffff;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  opacity: 0.6;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.cardMinimal .linkCard {
-  background: transparent;
+/* Diagonal adjustments for Contact List inside the floating card */
+.contactCardBlock .sectionLabel {
+  display: none; /* Hide standard section label */
+}
+.contactCardBlock .linkCard {
   border: none;
-  border-bottom: 1px solid var(--border);
+  box-shadow: none;
+  background: transparent;
+  padding: 12px 24px;
+  margin: 0;
   border-radius: 0;
-  padding: 16px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+.contactCardBlock .linkCard:last-child {
+  border-bottom: none;
+}
+.contactCardBlock .linkCard:hover {
+  background: rgba(0,0,0,0.02);
+  transform: none;
+}
+.contactCardBlock .linkIcon {
+  background: transparent;
+  color: var(--diagonal-primary, #111827);
 }
 
-.body > *:nth-child(3) { animation-delay: 0.15s; }
-.body > *:nth-child(4) { animation-delay: 0.2s; }
-.body > *:nth-child(5) { animation-delay: 0.25s; }
-.body > *:nth-child(6) { animation-delay: 0.3s; }
-.body > *:nth-child(7) { animation-delay: 0.35s; }
+.cardDiagonal .sectionLabel {
+  color: #a0aec0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0 24px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.cardDiagonal .body {
+  padding-left: 0;
+  padding-right: 0;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.cardDiagonal .quickRow {
+  padding: 0 24px;
+}
+
+.cardDiagonal .mainCta {
+  background: var(--diagonal-primary, #111827);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+.cardDiagonal .mainCta:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cardDiagonal .linkCard {
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 12px 16px;
+  gap: 16px;
+  margin: 0 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  transition: all 0.2s ease;
+}
+.cardDiagonal .linkCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.1);
+}
+
+.cardDiagonal .linkIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.03);
+  color: var(--diagonal-primary, #111827);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cardDiagonal .linkIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cardDiagonal .linkTitle {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+.cardDiagonal .linkSub {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 2px;
+}
+
+.diagonalSocialWrap {
+  background: #ffffff;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.cardDiagonal .socialGrid {
+  padding: 0 24px 24px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.cardDiagonal .socialBtn {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+}
+.cardDiagonal .socialBtn:hover {
+  background: var(--diagonal-primary, #111827);
+  color: #ffffff;
+  border-color: var(--diagonal-primary, #111827);
+  transform: translateY(-2px);
+}

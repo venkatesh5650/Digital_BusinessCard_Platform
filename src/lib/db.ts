@@ -7,7 +7,9 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Extremely resilient connection for Vercel Serverless
-const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+const connectionString = process.env.NODE_ENV === 'development' 
+  ? (process.env.DATABASE_URL || process.env.POSTGRES_URL)
+  : (process.env.POSTGRES_URL || process.env.DATABASE_URL);
 
 const poolConfig: PoolConfig = {
   connectionString,

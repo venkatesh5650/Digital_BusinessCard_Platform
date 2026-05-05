@@ -118,6 +118,7 @@ export async function updateCard(cardId: string, formData: FormData) {
       seoTitle: (formData.get("seoTitle") as string) || null,
       seoDescription: (formData.get("seoDescription") as string) || null,
       layout: (formData.get("layout") as string) || card.layout,
+      colorPrimary: (formData.get("colorPrimary") as string) || card.colorPrimary,
     },
   });
 

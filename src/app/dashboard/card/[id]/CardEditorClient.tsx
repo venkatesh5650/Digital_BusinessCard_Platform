@@ -238,6 +238,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [companyLogoUrl, setCompanyLogoUrl] = useState(card.companyLogoUrl ?? "");
   const [layout, setLayout] = useState(card.layout || "classic");
   const [coverMode, setCoverMode] = useState<"gallery" | "upload" | "url">("gallery");
+  const [colorPrimary, setColorPrimary] = useState(card.colorPrimary || "#157e70");
 
   // Profile fields
   const [firstName, setFirstName] = useState(card.firstName);
@@ -327,6 +328,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       fd.append("companyLogoUrl", companyLogoUrl);
       fd.append("coverImageUrl", coverPhotoUrl);
       fd.append("layout", layout);
+      fd.append("colorPrimary", colorPrimary);
       fd.append("slug", slug);
       fd.append("isPublished", isPublished.toString());
       fd.append("leadCaptureEnabled", leadCapture.toString());
@@ -402,7 +404,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       theme: {
         preset: "custom",
         backgroundStyle: "gradient",
-        colorPrimary: "#171717",
+        colorPrimary: colorPrimary,
         colorSecondary: "#3b82f6",
         colorAccent: "#f97316",
         textColor: "#171717",
@@ -426,7 +428,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
     card.id, card.userId, firstName, lastName, displayName, jobTitle, headline, bio, pronouns, avatarUrl,
     companyName, companyRole, companyLogoUrl, companyWebsite, companyTagline,
     phones, emails, addresses, websites, socials, payments, actions,
-    layout, coverPhotoUrl, slug, isPublished, leadCapture, vcfDownload
+    layout, colorPrimary, coverPhotoUrl, slug, isPublished, leadCapture, vcfDownload
   ]);
 
   // ── Phone handlers ──
@@ -661,6 +663,45 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 </div>
               </div>
             )}
+          </div>
+        );
+        break;
+      case "themeColor":
+        modalTitle = "Theme Color";
+        modalContent = (
+          <div className={styles.formGrid}>
+            <div className={`${styles.formField} ${styles.formGridFull}`}>
+              <label>Select Primary Color</label>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "16px" }}>
+                 <input 
+                   type="color" 
+                   value={colorPrimary} 
+                   onChange={e => setColorPrimary(e.target.value)} 
+                   style={{ width: "48px", height: "48px", padding: 0, border: "none", borderRadius: "8px", cursor: "pointer", flexShrink: 0, outline: "none" }} 
+                 />
+                 <input 
+                   type="text" 
+                   value={colorPrimary} 
+                   onChange={e => setColorPrimary(e.target.value)} 
+                   placeholder="#157e70" 
+                   style={{ flex: 1, textTransform: "uppercase" }}
+                 />
+              </div>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                 {["#157e70", "#000000", "#1d4ed8", "#b91c1c", "#d97706", "#4338ca", "#0f766e", "#be185d"].map(c => (
+                   <button 
+                     key={c}
+                     type="button"
+                     onClick={() => setColorPrimary(c)}
+                     style={{ 
+                       width: "36px", height: "36px", borderRadius: "50%", background: c, cursor: "pointer", 
+                       border: colorPrimary === c ? "2px solid var(--orange)" : "2px solid transparent",
+                       boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                     }}
+                   />
+                 ))}
+              </div>
+            </div>
           </div>
         );
         break;
@@ -902,19 +943,22 @@ export default function CardEditorClient({ card }: { card: Card }) {
       case "templates":
         modalTitle = "Choose Your Template";
         modalContent = (
-          <div className={styles.galleryGrid}>
+          <div className={styles.templateGrid}>
             {ATTR_TEMPLATES.map((tmpl) => (
               <div 
                 key={tmpl.id} 
-                className={`${styles.galleryItem} ${layout === tmpl.id ? styles.galleryItemActive : ""}`}
+                className={`${styles.templateItem} ${layout === tmpl.id ? styles.templateItemActive : ""}`}
                 onClick={() => setLayout(tmpl.id as any)}
-                style={{ height: "auto", minHeight: "120px" }}
               >
-                <div style={{ padding: "16px", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", background: layout === tmpl.id ? "rgba(255,107,0,0.05)" : "var(--bg-surface)" }}>
-                  <div style={{ fontWeight: 800, fontSize: "1.1rem", marginBottom: "4px" }}>{tmpl.name}</div>
-                  <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>{tmpl.description}</div>
+                <div className={styles.templateItemContent}>
+                  <div className={styles.templateItemName}>{tmpl.name}</div>
+                  <div className={styles.templateItemDesc}>{tmpl.description}</div>
                 </div>
-                {layout === tmpl.id && <div className={styles.galleryCheck}><CheckCircle size={16} /></div>}
+                {layout === tmpl.id && (
+                  <div className={styles.templateItemCheck}>
+                    <CheckCircle size={18} />
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -1085,37 +1129,13 @@ export default function CardEditorClient({ card }: { card: Card }) {
            <div className={styles.builderSection} style={{ marginTop: 24 }}>
              <div className={styles.builderSectionTitle}>Customize your card</div>
              
-             <div className={styles.builderSectionSubtitle}>Messaging</div>
+             <div className={styles.builderSectionSubtitle}>Design & Styling</div>
              <div className={styles.builderGrid}>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "whatsapp")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(37, 211, 102, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="whatsapp" />
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("themeColor")}>
+                   <div className={styles.builderGridItemIcon}>
+                     <div style={{ width: 24, height: 24, borderRadius: "50%", background: colorPrimary, border: "2px solid #fff", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}></div>
                    </div>
-                   <div className={styles.builderGridItemLabel}>WhatsApp</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "telegram")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(34, 158, 217, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="telegram" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>Telegram</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "signal")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(58, 118, 240, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="signal" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>Signal</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "discord")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(88, 101, 242, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="discord" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>Discord</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "skype")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 175, 240, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="skype" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>Skype</div>
+                   <div className={styles.builderGridItemLabel}>Theme Color</div>
                 </div>
              </div>
 
@@ -1167,7 +1187,84 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 </div>
              </div>
 
-             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Professional</div>
+             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Messaging</div>
+             <div className={styles.builderGrid}>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "whatsapp")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(37, 211, 102, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="whatsapp" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>WhatsApp</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "telegram")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(34, 158, 217, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="telegram" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Telegram</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "signal")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(58, 118, 240, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="signal" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Signal</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "discord")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(88, 101, 242, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="discord" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Discord</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "skype")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 175, 240, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="skype" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Skype</div>
+                </div>
+             </div>
+
+             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Social & Entertainment</div>
+             <div className={styles.builderGrid}>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "instagram")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(228, 64, 95, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="instagram" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Instagram</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "twitter")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="twitter" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>X</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "facebook")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(24, 119, 242, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="facebook" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Facebook</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "youtube")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(255, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="youtube" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>YouTube</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "tiktok")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="tiktok" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>TikTok</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "twitch")}>
+                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(145, 70, 255, 0.1)", borderRadius: "12px", padding: "12px" }}>
+                      <PlatformIcon platform="twitch" />
+                   </div>
+                   <div className={styles.builderGridItemLabel}>Twitch</div>
+                </div>
+                <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
+                   <div className={styles.builderGridItemIcon}><Plus size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemLabel}>More</div>
+                </div>
+             </div>
+<div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Professional</div>
              <div className={styles.builderGrid}>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "linkedin")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(10, 102, 194, 0.1)", borderRadius: "12px", padding: "12px" }}>
@@ -1235,50 +1332,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 </div>
              </div>
 
-             <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Social & Entertainment</div>
-             <div className={styles.builderGrid}>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "instagram")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(228, 64, 95, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="instagram" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>Instagram</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "twitter")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="twitter" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>X</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "facebook")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(24, 119, 242, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="facebook" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>Facebook</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "youtube")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(255, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="youtube" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>YouTube</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "tiktok")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="tiktok" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>TikTok</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "twitch")}>
-                   <div className={styles.builderGridItemIcon} style={{ background: "rgba(145, 70, 255, 0.1)", borderRadius: "12px", padding: "12px" }}>
-                      <PlatformIcon platform="twitch" />
-                   </div>
-                   <div className={styles.builderGridItemLabel}>Twitch</div>
-                </div>
-                <div className={styles.builderGridItem} onClick={() => setActiveModal("social")}>
-                   <div className={styles.builderGridItemIcon}><Plus size={24} strokeWidth={1.5} /></div>
-                   <div className={styles.builderGridItemLabel}>More</div>
-                </div>
-             </div>
-           </div>
+                        </div>
 
           <div style={{ marginTop: 32, display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--border)", paddingTop: 20 }}>
              <div className={styles.toggleRow} style={{ flex: 1, paddingRight: 40 }}>
@@ -1306,16 +1360,6 @@ export default function CardEditorClient({ card }: { card: Card }) {
               <PublicCard card={livePreviewCard} isEditor={true} />
             </div>
           </div>
-          
-          {/* Subtle Floating Button to return to Edit mode */}
-          <button 
-            type="button"
-            className={styles.mobileFab}
-            onClick={() => setActiveMobileTab("edit")}
-            title="Return to Editor"
-          >
-            <Settings size={22} />
-          </button>
         </div>
       </div>
 

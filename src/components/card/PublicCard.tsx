@@ -10,9 +10,8 @@ import { getDisplayName } from "@/data/dummyCard";
 
 // Templates
 import ClassicTemplate from "./templates/ClassicTemplate";
-import ModernTemplate from "./templates/ModernTemplate";
-import GlassTemplate from "./templates/GlassTemplate";
-import MinimalTemplate from "./templates/MinimalTemplate";
+import WaveTemplate from "./templates/WaveTemplate";
+import DiagonalTemplate from "./templates/DiagonalTemplate";
 
 export default function PublicCard({ card, isEditor = false }: { card: VCard, isEditor?: boolean }) {
   const [cardUrl, setCardUrl] = useState(`https://imprint.cards/${card?.settings?.slug || ""}`);
@@ -58,14 +57,10 @@ export default function PublicCard({ card, isEditor = false }: { card: VCard, is
   const renderTemplate = () => {
     const props = { card, trackClick, handleDownloadImage };
     switch (layout) {
-      case "bold":
-      case "modern": // Alias for modern
-        return <ModernTemplate {...props} />;
-      case "cyber":
-      case "glass": // Alias for glass
-        return <GlassTemplate {...props} />;
-      case "minimal":
-        return <MinimalTemplate {...props} />;
+      case "wave":
+        return <WaveTemplate {...props} />;
+      case "diagonal":
+        return <DiagonalTemplate {...props} />;
       case "classic":
       default:
         return <ClassicTemplate {...props} />;

@@ -193,7 +193,7 @@ export default function DashboardClient({
       {/* ── Page Header ── */}
       <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle}>
+          <h1 className={styles.pageTitle} suppressHydrationWarning>
             {getGreeting()}, {firstName} 👋
           </h1>
           <p className={styles.pageSubtitle}>
@@ -204,7 +204,7 @@ export default function DashboardClient({
           <div className={styles.liveIndicator}>
             <span className={styles.livePulse} />
             Live
-            <span className={styles.refreshTime}>
+            <span className={styles.refreshTime} suppressHydrationWarning>
               · {timeAgo(lastRefreshed)}
             </span>
           </div>
