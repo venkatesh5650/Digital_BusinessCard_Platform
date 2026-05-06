@@ -18,13 +18,24 @@ const poolConfig: PoolConfig = {
   allowExitOnIdle: true, // Let Lambdas die gracefully
 };
 
+console.log("[DB] Initializing Prisma with connection string:", connectionString?.split('@')[1] || "UNDEFINED");
+
 const pool = new Pool(poolConfig);
+
+pool.on('error', (err) => {
+  console.error("[DB][Pool] Unexpected error on idle client", err);
+});
+
 const adapter = new PrismaPg(pool);
 
 const db = globalForPrisma.prisma ?? new PrismaClient({
   adapter,
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 });
+
+db.$connect()
+  .then(() => console.log("[DB] Successfully connected to database"))
+  .catch((err) => console.error("[DB] Failed to connect to database:", err));
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 

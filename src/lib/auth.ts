@@ -40,27 +40,59 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        console.log("[Auth][Authorize] Attempting credentials login for:", credentials?.email);
+        if (!credentials?.email || !credentials?.password) {
+          console.log("[Auth][Authorize] Missing email or password");
+          return null;
+        }
 
-        const user = await db.user.findUnique({
-          where: { email: credentials.email as string },
-        });
+        try {
+          const user = await db.user.findUnique({
+            where: { email: credentials.email as string },
+          });
 
-        if (!user || !user.password) return null;
+          if (!user) {
+            console.log("[Auth][Authorize] User not found:", credentials.email);
+            return null;
+          }
 
-        const passwordMatch = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        );
+          if (!user.password) {
+            console.log("[Auth][Authorize] User has no password (likely OAuth user):", credentials.email);
+            return null;
+          }
 
-        if (!passwordMatch) return null;
+          const passwordMatch = await bcrypt.compare(
+            credentials.password as string,
+            user.password
+          );
 
-        return user;
+          if (!passwordMatch) {
+            console.log("[Auth][Authorize] Password mismatch for:", credentials.email);
+            return null;
+          }
+
+          console.log("[Auth][Authorize] Login successful for:", credentials.email);
+          return user;
+        } catch (error) {
+          console.error("[Auth][Authorize] Database error during login:", error);
+          throw error;
+        }
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      console.log("[Auth][Callback] signIn:", { 
+        userEmail: user.email, 
+        provider: account?.provider,
+        type: account?.type 
+      });
+      return true;
+    },
+    async jwt({ token, user, account }) {
+      if (account) {
+        console.log("[Auth][Callback] jwt: initial sign-in with", account.provider);
+      }
       if (user) {
         token.id = user.id;
       }
@@ -73,4 +105,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
+  events: {
+    async signIn(message) { console.log("[Auth][Event] Successful sign-in:", message.user.email); },
+    async createUser(message) { console.log("[Auth][Event] User created:", message.user.email); },
+    async linkAccount(message) { console.log("[Auth][Event] Account linked:", message.account.provider); },
+    async session(message) { /* session active */ },
+  }
 });

@@ -113,8 +113,13 @@ export default function DashboardClient({
 }) {
   const [stats, setStats] = useState<DashboardStats>(initialStats);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
+  const [mounted, setMounted] = useState(false);
   const [, setTick] = useState(0); // forces re-render for timeAgo display
   const [draftModalCard, setDraftModalCard] = useState<CardData | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   function handlePreviewClick(e: React.MouseEvent<HTMLAnchorElement>, card: CardData) {
     if (!card.isPublished) {
@@ -193,8 +198,8 @@ export default function DashboardClient({
       {/* ── Page Header ── */}
       <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle} suppressHydrationWarning>
-            {getGreeting()}, {firstName} 👋
+          <h1 className={styles.pageTitle}>
+            {mounted ? getGreeting() : "Welcome back"}, {firstName} 👋
           </h1>
           <p className={styles.pageSubtitle}>
             Real-time overview of your digital card performance.
