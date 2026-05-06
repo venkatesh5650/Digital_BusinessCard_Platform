@@ -191,61 +191,65 @@ export default function LeadsClient({ leads, cards }: { leads: Lead[]; cards: Ca
                 {isExpanded && (
                   <div style={{
                     marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border)",
-                    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px 24px",
-                    animation: "fadeIn 0.3s ease"
+                    display: "grid", 
+                    gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", 
+                    gap: "20px 24px",
+                    animation: "fadeIn 0.2s ease"
                   }}>
                     {lead.email && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(168, 85, 247, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ display: "flex", gap: 12 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(168, 85, 247, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <Mail size={16} color="#a855f7" />
                         </div>
-                        <div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Email</div>
-                          <a href={`mailto:${lead.email}`} style={{ color: "var(--text-1)", fontSize: 14, textDecoration: "none", fontWeight: 500 }}>{lead.email}</a>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 2 }}>Email</div>
+                          <a href={`mailto:${lead.email}`} style={{ color: "var(--text-1)", fontSize: 13, textDecoration: "none", fontWeight: 600, wordBreak: "break-all" }}>{lead.email}</a>
                         </div>
                       </div>
                     )}
                     {lead.phone && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(59, 130, 246, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ display: "flex", gap: 12 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(59, 130, 246, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <Phone size={16} color="#3b82f6" />
                         </div>
-                        <div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Phone</div>
-                          <a href={`tel:${lead.phone}`} style={{ color: "var(--text-1)", fontSize: 14, textDecoration: "none", fontWeight: 500 }}>{lead.phone}</a>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 2 }}>Phone</div>
+                          <a href={`tel:${lead.phone}`} style={{ color: "var(--text-1)", fontSize: 14, textDecoration: "none", fontWeight: 600 }}>{lead.phone}</a>
                         </div>
                       </div>
                     )}
                     {lead.company && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(16, 185, 129, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ display: "flex", gap: 12 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(16, 185, 129, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <Building2 size={16} color="#10b981" />
                         </div>
-                        <div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Company</div>
-                          <div style={{ color: "var(--text-1)", fontSize: 14, fontWeight: 500 }}>{lead.company}</div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 2 }}>Company</div>
+                          <div style={{ color: "var(--text-1)", fontSize: 14, fontWeight: 600 }}>{lead.company}</div>
                         </div>
                       </div>
                     )}
                     {lead.jobTitle && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(245, 158, 11, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ display: "flex", gap: 12 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(245, 158, 11, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <Briefcase size={16} color="#f59e0b" />
                         </div>
-                        <div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Job Title</div>
-                          <div style={{ color: "var(--text-1)", fontSize: 14, fontWeight: 500 }}>{lead.jobTitle}</div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 2 }}>Job Title</div>
+                          <div style={{ color: "var(--text-1)", fontSize: 14, fontWeight: 600 }}>{lead.jobTitle}</div>
                         </div>
                       </div>
                     )}
                     {lead.note && (
-                      <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "flex-start", gap: 12 }}>
+                      <div style={{ gridColumn: "1 / -1", display: "flex", gap: 12 }}>
                         <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(236, 72, 153, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <StickyNote size={16} color="#ec4899" />
                         </div>
-                        <div>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Note from User</div>
-                          <div style={{ color: "var(--text-1)", fontSize: 14, lineHeight: 1.5, marginTop: 4 }}>{lead.note}</div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 2 }}>Note from User</div>
+                          <div style={{ color: "var(--text-1)", fontSize: 13, lineHeight: 1.5, background: "var(--bg-hover)", padding: "10px 14px", borderRadius: 10, marginTop: 4 }}>
+                            {lead.note}
+                          </div>
                         </div>
                       </div>
                     )}
