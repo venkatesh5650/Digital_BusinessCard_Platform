@@ -67,8 +67,9 @@ export default function DashboardNav({ user }: { user: User }) {
 
       <div className={styles.sidebarFooter}>
         <a
-          href="/"
+          href="https://digital-business-card-platform-gdam.vercel.app"
           target="_blank"
+          rel="noopener noreferrer"
           className={styles.navItem}
           title="View public site"
         >
