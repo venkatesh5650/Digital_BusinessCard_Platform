@@ -37,7 +37,7 @@
 
   --font-d:       'Syne', sans-serif;
   --font-b:       'DM Sans', sans-serif;
-  --r-card:       16px;
+  --r-card:       20px;
 }
 
 [data-theme="dark"] .root {
@@ -290,18 +290,18 @@
 
 .pageTitle {
   font-family: var(--font-d);
-  font-size: 30px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 700;
   color: var(--text-1);
-  letter-spacing: -0.6px;
-  line-height: 1.1;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
 }
 
 .pageSubtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-2);
-  margin-top: 5px;
-  font-weight: 300;
+  margin-top: 8px;
+  font-weight: 400;
 }
 
 .headerActions {
@@ -359,10 +359,10 @@
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--r-card);
-  padding: 24px 24px;
+  padding: 28px 24px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 20px;
   overflow: hidden;
   transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
   animation: statFadeUp 0.55s ease-out both;
@@ -416,11 +416,11 @@
 
 .statValue {
   font-family: var(--font-d);
-  font-size: 38px;
-  font-weight: 800;
+  font-size: 42px;
+  font-weight: 700;
   color: var(--text-1);
-  letter-spacing: -2.5px;
-  line-height: 1;
+  letter-spacing: -1px;
+  line-height: 1.1;
 }
 
 .statLabel {
@@ -451,7 +451,7 @@
 
 .cardsSectionTitle {
   font-family: var(--font-d);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-1);
 }
@@ -503,19 +503,19 @@
 }
 
 .cardItemHeader {
-  padding: 20px 20px 16px;
+  padding: 24px 24px 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .cardAvatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   color: #ffffff;
   font-family: var(--font-d);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -623,8 +623,8 @@
 /* ── Actions ──────────────────────────────────────────────────────────── */
 .cardActions {
   display: flex;
-  gap: 8px;
-  padding: 12px 16px 16px;
+  gap: 10px;
+  padding: 16px 24px 24px;
 }
 
 /* ── Buttons ──────────────────────────────────────────────────────────── */

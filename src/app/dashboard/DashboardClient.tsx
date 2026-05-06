@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import styles from "./dashboard.module.css";
 import ShareQRButton from "./ShareQRButton";
+import SubmitButton from "@/components/SubmitButton";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -214,14 +215,14 @@ export default function DashboardClient({
             </span>
           </div>
           <form action={createCard}>
-            <button
+            <SubmitButton
               id="btn-create-card"
-              type="submit"
               className={styles.btnPrimary}
               style={{ flex: "none", whiteSpace: "nowrap" }}
+              loadingText="Creating..."
             >
               <Plus size={15} strokeWidth={2.5} /> Create Card
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>
@@ -268,14 +269,14 @@ export default function DashboardClient({
               Create your first digital business card and start sharing it instantly.
             </p>
             <form action={createCard}>
-              <button
+              <SubmitButton
                 id="btn-create-first-card"
-                type="submit"
                 className={styles.btnPrimary}
                 style={{ flex: "none", display: "inline-flex" }}
+                loadingText="Creating..."
               >
                 <Plus size={15} strokeWidth={2.5} /> Create My First Card
-              </button>
+              </SubmitButton>
             </form>
           </div>
         ) : (
