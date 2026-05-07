@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { normalizeUrl } from "@/lib/urlUtils";
+import { sendLeadNotification } from "@/lib/mail";
 
 // ─── AUTH ─────────────────────────────────────────────────────────
 export async function registerUser(formData: FormData) {
@@ -449,7 +450,7 @@ export async function captureLead(vcardId: string, formData: FormData) {
   const name = formData.get("name") as string;
   if (!name) return { error: "Name is required." };
 
-  await db.lead.create({
+  const lead = await db.lead.create({
     data: {
       vcardId,
       name,
@@ -461,10 +462,27 @@ export async function captureLead(vcardId: string, formData: FormData) {
     }
   });
 
-  await db.vCard.update({
+  const card = await db.vCard.update({
     where: { id: vcardId },
-    data: { leadsCollected: { increment: 1 } }
+    data: { leadsCollected: { increment: 1 } },
+    include: { user: true }
   });
+
+  // Send professional email notification to card owner
+  if (card.user?.email) {
+    sendLeadNotification({
+      to: card.user.email,
+      vcardName: `${card.firstName} ${card.lastName}`,
+      leadData: {
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        company: lead.company,
+        jobTitle: lead.jobTitle,
+        note: lead.note,
+      }
+    }).catch(err => console.error("Silent notification failure:", err));
+  }
 
   return { success: true };
 }
