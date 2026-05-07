@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import Link from "next/link";
-import { createCard } from "@/lib/actions";
+import { createCard, deleteCard } from "@/lib/actions";
 import {
   Eye,
   MousePointerClick,
   Users,
   CreditCard,
   Plus,
+  Trash2,
 } from "lucide-react";
 import styles from "./dashboard.module.css";
 import ShareQRButton from "./ShareQRButton";
@@ -28,6 +29,8 @@ type CardData = {
   totalViews: number;
   totalClicks: number;
   leadsCollected: number;
+  layout: string;
+  colorPrimary: string;
 };
 
 export type DashboardStats = {
@@ -117,6 +120,9 @@ export default function DashboardClient({
   const [mounted, setMounted] = useState(false);
   const [, setTick] = useState(0); // forces re-render for timeAgo display
   const [draftModalCard, setDraftModalCard] = useState<CardData | null>(null);
+  const [cardToDelete, setCardToDelete] = useState<string | null>(null);
+  const [activeAction, setActiveAction] = useState<"create" | "delete" | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setMounted(true);
@@ -140,6 +146,33 @@ export default function DashboardClient({
       // silently show stale data
     }
   }, []);
+
+  const handleCreateNewCard = () => {
+    setActiveAction("create");
+    startTransition(async () => {
+      await createCard();
+    });
+  };
+
+  const handleDeleteCard = async (id: string) => {
+    setCardToDelete(null);
+    setActiveAction("delete");
+    startTransition(async () => {
+      const result = await deleteCard(id);
+      if (result?.error) {
+        alert(result.error);
+        setActiveAction(null);
+      } else {
+        // Optimistic UI update
+        setStats(prev => ({
+          ...prev,
+          cards: prev.cards.filter(c => c.id !== id),
+          totalCards: prev.totalCards - 1
+        }));
+        setActiveAction(null);
+      }
+    });
+  };
 
   useEffect(() => {
     // Poll every 30 seconds (only when tab is visible)
@@ -214,16 +247,15 @@ export default function DashboardClient({
               · {timeAgo(lastRefreshed)}
             </span>
           </div>
-          <form action={createCard}>
-            <SubmitButton
-              id="btn-create-card"
-              className={styles.btnPrimary}
-              style={{ flex: "none", whiteSpace: "nowrap" }}
-              loadingText="Creating..."
-            >
-              <Plus size={15} strokeWidth={2.5} /> Create Card
-            </SubmitButton>
-          </form>
+          <button 
+            id="btn-create-card"
+            className={styles.btnPrimary}
+            style={{ flex: "none", whiteSpace: "nowrap" }}
+            onClick={handleCreateNewCard}
+            disabled={isPending}
+          >
+            <Plus size={15} strokeWidth={2.5} /> Create Card
+          </button>
         </div>
       </div>
 
@@ -268,16 +300,15 @@ export default function DashboardClient({
             <p className={styles.emptyDesc}>
               Create your first digital business card and start sharing it instantly.
             </p>
-            <form action={createCard}>
-              <SubmitButton
-                id="btn-create-first-card"
-                className={styles.btnPrimary}
-                style={{ flex: "none", display: "inline-flex" }}
-                loadingText="Creating..."
-              >
-                <Plus size={15} strokeWidth={2.5} /> Create My First Card
-              </SubmitButton>
-            </form>
+            <button 
+              id="btn-create-first-card"
+              className={styles.btnPrimary}
+              style={{ flex: "none", display: "inline-flex" }}
+              onClick={handleCreateNewCard}
+              disabled={isPending}
+            >
+              <Plus size={15} strokeWidth={2.5} /> Create My First Card
+            </button>
           </div>
         ) : (
           <div className={styles.cardsGrid}>
@@ -371,7 +402,19 @@ export default function DashboardClient({
                     >
                       Preview
                     </a>
-                    <ShareQRButton slug={card.slug} />
+                    <button 
+                      className={styles.btnDangerIcon}
+                      onClick={() => setCardToDelete(card.id)}
+                      title="Delete Card"
+                      disabled={isPending}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    <ShareQRButton 
+                      slug={card.slug} 
+                      layout={card.layout} 
+                      primaryColor={card.colorPrimary} 
+                    />
                   </div>
                 </div>
               );
@@ -379,6 +422,36 @@ export default function DashboardClient({
           </div>
         )}
       </div>
+
+      {/* ── Delete Confirmation Modal ── */}
+      {cardToDelete && (
+        <div className={styles.modalOverlay} onClick={() => setCardToDelete(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🗑️</div>
+            <h2 className={styles.modalTitle}>Delete this card?</h2>
+            <p className={styles.modalSubtitle} style={{ marginTop: '12px' }}>
+              Are you sure? This action is permanent and cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <button 
+                className={styles.btnSecondary} 
+                onClick={() => setCardToDelete(null)}
+                style={{ flex: 1, padding: '14px' }}
+              >
+                Cancel
+              </button>
+              <button 
+                className={styles.btnDanger} 
+                onClick={() => handleDeleteCard(cardToDelete)}
+                style={{ flex: 1, padding: '14px' }}
+                disabled={isPending && activeAction === "delete"}
+              >
+                {isPending && activeAction === "delete" ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Draft Modal ── */}
       {draftModalCard && (
@@ -409,6 +482,30 @@ export default function DashboardClient({
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* ── Creating Modal ── */}
+      {isPending && activeAction === "create" && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent} style={{ textAlign: "center", padding: "40px" }}>
+            <div className={styles.loader} style={{ margin: "0 auto 20px" }}></div>
+            <h2 className={styles.modalTitle}>
+              Creating your card<span className={styles.loadingDots}></span>
+            </h2>
+            <p className={styles.modalSubtitle}>Please wait while we set up your profile.</p>
+          </div>
+        </div>
+      )}
+      {/* ── Deleting Progress Modal ── */}
+      {isPending && activeAction === "delete" && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent} style={{ textAlign: "center", padding: "40px" }}>
+            <div className={styles.loader} style={{ margin: "0 auto 20px" }}></div>
+            <h2 className={styles.modalTitle}>
+              Permanently deleting your card<span className={styles.loadingDots}></span>
+            </h2>
+            <p className={styles.modalSubtitle}>Cleaning up your data. This won't take long.</p>
           </div>
         </div>
       )}

@@ -5,7 +5,15 @@ import QRCode from "react-qr-code";
 import { QrCode, X, Download, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import styles from "./dashboard.module.css";
 
-export default function ShareQRButton({ slug }: { slug: string }) {
+export default function ShareQRButton({ 
+  slug, 
+  layout = "classic", 
+  primaryColor = "#ff6b00" 
+}: { 
+  slug: string;
+  layout?: string;
+  primaryColor?: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -22,7 +30,6 @@ export default function ShareQRButton({ slug }: { slug: string }) {
     const ctx = canvas.getContext("2d");
     const img = new Image();
     img.onload = () => {
-      // 2× for high-res
       canvas.width = 512;
       canvas.height = 512;
       if (ctx) {
@@ -48,14 +55,23 @@ export default function ShareQRButton({ slug }: { slug: string }) {
     }
   };
 
+  // ── Template-specific aesthetics ──
+  const isWave = layout === 'wave';
+  const isDiagonal = layout === 'diagonal';
+  
+  // Use a subtle version of primary color for backgrounds
+  const glassBg = isWave ? "rgba(255, 255, 255, 0.95)" : isDiagonal ? "#0a0a0a" : "#0c1628";
+  const textColor = isWave ? "#1a1a1a" : "#ffffff";
+  const subTextColor = isWave ? "#64748b" : "rgba(232,238,255,0.55)";
+  const modalBorder = isWave ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.13)";
+  const borderRadius = isWave ? "32px" : "24px";
+
   return (
     <>
-      {/* Trigger button */}
       <button onClick={() => setIsOpen(true)} className={styles.btnSecondary}>
         <QrCode size={14} /> Share
       </button>
 
-      {/* Modal — inline styles guarantee visibility regardless of CSS variable scope */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
@@ -63,37 +79,49 @@ export default function ShareQRButton({ slug }: { slug: string }) {
             position: "fixed",
             inset: 0,
             zIndex: 9999,
-            background: "rgba(2, 6, 18, 0.82)",
+            background: isWave ? "rgba(241, 245, 249, 0.85)" : "rgba(2, 6, 18, 0.82)",
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "center",
-            padding: "20px",
+            padding: "40px 20px",
             overflowY: "auto",
-            WebkitOverflowScrolling: "touch" as React.CSSProperties["WebkitOverflowScrolling"],
+            WebkitOverflowScrolling: "touch",
           }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: "#0c1628",
-              border: "1px solid rgba(255, 255, 255, 0.13)",
-              borderRadius: "24px",
+              background: glassBg,
+              border: modalBorder,
+              borderRadius: borderRadius,
               padding: "32px",
               width: "100%",
               maxWidth: "400px",
               position: "relative",
               margin: "auto 0",
               flexShrink: 0,
-              boxShadow:
-                "0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)",
+              boxShadow: isWave 
+                ? "0 25px 50px -12px rgba(0, 0, 0, 0.15)" 
+                : "0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04)",
+              overflow: "hidden"
             }}
           >
-            {/* ── X close button — always white ── */}
+            {/* Template-specific Accent (Diagonal Slant) */}
+            {isDiagonal && (
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "6px",
+                background: primaryColor
+              }} />
+            )}
+
             <button
               onClick={() => setIsOpen(false)}
-              title="Close"
               style={{
                 position: "absolute",
                 top: "16px",
@@ -101,64 +129,52 @@ export default function ShareQRButton({ slug }: { slug: string }) {
                 width: "36px",
                 height: "36px",
                 borderRadius: "50%",
-                background: "rgba(255, 255, 255, 0.10)",
-                border: "1.5px solid rgba(255, 255, 255, 0.28)",
-                color: "#ffffff",
+                background: isWave ? "rgba(0,0,0,0.05)" : "rgba(255, 255, 255, 0.10)",
+                border: "none",
+                color: textColor,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                transition: "background 150ms",
-                padding: 0,
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "rgba(255,255,255,0.20)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "rgba(255,255,255,0.10)";
               }}
             >
-              <X size={18} color="#ffffff" strokeWidth={2.5} />
+              <X size={18} />
             </button>
 
-            {/* ── Header ── */}
             <div style={{ textAlign: "center", marginBottom: "22px" }}>
               <h2
                 style={{
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: isWave ? "'Plus Jakarta Sans', sans-serif" : "'Syne', sans-serif",
                   fontSize: "22px",
                   fontWeight: 800,
-                  color: "#ffffff",
+                  color: textColor,
                   margin: 0,
-                  letterSpacing: "-0.4px",
+                  letterSpacing: "-0.5px",
                 }}
               >
-                Share Your Card
+                Share Card
               </h2>
               <p
                 style={{
                   fontSize: "13px",
-                  color: "rgba(232,238,255,0.55)",
+                  color: subTextColor,
                   marginTop: "6px",
-                  fontWeight: 300,
                 }}
               >
-                Scan to open · or copy the link below
+                Scan or copy the link below
               </p>
             </div>
 
-            {/* ── QR Code ── */}
             <div
               style={{
                 background: "#ffffff",
-                borderRadius: "16px",
-                padding: "22px",
+                borderRadius: "20px",
+                padding: "24px",
                 display: "flex",
                 justifyContent: "center",
                 marginBottom: "16px",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                boxShadow: isWave ? "0 10px 15px -3px rgba(0, 0, 0, 0.1)" : "0 4px 20px rgba(0,0,0,0.3)",
+                border: isWave ? "1px solid #f1f5f9" : "none"
               }}
             >
               <QRCode
@@ -166,111 +182,87 @@ export default function ShareQRButton({ slug }: { slug: string }) {
                 value={cardUrl}
                 size={220}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                fgColor="#0a0f1e"
+                fgColor={isDiagonal ? primaryColor : "#0a0f1e"}
               />
             </div>
 
-            {/* ── URL chip ── */}
             <div
               style={{
-                background: "rgba(0, 245, 212, 0.07)",
-                border: "1px solid rgba(0, 245, 212, 0.18)",
-                borderRadius: "10px",
-                padding: "9px 14px",
-                marginBottom: "16px",
+                background: isWave ? "#f8fafc" : "rgba(255, 255, 255, 0.05)",
+                border: isWave ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "12px",
+                padding: "10px 14px",
+                marginBottom: "20px",
                 fontSize: "12px",
-                color: "#00f5d4",
-                fontWeight: 500,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                letterSpacing: "0.2px",
+                color: isWave ? primaryColor : "#ffffff",
+                fontWeight: 600,
+                textAlign: "center",
+                wordBreak: "break-all"
               }}
             >
               {cardUrl}
             </div>
 
-            {/* ── Action buttons ── */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {/* Download */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <button
                 onClick={handleDownloadQR}
                 style={{
                   width: "100%",
-                  padding: "13px 16px",
-                  background: "linear-gradient(135deg, #00f5d4 0%, #0ea5e9 100%)",
-                  color: "#040b18",
+                  padding: "14px",
+                  background: primaryColor,
+                  color: "#ffffff",
                   border: "none",
-                  borderRadius: "12px",
+                  borderRadius: "14px",
                   fontSize: "14px",
                   fontWeight: 700,
-                  fontFamily: "'Syne', sans-serif",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  letterSpacing: "0.1px",
+                  gap: "10px",
+                  boxShadow: `0 4px 14px ${primaryColor}44`
                 }}
               >
-                <Download size={16} color="#040b18" strokeWidth={2.5} />
-                Download QR Code
+                <Download size={18} />
+                Download QR
               </button>
 
-              {/* Copy link */}
               <button
                 onClick={copyLink}
                 style={{
                   width: "100%",
-                  padding: "13px 16px",
-                  background: "rgba(255,255,255,0.07)",
-                  color: "#e8eeff",
-                  border: "1.5px solid rgba(255,255,255,0.18)",
-                  borderRadius: "12px",
+                  padding: "14px",
+                  background: "transparent",
+                  color: textColor,
+                  border: isWave ? "1px solid #e2e8f0" : "1.5px solid rgba(255,255,255,0.18)",
+                  borderRadius: "14px",
                   fontSize: "14px",
                   fontWeight: 600,
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  transition: "background 150ms",
+                  gap: "10px",
                 }}
               >
-                <LinkIcon size={16} color={copied ? "#00f5d4" : "#e8eeff"} />
-                {copied ? "✓ Link Copied!" : "Copy Link"}
+                <LinkIcon size={18} color={copied ? primaryColor : (isWave ? "#64748b" : "#e8eeff")} />
+                {copied ? "Link Copied!" : "Copy Link"}
               </button>
 
-              {/* ── Back / Close ── */}
               <button
                 onClick={() => setIsOpen(false)}
                 style={{
                   width: "100%",
-                  padding: "11px 16px",
+                  padding: "10px",
                   background: "transparent",
-                  color: "rgba(232,238,255,0.65)",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  borderRadius: "12px",
+                  color: subTextColor,
+                  border: "none",
                   fontSize: "13px",
-                  fontWeight: 500,
                   cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "7px",
-                  transition: "color 150ms, border-color 150ms",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#ffffff";
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.22)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "rgba(232,238,255,0.65)";
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)";
+                  textDecoration: "underline"
                 }}
               >
-                <ArrowLeft size={15} />
-                Back to Dashboard
+                Close
               </button>
             </div>
           </div>

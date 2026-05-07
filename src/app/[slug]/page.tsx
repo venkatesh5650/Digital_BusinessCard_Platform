@@ -32,14 +32,6 @@ export default async function CardPage({ params }: Props) {
     notFound();
   }
 
-  // Increment view count (fire-and-forget, non-blocking)
-  const { db } = await import("@/lib/db");
-  db.vCard
-    .update({
-      where: { id: dbCard.id },
-      data: { totalViews: { increment: 1 } },
-    })
-    .catch(console.error);
 
   const card = dbCardToVCard(dbCard);
   return <PublicCard card={card} />;

@@ -1,9 +1,9 @@
-﻿/* =============================================
-   IMPRINT â€” Public Card Styles
+/* =============================================
+   IMPRINT — Public Card Styles
    Blinq-inspired clean corporate aesthetic
    ============================================= */
 
-/* â”€â”€ Wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Wrapper ───────────────────────────────── */
 .wrapper {
   min-height: 100vh;
   min-height: 100dvh;
@@ -18,6 +18,11 @@
   width: 100%;
   max-width: 440px;
   background: var(--bg-elevated, #ffffff);
+  margin-top: 0;
+  border-radius: 0 0 var(--r-xl, 24px) var(--r-xl, 24px);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl, 0 24px 60px rgba(0,0,0,0.12));
+  border-top: 1px solid var(--border, #f1f3f5);
 }
 
 .cardContainer {
@@ -33,13 +38,11 @@
     padding: 40px 24px;
   }
   .sharedElements {
-    border-radius: 0 0 var(--r-xl, 24px) var(--r-xl, 24px);
-    overflow: hidden;
-    box-shadow: var(--shadow-xl, 0 24px 60px rgba(0,0,0,0.12));
+    margin-top: 0;
   }
   .cardContainer {
     background: var(--bg-elevated, #ffffff);
-    border-radius: var(--r-xl, 24px);
+    border-radius: var(--r-xl, 24px) var(--r-xl, 24px) 0 0;
     overflow: hidden;
     box-shadow: var(--shadow-xl, 0 24px 60px rgba(0,0,0,0.12));
   }
@@ -58,16 +61,16 @@
   margin: 0 auto !important;
 }
 
-/* â”€â”€ Main Card Shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Main Card Shell ─────────────────────── */
 .card {
   width: 100%;
   max-width: 440px;
   background: var(--bg-elevated, #ffffff);
   margin: 0 auto;
   position: relative;
-  border-radius: var(--r-xl, 24px);
+  border-radius: var(--r-xl, 24px) var(--r-xl, 24px) 0 0;
   overflow: hidden;
-  box-shadow: var(--shadow-lg, 0 12px 40px rgba(0,0,0,0.10));
+  box-shadow: var(--shadow-xl, 0 24px 60px rgba(0,0,0,0.12));
 }
 @media (min-width: 520px) {
   .card {
@@ -77,7 +80,7 @@
   }
 }
 
-/* â”€â”€ Header & Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Header & Banner ─────────────────────── */
 .header {
   position: relative;
   display: flex;
@@ -252,7 +255,7 @@
   max-width: 100%;
 }
 
-/* â”€â”€ Body Sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Body Sections ─────────────────────────── */
 .body {
   padding: 0 24px 32px;
   display: flex;
@@ -271,7 +274,7 @@
   margin-bottom: 10px;
 }
 
-/* â”€â”€ CTA Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── CTA Buttons ────────────────────────────── */
 .quickRow {
   display: flex;
   flex-direction: column;
@@ -331,7 +334,7 @@
   border-color: var(--border-strong, #dee2e6);
 }
 
-/* â”€â”€ Link Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Link Cards ──────────────────────────────── */
 .linkCard {
   display: flex;
   align-items: center;
@@ -378,7 +381,7 @@
   text-overflow: ellipsis;
 }
 
-/* â”€â”€ Social Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Social Grid ────────────────────────────── */
 .socialGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
@@ -402,44 +405,30 @@
   transform: translateY(-2px);
 }
 
-/* â”€â”€ QR Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── QR Section ─────────────────────────────── */
 .publicQrSection {
-  padding: 0 24px 28px;
+  padding: 32px 24px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: transparent;
-  border-bottom: none;
   width: 100%;
-  max-width: 440px;
 }
 
-/* On desktop, push QR below the card and integrate into the cardContainer */
+/* On desktop, keep standard padding */
 @media (min-width: 520px) {
   .publicQrSection {
-    order: 2;
-    background: transparent;
-    border-bottom: none;
-    border-top: 1px dashed var(--border, #e9ecef);
-    border-radius: 0;
-    box-shadow: none;
-    padding-top: 28px;
-    padding-bottom: 32px;
+    padding-top: 40px;
   }
 }
 
 .publicQrBox {
-  background: var(--bg-elevated, #ffffff);
-  padding: 14px;
-  border-radius: var(--r-lg, 16px);
-  border: 1px solid var(--border, #e9ecef);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
-  margin-bottom: 10px;
-  width: 164px;
-  height: 164px;
+  margin-bottom: 12px;
+  width: 140px;
+  height: 140px;
 }
 
 .publicQrText {
@@ -451,11 +440,10 @@
   text-align: center;
 }
 
-/* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Footer ────────────────────────────────── */
 .footer {
-  padding: 28px 24px;
+  padding: 12px 24px 32px;
   text-align: center;
-  border-top: 1px solid var(--border, #e9ecef);
 }
 
 .footerLabel {
@@ -472,7 +460,7 @@
   letter-spacing: -0.01em;
 }
 
-/* â”€â”€ Sticky Save Contact (Mobile) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Sticky Save Contact (Mobile) ────────────── */
 .stickyCtaBar {
   display: none;
 }
@@ -509,7 +497,7 @@
   }
 }
 
-/* â”€â”€ Lead Capture Modal (clean overlay) â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Lead Capture Modal (clean overlay) ──────── */
 .leadOverlay {
   position: fixed;
   inset: 0;
@@ -531,7 +519,7 @@
   box-shadow: var(--shadow-xl, 0 24px 60px rgba(0,0,0,0.12));
 }
 
-/* â”€â”€ Entrance Animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Entrance Animations ────────────────────── */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -553,9 +541,9 @@
 .body > *:nth-child(4) { animation-delay: 0.2s; }
 .body > *:nth-child(5) { animation-delay: 0.25s; }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* =============================================
    CLASSIC TEMPLATE (HiHello Style)
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ============================================= */
 .cardClassic {
   background: #ffffff;
 }

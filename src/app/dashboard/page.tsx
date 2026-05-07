@@ -25,6 +25,8 @@ export default async function DashboardPage() {
       totalViews: c.totalViews,
       totalClicks: c.totalClicks,
       leadsCollected: c.leadsCollected,
+      layout: c.layout,
+      colorPrimary: c.colorPrimary,
     })),
     totalViews: cards.reduce((s, c) => s + c.totalViews, 0),
     totalClicks: cards.reduce((s, c) => s + c.totalClicks, 0),

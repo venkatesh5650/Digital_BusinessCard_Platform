@@ -623,13 +623,15 @@
 /* ── Actions ──────────────────────────────────────────────────────────── */
 .cardActions {
   display: flex;
-  gap: 10px;
-  padding: 16px 24px 24px;
+  gap: 8px;
+  padding: 16px 16px 24px;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 /* ── Buttons ──────────────────────────────────────────────────────────── */
 .btnPrimary {
-  padding: 9px 16px;
+  padding: 9px 12px;
   background: var(--orange);
   color: #ffffff;
   border: none;
@@ -654,7 +656,7 @@
 }
 
 .btnSecondary {
-  padding: 9px 16px;
+  padding: 9px 12px;
   background: var(--bg-surface);
   color: var(--text-2);
   border: 1px solid var(--border);
@@ -677,7 +679,7 @@
 }
 
 .btnDanger {
-  padding: 9px 16px;
+  padding: 9px 12px;
   background: rgba(239, 68, 68, 0.09);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.20);
@@ -1663,3 +1665,55 @@
   box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3);
   z-index: 5;
 }
+
+/* ── Optimization Styles ── */
+.btnDangerIcon {
+  padding: 9px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+
+.btnDangerIcon:hover {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  transform: translateY(-1px);
+}
+
+.btnDangerIcon:active {
+  transform: translateY(0);
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(0, 0, 0, 0.05);
+  border-left-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingDots::after {
+  content: '.';
+  animation: dots 1.5s steps(5, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60% { content: '...'; }
+  80%, 100% { content: ''; }
+}
+

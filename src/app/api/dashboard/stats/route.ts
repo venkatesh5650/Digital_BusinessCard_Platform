@@ -25,6 +25,8 @@ export async function GET() {
       totalViews: true,
       totalClicks: true,
       leadsCollected: true,
+      layout: true,
+      colorPrimary: true,
     },
   });
 

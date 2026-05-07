@@ -21,6 +21,7 @@ import {
   togglePublish,
   deleteCard,
 } from "@/lib/actions";
+import { normalizeUrl } from "@/lib/urlUtils";
 import { Trash2, Plus, Eye, EyeOff, CheckCircle, ArrowLeft, ExternalLink, Image as ImageIcon, User, Briefcase, Mail, Phone as PhoneIcon, Link2, MapPin, Share2, Search, Settings, Building2, FileText, Medal, X, MessageSquare, Camera, Globe, Video } from "lucide-react";
 import Link from "next/link";
 import styles from "../../dashboard.module.css";
@@ -236,7 +237,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [avatarUrl, setAvatarUrl] = useState(card.avatarUrl ?? "");
   const [coverPhotoUrl, setCoverPhotoUrl] = useState(card.coverImageUrl ?? "");
   const [companyLogoUrl, setCompanyLogoUrl] = useState(card.companyLogoUrl ?? "");
-  const [layout, setLayout] = useState(card.layout || "classic");
+  const [layout, setLayout] = useState(card.layout === "draft" ? "classic" : (card.layout || "classic"));
   const [coverMode, setCoverMode] = useState<"gallery" | "upload" | "url">("gallery");
   const [colorPrimary, setColorPrimary] = useState(card.colorPrimary || "#157e70");
 
@@ -823,7 +824,15 @@ export default function CardEditorClient({ card }: { card: Card }) {
             </div>
             <div className={styles.formGrid} style={{ marginTop: 16 }}>
               <div className={styles.formField}><label>Label</label><input value={newWebsite.label} onChange={e => setNewWebsite(v => ({ ...v, label: e.target.value }))} placeholder="My Site" /></div>
-              <div className={styles.formField}><label>URL</label><input value={newWebsite.url} onChange={e => setNewWebsite(v => ({ ...v, url: e.target.value }))} placeholder="https://..." /></div>
+              <div className={styles.formField}>
+                <label>URL</label>
+                <input 
+                  value={newWebsite.url} 
+                  onChange={e => setNewWebsite(v => ({ ...v, url: e.target.value }))} 
+                  onBlur={e => setNewWebsite(v => ({ ...v, url: normalizeUrl("website", e.target.value) }))}
+                  placeholder="https://..." 
+                />
+              </div>
               <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddWebsite} disabled={isPending || !newWebsite.label || !newWebsite.url}><Plus size={14} /> Add</button></div>
             </div>
           </div>
@@ -870,7 +879,15 @@ export default function CardEditorClient({ card }: { card: Card }) {
             </div>
             <div className={styles.formGrid} style={{ marginTop: 16 }}>
               <div className={styles.formField}><label>Platform</label><select value={newSocial.platform} onChange={e => setNewSocial(s => ({ ...s, platform: e.target.value }))}>{SOCIAL_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-              <div className={styles.formField}><label>URL / Handle</label><input value={newSocial.url} onChange={e => setNewSocial(s => ({ ...s, url: e.target.value }))} placeholder="https://..." /></div>
+              <div className={styles.formField}>
+                <label>URL / Handle</label>
+                <input 
+                  value={newSocial.url} 
+                  onChange={e => setNewSocial(s => ({ ...s, url: e.target.value }))} 
+                  onBlur={e => setNewSocial(s => ({ ...s, url: normalizeUrl(newSocial.platform, e.target.value) }))}
+                  placeholder="e.g. @username or full link" 
+                />
+              </div>
               <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddSocial} disabled={isPending || !newSocial.url}><Plus size={14} /> Add</button></div>
             </div>
           </div>
@@ -908,7 +925,15 @@ export default function CardEditorClient({ card }: { card: Card }) {
             </div>
             <div className={styles.formGrid} style={{ marginTop: 16 }}>
               <div className={styles.formField}><label>Platform</label><select value={newPayment.platform} onChange={e => setNewPayment(v => ({ ...v, platform: e.target.value }))}>{PAYMENT_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-              <div className={styles.formField}><label>{config.label}</label><input value={newPayment.url} onChange={e => setNewPayment(v => ({ ...v, url: e.target.value }))} placeholder={config.ph} /></div>
+              <div className={styles.formField}>
+                <label>{config.label}</label>
+                <input 
+                  value={newPayment.url} 
+                  onChange={e => setNewPayment(v => ({ ...v, url: e.target.value }))} 
+                  onBlur={e => setNewPayment(v => ({ ...v, url: normalizeUrl(newPayment.platform, e.target.value) }))}
+                  placeholder={config.ph} 
+                />
+              </div>
               <div className={styles.formField}><label>Display Label</label><input value={newPayment.label} onChange={e => setNewPayment(v => ({ ...v, label: e.target.value }))} placeholder="Optional (e.g. My PayPal)" /></div>
               <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddPayment} disabled={isPending || !newPayment.url}><Plus size={14} /> Add</button></div>
             </div>
@@ -933,7 +958,15 @@ export default function CardEditorClient({ card }: { card: Card }) {
             </div>
             <div className={styles.formGrid} style={{ marginTop: 16 }}>
               <div className={styles.formField}><label>Platform</label><select value={newAction.platform} onChange={e => setNewAction(v => ({ ...v, platform: e.target.value }))}>{ACTION_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-              <div className={styles.formField}><label>Link / URL</label><input value={newAction.url} onChange={e => setNewAction(v => ({ ...v, url: e.target.value }))} placeholder="https://..." /></div>
+              <div className={styles.formField}>
+                <label>Link / URL</label>
+                <input 
+                  value={newAction.url} 
+                  onChange={e => setNewAction(v => ({ ...v, url: e.target.value }))} 
+                  onBlur={e => setNewAction(v => ({ ...v, url: normalizeUrl(newAction.platform, e.target.value) }))}
+                  placeholder="e.g. username or full link" 
+                />
+              </div>
               <div className={styles.formField}><label>Button Text</label><input value={newAction.label} onChange={e => setNewAction(v => ({ ...v, label: e.target.value }))} placeholder="e.g. Book a Call" /></div>
               <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddAction} disabled={isPending || !newAction.url || !newAction.label}><Plus size={14} /> Add</button></div>
             </div>

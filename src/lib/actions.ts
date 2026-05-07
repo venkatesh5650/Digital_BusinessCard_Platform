@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { normalizeUrl } from "@/lib/urlUtils";
 
 // ─── AUTH ─────────────────────────────────────────────────────────
 export async function registerUser(formData: FormData) {
@@ -71,6 +72,7 @@ export async function createCard() {
       jobTitle: "Your Job Title",
       slug,
       isPublished: false,
+      layout: "draft",
     },
   });
 
@@ -226,10 +228,12 @@ export async function upsertSocial(
   const card = await db.vCard.findUnique({ where: { id: cardId } });
   if (!card || card.userId !== session.user.id) return { error: "Not found." };
 
+  const normalizedUrl = normalizeUrl(data.platform, data.url);
+
   if (data.id) {
-    await db.socialLink.update({ where: { id: data.id }, data: { platform: data.platform, url: data.url, handle: data.handle, order: data.order ?? 0, isVisible: data.isVisible ?? true } });
+    await db.socialLink.update({ where: { id: data.id }, data: { platform: data.platform, url: normalizedUrl, handle: data.handle, order: data.order ?? 0, isVisible: data.isVisible ?? true } });
   } else {
-    await db.socialLink.create({ data: { vcardId: cardId, platform: data.platform, url: data.url, handle: data.handle, order: data.order ?? 0, isVisible: data.isVisible ?? true } });
+    await db.socialLink.create({ data: { vcardId: cardId, platform: data.platform, url: normalizedUrl, handle: data.handle, order: data.order ?? 0, isVisible: data.isVisible ?? true } });
   }
   revalidatePath(`/dashboard/card/${cardId}`);
   return { success: true };
@@ -308,14 +312,16 @@ export async function upsertWebsite(
   const card = await db.vCard.findUnique({ where: { id: cardId } });
   if (!card || card.userId !== session.user.id) return { error: "Not found." };
 
+  const normalizedUrl = normalizeUrl("website", data.url);
+
   if (data.id) {
     await db.websiteEntry.update({
       where: { id: data.id },
-      data: { label: data.label, url: data.url, featured: data.featured ?? false },
+      data: { label: data.label, url: normalizedUrl, featured: data.featured ?? false },
     });
   } else {
     await db.websiteEntry.create({
-      data: { vcardId: cardId, label: data.label, url: data.url, featured: data.featured ?? false },
+      data: { vcardId: cardId, label: data.label, url: normalizedUrl, featured: data.featured ?? false },
     });
   }
   revalidatePath(`/dashboard/card/${cardId}`);
@@ -342,12 +348,14 @@ export async function upsertPayment(
   const card = await db.vCard.findUnique({ where: { id: cardId } });
   if (!card || card.userId !== session.user.id) return { error: "Not found." };
 
+  const normalizedUrl = normalizeUrl(data.platform, data.url);
+
   if (data.id) {
     await db.paymentLink.update({
       where: { id: data.id },
       data: {
         platform: data.platform,
-        url: data.url,
+        url: normalizedUrl,
         label: data.label,
         note: data.note,
         order: data.order ?? 0,
@@ -359,7 +367,7 @@ export async function upsertPayment(
       data: {
         vcardId: cardId,
         platform: data.platform,
-        url: data.url,
+        url: normalizedUrl,
         label: data.label,
         note: data.note,
         order: data.order ?? 0,
@@ -391,12 +399,14 @@ export async function upsertAction(
   const card = await db.vCard.findUnique({ where: { id: cardId } });
   if (!card || card.userId !== session.user.id) return { error: "Not found." };
 
+  const normalizedUrl = normalizeUrl(data.platform, data.url);
+
   if (data.id) {
     await db.actionLink.update({
       where: { id: data.id },
       data: {
         platform: data.platform,
-        url: data.url,
+        url: normalizedUrl,
         label: data.label,
         subtitle: data.subtitle,
         icon: data.icon,
@@ -410,7 +420,7 @@ export async function upsertAction(
       data: {
         vcardId: cardId,
         platform: data.platform,
-        url: data.url,
+        url: normalizedUrl,
         label: data.label,
         subtitle: data.subtitle,
         icon: data.icon,

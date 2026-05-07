@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, CreditCard, Users, LogOut, ExternalLink, Moon, Sun } from "lucide-react";
 import styles from "./dashboard.module.css";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useTheme } from "@/components/ThemeProvider";
 
 type User = {
   id?: string;
@@ -16,6 +17,7 @@ type User = {
 
 export default function DashboardNav({ user }: { user: User }) {
   const pathname = usePathname();
+  const { toggleTheme } = useTheme();
 
   const navItems = [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -59,8 +61,15 @@ export default function DashboardNav({ user }: { user: User }) {
 
         <div className={styles.navDivider} />
         
-        <div className={styles.navItem} style={{ cursor: 'default' }}>
-          <ThemeToggle />
+        <div 
+          className={styles.navItem} 
+          onClick={toggleTheme}
+          style={{ cursor: 'pointer' }}
+          title="Toggle Theme"
+        >
+          <div style={{ pointerEvents: 'none', display: 'flex' }}>
+            <ThemeToggle />
+          </div>
           <span style={{ marginLeft: '12px', fontSize: '14px', fontWeight: 500 }}>Switch Theme</span>
         </div>
       </nav>

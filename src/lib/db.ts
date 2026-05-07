@@ -33,9 +33,7 @@ const db = globalForPrisma.prisma ?? new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 });
 
-db.$connect()
-  .then(() => console.log("[DB] Successfully connected to database"))
-  .catch((err) => console.error("[DB] Failed to connect to database:", err));
+
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 
@@ -60,7 +58,7 @@ export async function getCardBySlug(slug: string) {
 
 export async function getCardsByUser(userId: string) {
   return db.vCard.findMany({
-    where: { userId },
+    where: { userId, layout: { not: "draft" } },
     orderBy: { updatedAt: 'desc' },
     select: {
       id: true,
@@ -77,6 +75,8 @@ export async function getCardsByUser(userId: string) {
       totalClicks: true,
       leadsCollected: true,
       updatedAt: true,
+      layout: true,
+      colorPrimary: true,
     },
   });
 }
