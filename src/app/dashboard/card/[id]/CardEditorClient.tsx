@@ -1385,11 +1385,19 @@ export default function CardEditorClient({ card }: { card: Card }) {
 
         {/* ── Right: Live Preview ── */}
         <div className={`${styles.previewPanel} ${activeMobileTab === "edit" ? styles.mobileHidden : ""}`}>
-          <div className={styles.previewHeaderLabel} style={{ fontSize: 12, fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
-            Live Preview
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div className={styles.previewHeaderLabel} style={{ fontSize: 11, fontWeight: 800, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "1px" }}>
+              Live Preview
+            </div>
+            <div className={styles.liveIndicator}>
+               <span className={styles.livePulse} /> Live
+            </div>
           </div>
+          
           <div className={styles.previewPhoneFrame}>
-            <div className={styles.previewIframe} style={{ overflow: "auto", background: "#ffffff" }}>
+            <div className={styles.dynamicIsland} />
+            <div className={styles.phoneGlare} />
+            <div className={styles.previewIframe}>
               <PublicCard card={livePreviewCard} isEditor={true} />
             </div>
           </div>
