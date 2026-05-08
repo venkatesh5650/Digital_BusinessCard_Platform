@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Download, Share2, MessageCircle, Link as LinkIcon, Play, FileText, CreditCard, Image as ImageIcon } from "lucide-react";
 import styles from "../card.module.css";
 import { Section, ContactList, WebsiteList } from "../fragments/Sections";
@@ -30,10 +31,17 @@ export default function WaveTemplate({ card, trackClick, handleDownloadImage }: 
       style={{ "--wave-primary": card.theme?.colorPrimary || "#ff6b00" } as React.CSSProperties}
     >
       {/* ── WAVE HEADER (FULL IMAGE BG) ── */}
-      <header 
-        className={styles.waveHeader}
-        style={{ backgroundImage: `url(${avatarBg})` }}
-      >
+      <header className={styles.waveHeader}>
+        <Image 
+          src={avatarBg} 
+          alt={name} 
+          fill 
+          priority 
+          quality={100}
+          sizes="(max-width: 440px) 100vw, 440px"
+          style={{ objectFit: 'cover', objectPosition: 'center top' }}
+          className={styles.waveHeaderImage}
+        />
         <div className={styles.waveHeaderGradient} />
         
         {/* The Wave Separator */}
@@ -148,7 +156,7 @@ export default function WaveTemplate({ card, trackClick, handleDownloadImage }: 
 
         <WebsiteList card={card} trackClick={trackClick} />
         
-        <SocialConnect card={card} trackClick={trackClick} />
+        <SocialConnect card={card} trackClick={trackClick} layout="list" />
       </div>
     </article>
   );

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
+import Script from "next/script";
 import ThemeProvider from "@/components/ThemeProvider";
 import "./globals.css";
 
@@ -72,23 +73,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
-      <head>
-        {/* Prevent theme flash — runs before React hydration */}
-        <script
-          id="theme-prevention"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var t = localStorage.getItem('theme') || 'light';
-                  document.documentElement.setAttribute('data-theme', t);
-                } catch(e) {}
-              })();
-            `,
-          }}
-        />
-      </head>
       <body>
+        {/* Prevent theme flash — runs before React hydration */}
+        <Script
+          id="theme-prevention"
+          strategy="beforeInteractive"
+        >
+          {`
+            (function() {
+              try {
+                var t = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', t);
+              } catch(e) {}
+            })();
+          `}
+        </Script>
         <ThemeProvider>
           <SessionProvider>{children}</SessionProvider>
         </ThemeProvider>

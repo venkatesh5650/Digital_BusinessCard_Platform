@@ -168,7 +168,7 @@ export default function DiagonalTemplate({ card, trackClick, handleDownloadImage
         <WebsiteList card={card} trackClick={trackClick} />
         
         <div className={styles.diagonalSocialWrap}>
-          <SocialConnect card={card} trackClick={trackClick} />
+          <SocialConnect card={card} trackClick={trackClick} layout="list" />
         </div>
       </div>
     </article>

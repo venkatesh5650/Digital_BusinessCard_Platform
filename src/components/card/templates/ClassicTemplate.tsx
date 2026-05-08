@@ -124,7 +124,7 @@ export default function ClassicTemplate({ card, trackClick, handleDownloadImage 
         <WebsiteList card={card} trackClick={trackClick} />
         
         {/* Moved Social Connect to the bottom for this design */}
-        <SocialConnect card={card} trackClick={trackClick} />
+        <SocialConnect card={card} trackClick={trackClick} layout="list" />
       </div>
     </article>
   );

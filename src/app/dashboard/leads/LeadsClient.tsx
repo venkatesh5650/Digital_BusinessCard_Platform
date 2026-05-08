@@ -85,30 +85,22 @@ export default function LeadsClient({ leads, cards }: { leads: Lead[]; cards: Ca
       </div>
 
       {/* Filters */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
-        <div style={{ flex: 1, position: "relative" }}>
-          <Search size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(232,238,255,0.3)" }} />
+      <div className={styles.leadsFilterBar}>
+        <div className={styles.leadsSearchWrap}>
+          <Search size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(107, 114, 128, 0.5)" }} />
           <input
             type="text"
-            placeholder="Search leads by name, email, phone, company..."
+            placeholder="Search leads..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{
-              width: "100%", padding: "12px 14px 12px 40px", borderRadius: 12,
-              border: "1.5px solid rgba(255,255,255,0.075)", background: "rgba(255,255,255,0.03)",
-              color: "#e8eeff", fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none"
-            }}
+            className={styles.leadsSearchInput}
           />
         </div>
         {cards.length > 1 && (
           <select
             value={cardFilter}
             onChange={e => setCardFilter(e.target.value)}
-            style={{
-              padding: "12px 16px", borderRadius: 12, minWidth: 180,
-              border: "1.5px solid rgba(255,255,255,0.075)", background: "rgba(255,255,255,0.03)",
-              color: "#e8eeff", fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none"
-            }}
+            className={styles.leadsSelect}
           >
             <option value="all">All Cards</option>
             {cards.map(c => <option key={c.id} value={c.slug}>{c.name}</option>)}
@@ -135,19 +127,10 @@ export default function LeadsClient({ leads, cards }: { leads: Lead[]; cards: Ca
               <div
                 key={lead.id}
                 onClick={() => setExpandedId(isExpanded ? null : lead.id)}
-                style={{
-                  background: "var(--bg-surface)",
-                  border: `1.5px solid ${isExpanded ? "var(--orange)" : "var(--border)"}`,
-                  borderRadius: 16, 
-                  padding: "16px 20px", 
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  boxShadow: isExpanded ? "0 8px 30px rgba(255, 107, 0, 0.08)" : "none",
-                  transform: isExpanded ? "scale(1.005)" : "scale(1)",
-                }}
+                className={`${styles.leadCard} ${isExpanded ? styles.leadCardActive : ""}`}
               >
                 {/* Main row */}
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div className={styles.leadMainRow}>
                   {/* Avatar */}
                   <div style={{
                     width: 48, height: 48, borderRadius: 12, flexShrink: 0,
@@ -158,7 +141,7 @@ export default function LeadsClient({ leads, cards }: { leads: Lead[]; cards: Ca
                   }}>
                     {lead.name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()}
                   </div>
-
+ 
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: 16, color: "var(--text-1)", fontFamily: "var(--font-d)" }}>
@@ -169,9 +152,9 @@ export default function LeadsClient({ leads, cards }: { leads: Lead[]; cards: Ca
                       {lead.company && <span style={{ display: "flex", alignItems: "center", gap: 4 }}>· <Building2 size={12} /> {lead.company}</span>}
                     </div>
                   </div>
-
+ 
                   {/* Card badge + time */}
-                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div className={styles.leadMeta}>
                     <div style={{
                       display: "inline-flex", alignItems: "center", gap: 5,
                       padding: "5px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700,
@@ -181,7 +164,7 @@ export default function LeadsClient({ leads, cards }: { leads: Lead[]; cards: Ca
                     }}>
                       <CreditCard size={11} /> {lead.cardName}
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 8, display: "flex", alignItems: "center", gap: 4, justifyContent: "flex-end" }}>
+                    <div className={styles.leadMetaTime} style={{ fontSize: 11, color: "var(--text-3)", marginTop: 8, display: "flex", alignItems: "center", gap: 4, justifyContent: "flex-end" }}>
                       <CalendarDays size={12} /> {formatDate(lead.createdAt)}
                     </div>
                   </div>

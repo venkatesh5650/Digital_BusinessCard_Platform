@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createCard, deleteCard } from "@/lib/actions";
 import {
   Eye,
@@ -124,9 +125,20 @@ export default function DashboardClient({
   const [activeAction, setActiveAction] = useState<"create" | "delete" | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // Handle 'create=true' from sidebar
+    if (searchParams.get("create") === "true") {
+      handleCreateNewCard();
+      // Remove the param without full navigation
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, [searchParams]);
 
   function handlePreviewClick(e: React.MouseEvent<HTMLAnchorElement>, card: CardData) {
     if (!card.isPublished) {

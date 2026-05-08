@@ -100,130 +100,214 @@ function Toggle({ id, checked, onChange }: { id: string; checked: boolean; onCha
 // ── Avatar Uploader Component ─────────────────────────────────────
 function AvatarUploader({ value, onChange, isBanner = false }: { value: string; onChange: (v: string) => void, isBanner?: boolean }) {
   const [mode, setMode] = useState<"upload" | "url">("upload");
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [showEditor, setShowEditor] = useState(false);
+
+  // Auto-apply filters when they change
+  useEffect(() => {
+    if (originalImage) {
+      const timer = setTimeout(() => {
+        applyFilters(originalImage);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [zoom, brightness, contrast]);
+
+  const applyFilters = (imgSrc: string) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      // Use higher target resolution for "HD Clarity"
+      const targetW = isBanner ? 1200 : 800; 
+      const targetH = isBanner ? 600 : 800;
+      
+      canvas.width = targetW;
+      canvas.height = targetH;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Premium Filter Stack
+      ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(105%)`;
+      
+      // Calculate framing (Center Crop)
+      const imgRatio = img.width / img.height;
+      const targetRatio = targetW / targetH;
+      
+      let sW, sH, sX, sY;
+      
+      if (imgRatio > targetRatio) {
+        sH = img.height;
+        sW = img.height * targetRatio;
+        sX = (img.width - sW) / 2;
+        sY = 0;
+      } else {
+        sW = img.width;
+        sH = img.width / targetRatio;
+        sX = 0;
+        sY = (img.height - sH) / 2;
+      }
+
+      // Apply Smart Zoom
+      const zoomFactor = 1 / zoom;
+      const finalSW = sW * zoomFactor;
+      const finalSH = sH * zoomFactor;
+      const finalSX = sX + (sW - finalSW) / 2;
+      const finalSY = sY + (sH - finalSH) / 2;
+
+      ctx.clearRect(0, 0, targetW, targetH);
+      ctx.drawImage(img, finalSX, finalSY, finalSW, finalSH, 0, 0, targetW, targetH);
+      
+      onChange(canvas.toDataURL("image/webp", 0.95)); // Export high-quality WebP
+    };
+    img.src = imgSrc;
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Direct Base64 compression on the client
     const reader = new FileReader();
     reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        // Higher resolution for banners
-        const targetW = isBanner ? 1200 : 400;
-        const targetH = isBanner ? 600 : 400;
-        
-        let width = img.width;
-        let height = img.height;
-        const ratio = width / height;
-
-        if (isBanner) {
-          // Fixed wide aspect for banners
-          canvas.width = 1200;
-          canvas.height = 600;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            const scale = Math.max(1200 / width, 600 / height);
-            const x = (1200 - width * scale) / 2;
-            const y = (600 - height * scale) / 2;
-            ctx.clearRect(0, 0, 1200, 600);
-            ctx.drawImage(img, x, y, width * scale, height * scale);
-            onChange(canvas.toDataURL("image/webp", 0.9));
-          }
-          return;
-        }
-
-        // Standard square for avatars/logos
-        if (width > height) {
-          if (width > targetW) { height = Math.round((height * targetW) / width); width = targetW; }
-        } else {
-          if (height > targetH) { width = Math.round((width * targetH) / height); height = targetH; }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          onChange(canvas.toDataURL("image/webp", 0.9));
-        }
-      };
-      img.src = event.target?.result as string;
+      const dataUrl = event.target?.result as string;
+      setOriginalImage(dataUrl);
+      setZoom(1);
+      setBrightness(100);
+      setContrast(100);
+      setShowEditor(true);
+      applyFilters(dataUrl);
     };
     reader.readAsDataURL(file);
   };
 
   return (
-    <div style={{ display: "flex", gap: "20px", alignItems: "center", padding: "12px", background: "rgba(255,107,0,0.03)", borderRadius: "16px", border: "1px solid rgba(255,107,0,0.1)" }}>
-      <div style={{ position: "relative" }}>
-        {value ? (
-          <img 
-            src={value} 
-            alt="Preview" 
-            style={{ 
-              width: 80, 
-              height: 80, 
-              borderRadius: "12px", 
-              objectFit: "contain", 
-              background: "transparent"
-            }} 
-          />
-        ) : (
-          <div style={{ width: 80, height: 80, borderRadius: "12px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", border: "2px dashed #d1d5db" }}>
-            <Camera size={24} color="#9ca3af" />
-          </div>
-        )}
-      </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
-        <div style={{ display: "flex", gap: "6px" }}>
-          <button type="button" onClick={() => setMode("upload")} style={{ padding: "6px 14px", borderRadius: "8px", fontSize: "0.75rem", fontWeight: 700, background: mode === "upload" ? "#000" : "#fff", color: mode === "upload" ? "#fff" : "#4b5563", border: "1px solid " + (mode === "upload" ? "#000" : "#e5e7eb"), cursor: "pointer", transition: "all 0.2s" }}>Upload File</button>
-          <button type="button" onClick={() => setMode("url")} style={{ padding: "6px 14px", borderRadius: "8px", fontSize: "0.75rem", fontWeight: 700, background: mode === "url" ? "#000" : "#fff", color: mode === "url" ? "#fff" : "#4b5563", border: "1px solid " + (mode === "url" ? "#000" : "#e5e7eb"), cursor: "pointer", transition: "all 0.2s" }}>Web URL</button>
-          {value && (
-            <button 
-              type="button" 
-              onClick={() => onChange("")} 
-              style={{ 
-                padding: "6px 14px", 
-                borderRadius: "8px", 
-                fontSize: "0.75rem", 
-                fontWeight: 700, 
-                background: "rgba(239, 68, 68, 0.1)", 
-                color: "#ef4444", 
-                border: "1px solid rgba(239, 68, 68, 0.2)", 
-                cursor: "pointer", 
-                transition: "all 0.2s",
-                marginLeft: "auto"
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)")}
-              onMouseOut={(e) => (e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)")}
-            >
-              Remove
-            </button>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "16px", background: "rgba(255,107,0,0.02)", borderRadius: "20px", border: "1px solid rgba(255,107,0,0.08)" }}>
+      <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          {value ? (
+            <div style={{ position: "relative", width: 100, height: 100 }}>
+              <img 
+                src={value} 
+                alt="Preview" 
+                style={{ 
+                  width: "100%", 
+                  height: "100%", 
+                  borderRadius: "16px", 
+                  objectFit: isBanner ? "cover" : "contain", 
+                  background: "#fff",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+                }} 
+              />
+              <button 
+                onClick={() => { setShowEditor(!showEditor); if(!originalImage) setOriginalImage(value); }}
+                style={{ position: "absolute", bottom: -8, right: -8, background: "#000", color: "#fff", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
+              >
+                <Settings size={16} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ width: 100, height: 100, borderRadius: "16px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", border: "2px dashed #d1d5db" }}>
+              <Camera size={28} color="#9ca3af" />
+            </div>
           )}
         </div>
-        
-        {mode === "url" ? (
-          <input 
-            value={value || ""} 
-            onChange={e => onChange(e.target.value)} 
-            placeholder="https://images.com/photo.jpg" 
-            style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #e5e7eb", fontSize: "0.85rem", background: "#fff" }}
-          />
-        ) : (
-          <div style={{ position: "relative", width: "100%" }}>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleFileChange}
-              style={{ width: "100%", fontSize: "0.8rem", color: "#6b7280", cursor: "pointer" }}
-            />
+
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "6px" }}>
+            <button type="button" onClick={() => setMode("upload")} style={{ padding: "8px 16px", borderRadius: "10px", fontSize: "0.8rem", fontWeight: 700, background: mode === "upload" ? "#000" : "#fff", color: mode === "upload" ? "#fff" : "#4b5563", border: "1px solid " + (mode === "upload" ? "#000" : "#e5e7eb"), cursor: "pointer", transition: "all 0.2s" }}>Upload</button>
+            <button type="button" onClick={() => setMode("url")} style={{ padding: "8px 16px", borderRadius: "10px", fontSize: "0.8rem", fontWeight: 700, background: mode === "url" ? "#000" : "#fff", color: mode === "url" ? "#fff" : "#4b5563", border: "1px solid " + (mode === "url" ? "#000" : "#e5e7eb"), cursor: "pointer", transition: "all 0.2s" }}>URL</button>
+            {value && (
+              <button type="button" onClick={() => { onChange(""); setOriginalImage(null); setShowEditor(false); }} style={{ padding: "8px 16px", borderRadius: "10px", fontSize: "0.8rem", fontWeight: 700, background: "rgba(239, 68, 68, 0.05)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.1)", cursor: "pointer", marginLeft: "auto" }}>Remove</button>
+            )}
           </div>
-        )}
+          
+          {mode === "url" ? (
+            <input 
+              value={value || ""} 
+              onChange={e => { onChange(e.target.value); setOriginalImage(e.target.value); }} 
+              placeholder="Paste image URL here..." 
+              style={{ width: "100%", padding: "12px 16px", borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "0.9rem", outline: "none" }}
+            />
+          ) : (
+            <div style={{ position: "relative", width: "100%" }}>
+              <input type="file" accept="image/*" onChange={handleFileChange} style={{ width: "100%", fontSize: "0.85rem", color: "#6b7280" }} />
+            </div>
+          )}
+        </div>
       </div>
+
+      {showEditor && originalImage && (
+        <div style={{ marginTop: "8px", padding: "16px", background: "#fff", borderRadius: "16px", border: "1px solid #eef2f6", display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", fontWeight: 700, color: "#64748b" }}>
+              <span>Smart Crop / Zoom</span>
+              <span>{Math.round(zoom * 100)}%</span>
+            </div>
+            <input type="range" min="1" max="3" step="0.01" value={zoom} onChange={e => setZoom(parseFloat(e.target.value))} style={{ width: "100%", accentColor: "#ff6b00" }} />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", fontWeight: 700, color: "#64748b" }}>
+                <span>Brightness</span>
+                <span>{brightness}%</span>
+              </div>
+              <input type="range" min="50" max="150" step="1" value={brightness} onChange={e => setBrightness(parseInt(e.target.value))} style={{ width: "100%", accentColor: "#000" }} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", fontWeight: 700, color: "#64748b" }}>
+                <span>Contrast</span>
+                <span>{contrast}%</span>
+              </div>
+              <input type="range" min="50" max="150" step="1" value={contrast} onChange={e => setContrast(parseInt(e.target.value))} style={{ width: "100%", accentColor: "#000" }} />
+            </div>
+          </div>
+          
+          <button 
+            type="button" 
+            onClick={() => setShowEditor(false)}
+            style={{ width: "100%", padding: "10px", borderRadius: "10px", background: "#f8fafc", border: "1px solid #e2e8f0", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}
+          >
+            Done Enhancing
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
+// ── Platform Title Suggestions ──────────────────────────────────
+const PLATFORM_SUGGESTIONS: Record<string, string[]> = {
+  whatsapp: ["Chat on WhatsApp", "WhatsApp Me", "Connect on WhatsApp"],
+  linkedin: ["Connect on LinkedIn", "LinkedIn Profile", "My Professional Network"],
+  instagram: ["Follow on Instagram", "My Instagram", "View Gallery"],
+  twitter: ["Follow on X", "Latest Updates", "X (Twitter)"],
+  facebook: ["Friend on Facebook", "Facebook Page", "My Facebook"],
+  youtube: ["Subscribe on YouTube", "Watch my Videos", "YouTube Channel"],
+  tiktok: ["Follow on TikTok", "My TikTok", "Watch Latest Clips"],
+  github: ["My Projects on GitHub", "GitHub Profile", "Code Repositories"],
+  paypal: ["Pay via PayPal", "PayPal.me", "Support my work"],
+  upi: ["Pay via UPI", "Scan to Pay", "Send Money via UPI"],
+  venmo: ["Venmo Me", "Pay with Venmo", "Send on Venmo"],
+  cashapp: ["CashApp Me", "$Cashtag", "Support on CashApp"],
+  buymeacoffee: ["Buy me a coffee", "Support my work", "Tip me"],
+  kofi: ["Buy me a Ko-fi", "Support on Ko-fi", "Ko-fi Tip"],
+  stripe: ["Secure Payment", "Pay with Stripe", "Pay Online"],
+  wise: ["Send via Wise", "International Transfer", "Wise.me"],
+  razorpay: ["Secure Pay", "Pay via Razorpay", "Online Payment"],
+  gpay: ["Pay with GPay", "Google Pay Me", "GPay"],
+  whatsapppay: ["Pay on WhatsApp", "WhatsApp Pay", "Send Money"],
+  bank_transfer: ["Bank Details", "Direct Transfer", "Account Info"],
+  patreon: ["Become a Patron", "Support on Patreon", "Patreon"],
+  calendly: ["Book a Meeting", "Schedule a Call", "My Calendar"],
+  zoom: ["Join my Zoom Room", "Video Call", "Meeting Link"],
+  typeform: ["Fill out my form", "Survey", "Contact Form"],
+  website: ["Visit our website", "Official Website", "Learn More"],
+  default: ["Connect with me", "My Profile", "Learn More"]
+};
 
 // ── Main Editor Component ─────────────────────────────────────────
 export default function CardEditorClient({ card }: { card: Card }) {
@@ -274,13 +358,13 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const [actions, setActions] = useState<Action[]>(card.actionLinks);
 
   // New entry temp state
-  const [newPhone, setNewPhone] = useState({ type: "mobile", number: "", label: "", whatsapp: false });
-  const [newEmail, setNewEmail] = useState({ type: "work", address: "", label: "" });
-  const [newAddress, setNewAddress] = useState({ type: "work", label: "", street: "", city: "", state: "", postalCode: "", country: "", mapUrl: "" });
-  const [newWebsite, setNewWebsite] = useState({ label: "", url: "", featured: false });
-  const [newSocial, setNewSocial] = useState({ platform: "linkedin", url: "", handle: "", label: "" });
-  const [newAction, setNewAction] = useState({ platform: "calendly", url: "", label: "", subtitle: "" });
-  const [newPayment, setNewPayment] = useState({ platform: "paypal", url: "", label: "", note: "" });
+  const [newPhone, setNewPhone] = useState({ id: "", type: "mobile", number: "", label: "", whatsapp: false });
+  const [newEmail, setNewEmail] = useState({ id: "", type: "work", address: "", label: "" });
+  const [newAddress, setNewAddress] = useState({ id: "", type: "work", label: "", street: "", city: "", state: "", postalCode: "", country: "", mapUrl: "" });
+  const [newWebsite, setNewWebsite] = useState({ id: "", label: "", url: "", featured: false });
+  const [newSocial, setNewSocial] = useState({ id: "", platform: "linkedin", url: "", handle: "", label: "" });
+  const [newAction, setNewAction] = useState({ id: "", platform: "calendly", url: "", label: "", subtitle: "" });
+  const [newPayment, setNewPayment] = useState({ id: "", platform: "paypal", url: "", label: "", note: "" });
 
   // ── Mobile Responsive State ──
   const [activeMobileTab, setActiveMobileTab] = useState<"edit" | "preview">("edit");
@@ -297,12 +381,69 @@ export default function CardEditorClient({ card }: { card: Card }) {
     return () => document.body.classList.remove("mobile-immersive-active");
   }, [activeMobileTab]);
 
-  // Helper to open modal with platform pre-selected
-  const openPlatformModal = (modalType: "social" | "payment" | "action", platform: string) => {
+  // Helper to open modal with pre-filled data if exists
+  const openPlatformModal = (modalType: string, platform?: string) => {
     setActiveModal(modalType);
-    if (modalType === "social") setNewSocial({ platform, url: "", handle: "", label: "" });
-    if (modalType === "payment") setNewPayment({ platform, url: "", label: "", note: "" });
-    if (modalType === "action") setNewAction({ platform, url: "", label: "", subtitle: "" });
+
+    // Platform-based identities (Social, Payment, Action)
+    if (modalType === "social" && platform) {
+      const existing = socials.find(s => s.platform === platform);
+      if (existing) {
+        setNewSocial({ id: existing.id, platform, url: existing.url, handle: existing.handle || "", label: existing.label || "" });
+      } else {
+        setNewSocial({ id: "", platform, url: "", handle: "", label: "" });
+      }
+    } else if (modalType === "payment" && platform) {
+      const existing = payments.find(p => p.platform === platform);
+      if (existing) {
+        setNewPayment({ id: existing.id, platform, url: existing.url, label: existing.label || "", note: existing.note || "" });
+      } else {
+        setNewPayment({ id: "", platform, url: "", label: "", note: "" });
+      }
+    } else if (modalType === "action" && platform) {
+      const existing = actions.find(a => a.platform === platform);
+      if (existing) {
+        setNewAction({ id: existing.id, platform, url: existing.url, label: existing.label || "", subtitle: existing.subtitle || "" });
+      } else {
+        setNewAction({ id: "", platform, url: "", label: "", subtitle: "" });
+      }
+    }
+
+    // List-based identities (if exactly one exists, pre-fill it for easy editing)
+    if (modalType === "email" && emails.length === 1) {
+      setNewEmail({ id: emails[0].id, type: emails[0].type, address: emails[0].address, label: emails[0].label || "" });
+    } else if (modalType === "email") {
+      setNewEmail({ id: "", type: "work", address: "", label: "" });
+    }
+
+    if (modalType === "phone" && phones.length === 1) {
+      setNewPhone({ id: phones[0].id, type: phones[0].type, number: phones[0].number, label: phones[0].label || "", whatsapp: phones[0].whatsapp });
+    } else if (modalType === "phone") {
+      setNewPhone({ id: "", type: "mobile", number: "", label: "", whatsapp: false });
+    }
+
+    if (modalType === "address" && addresses.length === 1) {
+      const a = addresses[0];
+      setNewAddress({ 
+        id: a.id,
+        type: a.type, 
+        label: a.label || "", 
+        street: a.street || "", 
+        city: a.city || "", 
+        state: a.state || "", 
+        postalCode: a.postalCode || "", 
+        country: a.country || "", 
+        mapUrl: a.mapUrl || "" 
+      });
+    } else if (modalType === "address") {
+      setNewAddress({ id: "", type: "work", label: "", street: "", city: "", state: "", postalCode: "", country: "", mapUrl: "" });
+    }
+
+    if ((modalType === "link" || modalType === "companyUrl") && websites.length === 1) {
+      setNewWebsite({ id: websites[0].id, label: websites[0].label, url: websites[0].url, featured: websites[0].featured });
+    } else if (modalType === "link" || modalType === "companyUrl") {
+      setNewWebsite({ id: "", label: "", url: "", featured: false });
+    }
   };
 
   function showFeedback(type: "success" | "error", msg: string) {
@@ -431,6 +572,30 @@ export default function CardEditorClient({ card }: { card: Card }) {
     phones, emails, addresses, websites, socials, payments, actions,
     layout, colorPrimary, coverPhotoUrl, slug, isPublished, leadCapture, vcfDownload
   ]);
+  
+  // Helper to check if an identity category or platform has data
+  const isIdentityFilled = (type: string, platform?: string) => {
+    switch (type) {
+      case "companyLogo": return !!companyLogoUrl;
+      case "profilePicture": return !!avatarUrl;
+      case "coverPhoto": return !!coverPhotoUrl;
+      case "themeColor": return colorPrimary !== "#157e70" && colorPrimary !== "#000000"; // Assuming these are defaults
+      case "name": return !!firstName || !!lastName;
+      case "jobTitle": return !!jobTitle;
+      case "department": return !!companyRole;
+      case "company": return !!companyName;
+      case "accreditations": return !!bio;
+      case "headline": return !!headline;
+      case "email": return emails.length > 0;
+      case "phone": return phones.length > 0;
+      case "address": return addresses.length > 0;
+      case "link": return websites.length > 0;
+      case "social": return socials.some(s => s.platform === platform);
+      case "payment": return payments.some(p => p.platform === platform);
+      case "action": return actions.some(a => a.platform === platform);
+      default: return false;
+    }
+  };
 
   // ── Phone handlers ──
   function handleAddPhone() {
@@ -438,8 +603,12 @@ export default function CardEditorClient({ card }: { card: Card }) {
     startTransition(async () => {
       const result = await upsertPhone(card.id, newPhone);
       if (result?.error) { showFeedback("error", result.error); return; }
-      setPhones(prev => [...prev, { id: Date.now().toString(), ...newPhone, sms: true, isPrimary: prev.length === 0, label: newPhone.label || null }]);
-      setNewPhone({ type: "mobile", number: "", label: "", whatsapp: false });
+      if (newPhone.id) {
+        setPhones(prev => prev.map(p => p.id === newPhone.id ? { ...p, ...newPhone, sms: true, label: newPhone.label || null } : p));
+      } else {
+        setPhones(prev => [...prev, { id: Date.now().toString(), ...newPhone, sms: true, isPrimary: prev.length === 0, label: newPhone.label || null }]);
+      }
+      setNewPhone({ id: "", type: "mobile", number: "", label: "", whatsapp: false });
       router.refresh();
     });
   }
@@ -457,8 +626,12 @@ export default function CardEditorClient({ card }: { card: Card }) {
     startTransition(async () => {
       const result = await upsertEmail(card.id, newEmail);
       if (result?.error) { showFeedback("error", result.error); return; }
-      setEmails(prev => [...prev, { id: Date.now().toString(), ...newEmail, isPrimary: prev.length === 0, label: newEmail.label || null }]);
-      setNewEmail({ type: "work", address: "", label: "" });
+      if (newEmail.id) {
+        setEmails(prev => prev.map(e => e.id === newEmail.id ? { ...e, ...newEmail, label: newEmail.label || null } : e));
+      } else {
+        setEmails(prev => [...prev, { id: Date.now().toString(), ...newEmail, isPrimary: prev.length === 0, label: newEmail.label || null }]);
+      }
+      setNewEmail({ id: "", type: "work", address: "", label: "" });
       router.refresh();
     });
   }
@@ -473,11 +646,16 @@ export default function CardEditorClient({ card }: { card: Card }) {
   // ── Social handlers ──
   function handleAddSocial() {
     if (!newSocial.url) return;
+    const finalUrl = normalizeUrl(newSocial.platform, newSocial.url);
     startTransition(async () => {
-      const result = await upsertSocial(card.id, { ...newSocial, order: socials.length, isVisible: true });
+      const result = await upsertSocial(card.id, { ...newSocial, url: finalUrl, order: socials.length, isVisible: true });
       if (result?.error) { showFeedback("error", result.error); return; }
-      setSocials(prev => [...prev, { id: Date.now().toString(), ...newSocial, order: prev.length, isVisible: true, handle: newSocial.handle || null, label: newSocial.label || null }]);
-      setNewSocial({ platform: "linkedin", url: "", handle: "", label: "" });
+      if (newSocial.id) {
+        setSocials(prev => prev.map(s => s.id === newSocial.id ? { ...s, ...newSocial, url: finalUrl, handle: newSocial.handle || null, label: newSocial.label || null } : s));
+      } else {
+        setSocials(prev => [...prev, { id: Date.now().toString(), ...newSocial, url: finalUrl, order: prev.length, isVisible: true, handle: newSocial.handle || null, label: newSocial.label || null }]);
+      }
+      setNewSocial({ id: "", platform: "linkedin", url: "", handle: "", label: "" });
       router.refresh();
     });
   }
@@ -493,11 +671,14 @@ export default function CardEditorClient({ card }: { card: Card }) {
   function handleAddAddress() {
     if (!newAddress.city && !newAddress.street && !newAddress.mapUrl) return;
     startTransition(async () => {
-      const payload = { ...newAddress };
-      const result = await upsertAddress(card.id, payload);
+      const result = await upsertAddress(card.id, newAddress);
       if (result?.error) { showFeedback("error", result.error); return; }
-      setAddresses(prev => [...prev, { id: Date.now().toString(), ...payload, label: payload.label || null, street: payload.street || null, city: payload.city || null, state: payload.state || null, postalCode: payload.postalCode || null, country: payload.country || null, mapUrl: payload.mapUrl || null }]);
-      setNewAddress({ type: "work", label: "", street: "", city: "", state: "", postalCode: "", country: "", mapUrl: "" });
+      if (newAddress.id) {
+        setAddresses(prev => prev.map(a => a.id === newAddress.id ? { ...a, ...newAddress, label: newAddress.label || null, street: newAddress.street || null, city: newAddress.city || null, state: newAddress.state || null, postalCode: newAddress.postalCode || null, country: newAddress.country || null, mapUrl: newAddress.mapUrl || null } : a));
+      } else {
+        setAddresses(prev => [...prev, { id: Date.now().toString(), ...newAddress, label: newAddress.label || null, street: newAddress.street || null, city: newAddress.city || null, state: newAddress.state || null, postalCode: newAddress.postalCode || null, country: newAddress.country || null, mapUrl: newAddress.mapUrl || null }]);
+      }
+      setNewAddress({ id: "", type: "work", label: "", street: "", city: "", state: "", postalCode: "", country: "", mapUrl: "" });
       router.refresh();
     });
   }
@@ -515,8 +696,12 @@ export default function CardEditorClient({ card }: { card: Card }) {
     startTransition(async () => {
       const result = await upsertWebsite(card.id, newWebsite);
       if (result?.error) { showFeedback("error", result.error); return; }
-      setWebsites(prev => [...prev, { id: Date.now().toString(), ...newWebsite }]);
-      setNewWebsite({ label: "", url: "", featured: false });
+      if (newWebsite.id) {
+        setWebsites(prev => prev.map(w => w.id === newWebsite.id ? { ...w, ...newWebsite } : w));
+      } else {
+        setWebsites(prev => [...prev, { id: Date.now().toString(), ...newWebsite }]);
+      }
+      setNewWebsite({ id: "", label: "", url: "", featured: false });
       router.refresh();
     });
   }
@@ -534,8 +719,12 @@ export default function CardEditorClient({ card }: { card: Card }) {
     startTransition(async () => {
       const result = await upsertPayment(card.id, { ...newPayment, order: payments.length, isVisible: true });
       if (result?.error) { showFeedback("error", result.error); return; }
-      setPayments(prev => [...prev, { id: Date.now().toString(), ...newPayment, label: newPayment.label || null, note: newPayment.note || null, order: prev.length, isVisible: true }]);
-      setNewPayment({ platform: "paypal", url: "", label: "", note: "" });
+      if (newPayment.id) {
+        setPayments(prev => prev.map(p => p.id === newPayment.id ? { ...p, ...newPayment, label: newPayment.label || null, note: newPayment.note || null } : p));
+      } else {
+        setPayments(prev => [...prev, { id: Date.now().toString(), ...newPayment, label: newPayment.label || null, note: newPayment.note || null, order: prev.length, isVisible: true }]);
+      }
+      setNewPayment({ id: "", platform: "paypal", url: "", label: "", note: "" });
       router.refresh();
     });
   }
@@ -553,8 +742,12 @@ export default function CardEditorClient({ card }: { card: Card }) {
     startTransition(async () => {
       const result = await upsertAction(card.id, { ...newAction, order: actions.length, isVisible: true });
       if (result?.error) { showFeedback("error", result.error); return; }
-      setActions(prev => [...prev, { id: Date.now().toString(), ...newAction, subtitle: newAction.subtitle || null, icon: null, color: null, order: prev.length, isVisible: true }]);
-      setNewAction({ platform: "calendly", url: "", label: "", subtitle: "" });
+      if (newAction.id) {
+        setActions(prev => prev.map(a => a.id === newAction.id ? { ...a, ...newAction, subtitle: newAction.subtitle || null } : a));
+      } else {
+        setActions(prev => [...prev, { id: Date.now().toString(), ...newAction, subtitle: newAction.subtitle || null, icon: null, color: null, order: prev.length, isVisible: true }]);
+      }
+      setNewAction({ id: "", platform: "calendly", url: "", label: "", subtitle: "" });
       router.refresh();
     });
   }
@@ -573,8 +766,9 @@ export default function CardEditorClient({ card }: { card: Card }) {
   const renderActiveModal = () => {
     if (!activeModal) return null;
 
-    let modalTitle = "";
-    let modalContent = null;
+    let modalTitle: React.ReactNode = "";
+    let modalContent: React.ReactNode = null;
+    let deleteAction: React.ReactNode = null;
 
     switch (activeModal) {
       case "companyLogo":
@@ -604,55 +798,16 @@ export default function CardEditorClient({ card }: { card: Card }) {
         modalContent = (
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid var(--border)", paddingBottom: "12px" }}>
-              <button 
-                type="button" 
-                onClick={() => setCoverMode("gallery")} 
-                style={{ 
-                  padding: "8px 16px", 
-                  borderRadius: "8px", 
-                  fontSize: "0.85rem", 
-                  fontWeight: 600, 
-                  background: coverMode === "gallery" ? "var(--orange)" : "transparent",
-                  color: coverMode === "gallery" ? "#fff" : "var(--text-1)",
-                  border: "none",
-                  cursor: "pointer"
-                }}
-              >
-                Design Gallery
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setCoverMode("upload")} 
-                style={{ 
-                  padding: "8px 16px", 
-                  borderRadius: "8px", 
-                  fontSize: "0.85rem", 
-                  fontWeight: 600, 
-                  background: coverMode === "upload" ? "var(--orange)" : "transparent",
-                  color: coverMode === "upload" ? "#fff" : "var(--text-1)",
-                  border: "none",
-                  cursor: "pointer"
-                }}
-              >
-                Upload / URL
-              </button>
+              <button type="button" onClick={() => setCoverMode("gallery")} style={{ padding: "8px 16px", borderRadius: "8px", fontSize: "0.85rem", fontWeight: 600, background: coverMode === "gallery" ? "var(--orange)" : "transparent", color: coverMode === "gallery" ? "#fff" : "var(--text-1)", border: "none", cursor: "pointer" }}>Design Gallery</button>
+              <button type="button" onClick={() => setCoverMode("upload")} style={{ padding: "8px 16px", borderRadius: "8px", fontSize: "0.85rem", fontWeight: 600, background: coverMode === "upload" ? "var(--orange)" : "transparent", color: coverMode === "upload" ? "#fff" : "var(--text-1)", border: "none", cursor: "pointer" }}>Upload / URL</button>
             </div>
-
             {coverMode === "gallery" ? (
               <div className={styles.galleryGrid}>
                 {COVER_PRESETS.map((preset) => (
-                  <div 
-                    key={preset.id} 
-                    className={`${styles.galleryItem} ${coverPhotoUrl === preset.url ? styles.galleryItemActive : ""}`}
-                    onClick={() => setCoverPhotoUrl(preset.url)}
-                  >
+                  <div key={preset.id} className={`${styles.galleryItem} ${coverPhotoUrl === preset.url ? styles.galleryItemActive : ""}`} onClick={() => setCoverPhotoUrl(preset.url)}>
                     <img src={preset.url} alt={preset.name} className={styles.galleryImage} />
                     <div className={styles.galleryLabel}>{preset.name}</div>
-                    {coverPhotoUrl === preset.url && (
-                      <div className={styles.galleryCheck}>
-                        <CheckCircle size={16} />
-                      </div>
-                    )}
+                    {coverPhotoUrl === preset.url && <div className={styles.galleryCheck}><CheckCircle size={16} /></div>}
                   </div>
                 ))}
               </div>
@@ -674,32 +829,12 @@ export default function CardEditorClient({ card }: { card: Card }) {
             <div className={`${styles.formField} ${styles.formGridFull}`}>
               <label>Select Primary Color</label>
               <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "16px" }}>
-                 <input 
-                   type="color" 
-                   value={colorPrimary} 
-                   onChange={e => setColorPrimary(e.target.value)} 
-                   style={{ width: "48px", height: "48px", padding: 0, border: "none", borderRadius: "8px", cursor: "pointer", flexShrink: 0, outline: "none" }} 
-                 />
-                 <input 
-                   type="text" 
-                   value={colorPrimary} 
-                   onChange={e => setColorPrimary(e.target.value)} 
-                   placeholder="#157e70" 
-                   style={{ flex: 1, textTransform: "uppercase" }}
-                 />
+                 <input type="color" value={colorPrimary} onChange={e => setColorPrimary(e.target.value)} style={{ width: "48px", height: "48px", padding: 0, border: "none", borderRadius: "8px", cursor: "pointer", flexShrink: 0, outline: "none" }} />
+                 <input type="text" value={colorPrimary} onChange={e => setColorPrimary(e.target.value)} placeholder="#157e70" style={{ flex: 1, textTransform: "uppercase" }} />
               </div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                  {["#157e70", "#000000", "#1d4ed8", "#b91c1c", "#d97706", "#4338ca", "#0f766e", "#be185d"].map(c => (
-                   <button 
-                     key={c}
-                     type="button"
-                     onClick={() => setColorPrimary(c)}
-                     style={{ 
-                       width: "36px", height: "36px", borderRadius: "50%", background: c, cursor: "pointer", 
-                       border: colorPrimary === c ? "2px solid var(--orange)" : "2px solid transparent",
-                       boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-                     }}
-                   />
+                   <button key={c} type="button" onClick={() => setColorPrimary(c)} style={{ width: "36px", height: "36px", borderRadius: "50%", background: c, cursor: "pointer", border: colorPrimary === c ? "2px solid var(--orange)" : "2px solid transparent", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }} />
                  ))}
               </div>
             </div>
@@ -824,15 +959,8 @@ export default function CardEditorClient({ card }: { card: Card }) {
             </div>
             <div className={styles.formGrid} style={{ marginTop: 16 }}>
               <div className={styles.formField}><label>Label</label><input value={newWebsite.label} onChange={e => setNewWebsite(v => ({ ...v, label: e.target.value }))} placeholder="My Site" /></div>
-              <div className={styles.formField}>
-                <label>URL</label>
-                <input 
-                  value={newWebsite.url} 
-                  onChange={e => setNewWebsite(v => ({ ...v, url: e.target.value }))} 
-                  onBlur={e => setNewWebsite(v => ({ ...v, url: normalizeUrl("website", e.target.value) }))}
-                  placeholder="https://..." 
-                />
-              </div>
+              <div className={styles.formField}><label>URL</label><input value={newWebsite.url} onChange={e => setNewWebsite(v => ({ ...v, url: e.target.value }))} onBlur={e => setNewWebsite(v => ({ ...v, url: normalizeUrl("website", e.target.value) }))} placeholder="https://..." /></div>
+              <div className={`${styles.formField} ${styles.formGridFull}`}><div className={styles.suggestionBox}><div className={styles.suggestionLabel}>Quick Suggestions:</div><div className={styles.suggestionChips}>{PLATFORM_SUGGESTIONS.website.map(s => (<button key={s} type="button" className={`${styles.suggestionChip} ${newWebsite.label === s ? styles.suggestionChipActive : ""}`} onClick={() => setNewWebsite(v => ({ ...v, label: s }))}>{s}</button>))}</div></div></div>
               <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddWebsite} disabled={isPending || !newWebsite.label || !newWebsite.url}><Plus size={14} /> Add</button></div>
             </div>
           </div>
@@ -845,10 +973,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
             <div className={styles.entryList}>
               {addresses.map(a => (
                 <div key={a.id} className={styles.entryItem}>
-                  <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel}>{a.label || a.city || "Address"}</div>
-                    <div className={styles.entryMeta}>{[a.street, a.city, a.country].filter(Boolean).join(", ")}</div>
-                  </div>
+                  <div className={styles.entryInfo}><div className={styles.entryLabel}>{a.label || a.city || "Address"}</div><div className={styles.entryMeta}>{[a.street, a.city, a.country].filter(Boolean).join(", ")}</div></div>
                   <button className={styles.btnDanger} onClick={() => handleDeleteAddress(a.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
                 </div>
               ))}
@@ -862,38 +987,39 @@ export default function CardEditorClient({ card }: { card: Card }) {
           </div>
         );
         break;
-      case "social":
-        modalTitle = "Social Links";
+      case "social": {
+        const platformName = newSocial.platform.charAt(0).toUpperCase() + newSocial.platform.slice(1);
+        const existingLink = socials.find(s => s.platform === newSocial.platform);
+        modalTitle = platformName;
+        if (existingLink) {
+          deleteAction = (
+            <button className={styles.btnDanger} style={{ borderRadius: "8px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.15)", padding: "8px" }} onClick={() => { if(confirm("Delete this link?")) { handleDeleteSocial(existingLink.id); setActiveModal(null); } }} disabled={isPending} title="Delete Link">
+              <Trash2 size={18} color="#ef4444" />
+            </button>
+          );
+        }
         modalContent = (
-          <div>
-            <div className={styles.entryList}>
-              {socials.map(s => (
-                <div key={s.id} className={styles.entryItem}>
-                  <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel} style={{ textTransform: "capitalize" }}>{s.platform}</div>
-                    <div className={styles.entryMeta}>{s.url}</div>
-                  </div>
-                  <button className={styles.btnDanger} onClick={() => handleDeleteSocial(s.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
-                </div>
-              ))}
+          <div className={styles.formGrid}>
+            <div className={styles.formField}>
+              <label>{newSocial.platform === "whatsapp" ? "WhatsApp Number" : "URL / Handle"}</label>
+              <input value={newSocial.url} onChange={e => setNewSocial(s => ({ ...s, url: e.target.value }))} onBlur={e => setNewSocial(s => ({ ...s, url: normalizeUrl(newSocial.platform, e.target.value) }))} placeholder={newSocial.platform === "whatsapp" ? "e.g. 919876543210" : "e.g. @username or full link"} />
+              {newSocial.url && <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}><Link2 size={12} /> {normalizeUrl(newSocial.platform, newSocial.url)}</div>}
             </div>
-            <div className={styles.formGrid} style={{ marginTop: 16 }}>
-              <div className={styles.formField}><label>Platform</label><select value={newSocial.platform} onChange={e => setNewSocial(s => ({ ...s, platform: e.target.value }))}>{SOCIAL_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-              <div className={styles.formField}>
-                <label>URL / Handle</label>
-                <input 
-                  value={newSocial.url} 
-                  onChange={e => setNewSocial(s => ({ ...s, url: e.target.value }))} 
-                  onBlur={e => setNewSocial(s => ({ ...s, url: normalizeUrl(newSocial.platform, e.target.value) }))}
-                  placeholder="e.g. @username or full link" 
-                />
-              </div>
-              <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddSocial} disabled={isPending || !newSocial.url}><Plus size={14} /> Add</button></div>
+            <div className={`${styles.formField} ${styles.formGridFull}`}>
+              <label>Button Label (Title)</label>
+              <input value={newSocial.label} onChange={e => setNewSocial(s => ({ ...s, label: e.target.value }))} placeholder={`e.g. Connect on ${platformName}`} />
+              <div className={styles.suggestionBox} style={{ marginTop: 8 }}><div className={styles.suggestionChips}>{(PLATFORM_SUGGESTIONS[newSocial.platform] || PLATFORM_SUGGESTIONS.default).map(s => (<button key={s} type="button" className={`${styles.suggestionChip} ${newSocial.label === s ? styles.suggestionChipActive : ""}`} onClick={() => setNewSocial(v => ({ ...v, label: s }))}>{s}</button>))}</div></div>
+            </div>
+            <div className={`${styles.formField} ${styles.formGridFull}`} style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12 }}>
+              <button className={styles.btnSecondary} onClick={() => setActiveModal(null)}>Cancel</button>
+              <button className={styles.btnPrimary} onClick={() => { handleAddSocial(); setActiveModal(null); }} disabled={isPending || !newSocial.url}>{newSocial.id ? "Save Changes" : "Add Link"}</button>
             </div>
           </div>
         );
         break;
+      }
       case "payment": {
+        // ... (config logic)
         const getPaymentConfig = (p: string) => {
           switch (p) {
             case "paypal": return { label: "PayPal.me Link", ph: "https://paypal.me/username" };
@@ -909,114 +1035,64 @@ export default function CardEditorClient({ card }: { card: Card }) {
           }
         };
         const config = getPaymentConfig(newPayment.platform);
-        modalTitle = "Payment Links";
+        const existingPay = payments.find(p => p.platform === newPayment.platform);
+        modalTitle = "Payment Link";
+        if (existingPay) {
+          deleteAction = (
+            <button className={styles.btnDanger} style={{ borderRadius: "8px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.15)", padding: "8px" }} onClick={() => { if(confirm("Delete this link?")) { handleDeletePayment(existingPay.id); setActiveModal(null); } }} disabled={isPending} title="Delete Payment">
+              <Trash2 size={18} color="#ef4444" />
+            </button>
+          );
+        }
         modalContent = (
-          <div>
-            <div className={styles.entryList}>
-              {payments.map(p => (
-                <div key={p.id} className={styles.entryItem}>
-                  <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel} style={{ textTransform: "capitalize" }}>{p.platform.replace('_', ' ')}</div>
-                    <div className={styles.entryMeta}>{p.url}</div>
-                  </div>
-                  <button className={styles.btnDanger} onClick={() => handleDeletePayment(p.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.formGrid} style={{ marginTop: 16 }}>
-              <div className={styles.formField}><label>Platform</label><select value={newPayment.platform} onChange={e => setNewPayment(v => ({ ...v, platform: e.target.value }))}>{PAYMENT_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-              <div className={styles.formField}>
-                <label>{config.label}</label>
-                <input 
-                  value={newPayment.url} 
-                  onChange={e => setNewPayment(v => ({ ...v, url: e.target.value }))} 
-                  onBlur={e => setNewPayment(v => ({ ...v, url: normalizeUrl(newPayment.platform, e.target.value) }))}
-                  placeholder={config.ph} 
-                />
-              </div>
-              <div className={styles.formField}><label>Display Label</label><input value={newPayment.label} onChange={e => setNewPayment(v => ({ ...v, label: e.target.value }))} placeholder="Optional (e.g. My PayPal)" /></div>
-              <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddPayment} disabled={isPending || !newPayment.url}><Plus size={14} /> Add</button></div>
+          <div className={styles.formGrid}>
+            <div className={styles.formField}><label>Platform</label><select value={newPayment.platform} onChange={e => setNewPayment(v => ({ ...v, platform: e.target.value }))}>{PAYMENT_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+            <div className={styles.formField}><label>{config.label}</label><input value={newPayment.url} onChange={e => setNewPayment(v => ({ ...v, url: e.target.value }))} onBlur={e => setNewPayment(v => ({ ...v, url: normalizeUrl(newPayment.platform, e.target.value) }))} placeholder={config.ph} /></div>
+            <div className={styles.formField}><label>Display Label</label><input value={newPayment.label} onChange={e => setNewPayment(v => ({ ...v, label: e.target.value }))} placeholder="Optional (e.g. My PayPal)" /><div className={styles.suggestionBox}><div className={styles.suggestionChips}>{(PLATFORM_SUGGESTIONS[newPayment.platform] || PLATFORM_SUGGESTIONS.default).slice(0, 3).map(s => (<button key={s} type="button" className={`${styles.suggestionChip} ${newPayment.label === s ? styles.suggestionChipActive : ""}`} onClick={() => setNewPayment(v => ({ ...v, label: s }))}>{s}</button>))}</div></div></div>
+            <div className={`${styles.formField} ${styles.formGridFull}`} style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12 }}>
+              <button className={styles.btnSecondary} onClick={() => setActiveModal(null)}>Cancel</button>
+              <button className={styles.btnPrimary} onClick={() => { handleAddPayment(); setActiveModal(null); }} disabled={isPending || !newPayment.url}>{newPayment.id ? "Save Changes" : "Add Payment"}</button>
             </div>
           </div>
         );
         break;
       }
-      case "action":
-        modalTitle = "Action Links";
+      case "action": {
+        const existingAct = actions.find(a => a.platform === newAction.platform);
+        modalTitle = "Action Link";
+        if (existingAct) {
+          deleteAction = (
+            <button className={styles.btnDanger} style={{ borderRadius: "8px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.15)", padding: "8px" }} onClick={() => { if(confirm("Delete this link?")) { handleDeleteAction(existingAct.id); setActiveModal(null); } }} disabled={isPending} title="Delete Action">
+              <Trash2 size={18} color="#ef4444" />
+            </button>
+          );
+        }
         modalContent = (
-          <div>
-            <div className={styles.entryList}>
-              {actions.map(a => (
-                <div key={a.id} className={styles.entryItem}>
-                  <div className={styles.entryInfo}>
-                    <div className={styles.entryLabel}>{a.label}</div>
-                    <div className={styles.entryMeta}>{a.url} ({a.platform})</div>
-                  </div>
-                  <button className={styles.btnDanger} onClick={() => handleDeleteAction(a.id)} disabled={isPending} title="Delete"><Trash2 size={14} /></button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.formGrid} style={{ marginTop: 16 }}>
-              <div className={styles.formField}><label>Platform</label><select value={newAction.platform} onChange={e => setNewAction(v => ({ ...v, platform: e.target.value }))}>{ACTION_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
-              <div className={styles.formField}>
-                <label>Link / URL</label>
-                <input 
-                  value={newAction.url} 
-                  onChange={e => setNewAction(v => ({ ...v, url: e.target.value }))} 
-                  onBlur={e => setNewAction(v => ({ ...v, url: normalizeUrl(newAction.platform, e.target.value) }))}
-                  placeholder="e.g. username or full link" 
-                />
-              </div>
-              <div className={styles.formField}><label>Button Text</label><input value={newAction.label} onChange={e => setNewAction(v => ({ ...v, label: e.target.value }))} placeholder="e.g. Book a Call" /></div>
-              <div className={`${styles.formField} ${styles.formGridFull}`} style={{ alignItems: "flex-end" }}><button className={styles.btnPrimary} onClick={handleAddAction} disabled={isPending || !newAction.url || !newAction.label}><Plus size={14} /> Add</button></div>
+          <div className={styles.formGrid}>
+            <div className={styles.formField}><label>Platform</label><select value={newAction.platform} onChange={e => setNewAction(v => ({ ...v, platform: e.target.value }))}>{ACTION_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+            <div className={styles.formField}><label>Link / URL</label><input value={newAction.url} onChange={e => setNewAction(v => ({ ...v, url: e.target.value }))} onBlur={e => setNewAction(v => ({ ...v, url: normalizeUrl(newAction.platform, e.target.value) }))} placeholder="e.g. username or full link" /></div>
+            <div className={styles.formField}><label>Button Text</label><input value={newAction.label} onChange={e => setNewAction(v => ({ ...v, label: e.target.value }))} placeholder="e.g. Book a Call" /><div className={styles.suggestionBox}><div className={styles.suggestionChips}>{(PLATFORM_SUGGESTIONS[newAction.platform] || PLATFORM_SUGGESTIONS.default).map(s => (<button key={s} type="button" className={`${styles.suggestionChip} ${newAction.label === s ? styles.suggestionChipActive : ""}`} onClick={() => setNewAction(v => ({ ...v, label: s }))}>{s}</button>))}</div></div></div>
+            <div className={`${styles.formField} ${styles.formGridFull}`} style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 12 }}>
+              <button className={styles.btnSecondary} onClick={() => setActiveModal(null)}>Cancel</button>
+              <button className={styles.btnPrimary} onClick={() => { handleAddAction(); setActiveModal(null); }} disabled={isPending || !newAction.url || !newAction.label}>{newAction.id ? "Save Changes" : "Add Link"}</button>
             </div>
           </div>
         );
         break;
+      }
       case "templates":
         modalTitle = "Choose Your Template";
         modalContent = (
-          <div className={styles.templateGrid}>
-            {ATTR_TEMPLATES.map((tmpl) => (
-              <div 
-                key={tmpl.id} 
-                className={`${styles.templateItem} ${layout === tmpl.id ? styles.templateItemActive : ""}`}
-                onClick={() => setLayout(tmpl.id as any)}
-              >
-                <div className={styles.templateItemContent}>
-                  <div className={styles.templateItemName}>{tmpl.name}</div>
-                  <div className={styles.templateItemDesc}>{tmpl.description}</div>
-                </div>
-                {layout === tmpl.id && (
-                  <div className={styles.templateItemCheck}>
-                    <CheckCircle size={18} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          <div className={styles.templateGrid}>{ATTR_TEMPLATES.map((tmpl) => (<div key={tmpl.id} className={`${styles.templateItem} ${layout === tmpl.id ? styles.templateItemActive : ""}`} onClick={() => setLayout(tmpl.id as any)}><div className={styles.templateItemContent}><div className={styles.templateItemName}>{tmpl.name}</div><div className={styles.templateItemDesc}>{tmpl.description}</div></div>{layout === tmpl.id && (<div className={styles.templateItemCheck}><CheckCircle size={18} /></div>)}</div>))}</div>
         );
         break;
       case "settings":
         modalTitle = "Card Settings";
         modalContent = (
            <div className={styles.formGrid}>
-             <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <label>Card URL Slug</label>
-                <input value={slug} onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} />
-             </div>
-             <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <div className={styles.toggleRow}>
-                  <div><div style={{ fontWeight: 600, fontSize: 14 }}>Lead Capture</div><div className={styles.toggleDesc}>Show contact form</div></div>
-                  <Toggle id="lead-capture" checked={leadCapture} onChange={setLeadCapture} />
-                </div>
-             </div>
-             <div className={`${styles.formField} ${styles.formGridFull}`}>
-                <div className={styles.toggleRow}>
-                  <div><div style={{ fontWeight: 600, fontSize: 14 }}>VCF Download</div><div className={styles.toggleDesc}>Allow contact download</div></div>
-                  <Toggle id="vcf-download" checked={vcfDownload} onChange={setVcfDownload} />
-                </div>
-             </div>
+             <div className={`${styles.formField} ${styles.formGridFull}`}><label>Card URL Slug</label><input value={slug} onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} /></div>
+             <div className={`${styles.formField} ${styles.formGridFull}`}><div className={styles.toggleRow}><div><div style={{ fontWeight: 600, fontSize: 14 }}>Lead Capture</div><div className={styles.toggleDesc}>Show contact form</div></div><Toggle id="lead-capture" checked={leadCapture} onChange={setLeadCapture} /></div></div>
+             <div className={`${styles.formField} ${styles.formGridFull}`}><div className={styles.toggleRow}><div><div style={{ fontWeight: 600, fontSize: 14 }}>VCF Download</div><div className={styles.toggleDesc}>Allow contact download</div></div><Toggle id="vcf-download" checked={vcfDownload} onChange={setVcfDownload} /></div></div>
            </div>
         );
         break;
@@ -1028,13 +1104,20 @@ export default function CardEditorClient({ card }: { card: Card }) {
           <button className={styles.modalClose} onClick={() => { handleSave(); setActiveModal(null); }}>
             <X size={18} />
           </button>
-          <div className={styles.modalHeader} style={{ textAlign: "left", marginBottom: 20 }}>
-            <h2 className={styles.modalTitle}>{modalTitle}</h2>
+          
+          <div className={styles.modalHeader} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, paddingRight: 40 }}>
+            <h2 className={styles.modalTitle} style={{ margin: 0, fontSize: "1.5rem" }}>{modalTitle}</h2>
+            {deleteAction}
           </div>
+
           {modalContent}
-          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 24 }}>
-             <button className={styles.btnPrimary} onClick={() => { handleSave(); setActiveModal(null); }}>Done</button>
-          </div>
+          
+          {/* Global Done button for modals without internal actions */}
+          {!["social", "payment", "action"].includes(activeModal as string) && (
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 24 }}>
+               <button className={styles.btnPrimary} onClick={() => { handleSave(); setActiveModal(null); }}>Done</button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1060,24 +1143,6 @@ export default function CardEditorClient({ card }: { card: Card }) {
              <ExternalLink size={15} /> View
            </a>
         </div>
-      </div>
-
-      {/* ── Mobile Tab Switcher — always visible on mobile ── */}
-      <div className={styles.mobileSwitcher}>
-        <button 
-          type="button"
-          className={`${styles.mobileTab} ${activeMobileTab === "edit" ? styles.mobileTabActive : ""}`}
-          onClick={() => setActiveMobileTab("edit")}
-        >
-          <FileText size={18} /> Edit
-        </button>
-        <button 
-          type="button"
-          className={`${styles.mobileTab} ${activeMobileTab === "preview" ? styles.mobileTabActive : ""}`}
-          onClick={() => setActiveMobileTab("preview")}
-        >
-          <Eye size={18} /> Preview
-        </button>
       </div>
 
       <div className={styles.editorLayout}>
@@ -1119,9 +1184,9 @@ export default function CardEditorClient({ card }: { card: Card }) {
                    )}
                    <div className={styles.builderGridImageItemIcon}>
                      {companyLogoUrl ? <img src={companyLogoUrl} alt="Logo" style={{ width: 44, height: 44, borderRadius: "8px", objectFit: "cover" }} /> : <Plus size={24} />}
+                     {isIdentityFilled("companyLogo") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridImageItemLabel}>Company Logo</div>
-                   {companyLogoUrl && <div style={{ fontSize: 10, color: "var(--orange)", fontWeight: 700, marginTop: -4 }}>SET</div>}
                 </div>
                 <div className={styles.builderGridImageItem} onClick={() => setActiveModal("profilePicture")} style={{ position: "relative", border: avatarUrl ? "1px solid var(--orange)" : undefined, background: avatarUrl ? "rgba(255,107,0,0.02)" : undefined }}>
                    {avatarUrl && (
@@ -1135,9 +1200,9 @@ export default function CardEditorClient({ card }: { card: Card }) {
                    )}
                    <div className={styles.builderGridImageItemIcon}>
                      {avatarUrl ? <img src={avatarUrl} alt="Avatar" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} /> : <Plus size={24} />}
+                     {isIdentityFilled("profilePicture") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridImageItemLabel}>Profile Picture</div>
-                   {avatarUrl && <div style={{ fontSize: 10, color: "var(--orange)", fontWeight: 700, marginTop: -4 }}>SET</div>}
                 </div>
                 <div className={styles.builderGridImageItem} onClick={() => setActiveModal("coverPhoto")} style={{ position: "relative", border: coverPhotoUrl ? "1px solid var(--orange)" : undefined, background: coverPhotoUrl ? "rgba(255,107,0,0.02)" : undefined }}>
                    {coverPhotoUrl && (
@@ -1151,9 +1216,9 @@ export default function CardEditorClient({ card }: { card: Card }) {
                    )}
                    <div className={styles.builderGridImageItemIcon}>
                      {coverPhotoUrl ? <img src={coverPhotoUrl} alt="Cover" style={{ width: 44, height: 44, borderRadius: "6px", objectFit: "cover" }} /> : <Plus size={24} />}
+                     {isIdentityFilled("coverPhoto") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridImageItemLabel}>Cover Photo</div>
-                   {coverPhotoUrl && <div style={{ fontSize: 10, color: "var(--orange)", fontWeight: 700, marginTop: -4 }}>SET</div>}
                 </div>
             </div>
           </div>
@@ -1167,6 +1232,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 <div className={styles.builderGridItem} onClick={() => setActiveModal("themeColor")}>
                    <div className={styles.builderGridItemIcon}>
                      <div style={{ width: 24, height: 24, borderRadius: "50%", background: colorPrimary, border: "2px solid #fff", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}></div>
+                     {isIdentityFilled("themeColor") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Theme Color</div>
                 </div>
@@ -1175,47 +1241,77 @@ export default function CardEditorClient({ card }: { card: Card }) {
              <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Identity</div>
              <div className={styles.builderGrid}>
                 <div className={styles.builderGridItem} onClick={() => setActiveModal("name")}>
-                   <div className={styles.builderGridItemIcon}><User size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemIcon}>
+                     <User size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("name") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Name</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => setActiveModal("jobTitle")}>
-                   <div className={styles.builderGridItemIcon}><Medal size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemIcon}>
+                     <Medal size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("jobTitle") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Job title</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => setActiveModal("department")}>
-                   <div className={styles.builderGridItemIcon}><Briefcase size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemIcon}>
+                     <Briefcase size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("department") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Department</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => setActiveModal("company")}>
-                   <div className={styles.builderGridItemIcon}><Building2 size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemIcon}>
+                     <Building2 size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("company") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Company</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => setActiveModal("accreditations")}>
-                   <div className={styles.builderGridItemIcon}><FileText size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemIcon}>
+                     <FileText size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("accreditations") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Bio</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => setActiveModal("headline")}>
-                   <div className={styles.builderGridItemIcon}><MessageSquare size={24} strokeWidth={1.5} /></div>
+                   <div className={styles.builderGridItemIcon}>
+                     <MessageSquare size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("headline") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Headline</div>
                 </div>
              </div>
 
              <div className={styles.builderSectionSubtitle} style={{ marginTop: 20 }}>Communication</div>
              <div className={styles.builderGrid}>
-                <div className={styles.builderGridItem} onClick={() => setActiveModal("email")}>
-                   <div className={styles.builderGridItemIcon}><Mail size={24} strokeWidth={1.5} /></div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("email")}>
+                   <div className={styles.builderGridItemIcon}>
+                     <Mail size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("email") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Email</div>
                 </div>
-                <div className={styles.builderGridItem} onClick={() => setActiveModal("phone")}>
-                   <div className={styles.builderGridItemIcon}><PhoneIcon size={24} strokeWidth={1.5} /></div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("phone")}>
+                   <div className={styles.builderGridItemIcon}>
+                     <PhoneIcon size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("phone") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Phone</div>
                 </div>
-                <div className={styles.builderGridItem} onClick={() => setActiveModal("address")}>
-                   <div className={styles.builderGridItemIcon}><MapPin size={24} strokeWidth={1.5} /></div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("address")}>
+                   <div className={styles.builderGridItemIcon}>
+                     <MapPin size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("address") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Address</div>
                 </div>
-                <div className={styles.builderGridItem} onClick={() => setActiveModal("link")}>
-                   <div className={styles.builderGridItemIcon}><Link2 size={24} strokeWidth={1.5} /></div>
+                <div className={styles.builderGridItem} onClick={() => openPlatformModal("link")}>
+                   <div className={styles.builderGridItemIcon}>
+                     <Link2 size={24} strokeWidth={1.5} />
+                     {isIdentityFilled("link") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
+                   </div>
                    <div className={styles.builderGridItemLabel}>Website</div>
                 </div>
              </div>
@@ -1225,30 +1321,35 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "whatsapp")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(37, 211, 102, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="whatsapp" />
+                      {isIdentityFilled("social", "whatsapp") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>WhatsApp</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "telegram")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(34, 158, 217, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="telegram" />
+                      {isIdentityFilled("social", "telegram") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Telegram</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "signal")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(58, 118, 240, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="signal" />
+                      {isIdentityFilled("social", "signal") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Signal</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "discord")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(88, 101, 242, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="discord" />
+                      {isIdentityFilled("social", "discord") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Discord</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "skype")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 175, 240, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="skype" />
+                      {isIdentityFilled("social", "skype") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Skype</div>
                 </div>
@@ -1259,36 +1360,42 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "instagram")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(228, 64, 95, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="instagram" />
+                      {isIdentityFilled("social", "instagram") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Instagram</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "twitter")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="twitter" />
+                      {isIdentityFilled("social", "twitter") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>X</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "facebook")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(24, 119, 242, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="facebook" />
+                      {isIdentityFilled("social", "facebook") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Facebook</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "youtube")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(255, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="youtube" />
+                      {isIdentityFilled("social", "youtube") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>YouTube</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "tiktok")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 0, 0, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="tiktok" />
+                      {isIdentityFilled("social", "tiktok") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>TikTok</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "twitch")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(145, 70, 255, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="twitch" />
+                      {isIdentityFilled("social", "twitch") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Twitch</div>
                 </div>
@@ -1302,18 +1409,21 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "linkedin")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(10, 102, 194, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="linkedin" />
+                      {isIdentityFilled("social", "linkedin") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>LinkedIn</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("social", "github")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(36, 41, 46, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="github" />
+                      {isIdentityFilled("social", "github") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>GitHub</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("action", "calendly")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 107, 255, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="calendly" />
+                      {isIdentityFilled("action", "calendly") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Calendly</div>
                 </div>
@@ -1324,42 +1434,49 @@ export default function CardEditorClient({ card }: { card: Card }) {
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "paypal")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 48, 135, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="paypal" />
+                      {isIdentityFilled("payment", "paypal") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>PayPal</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "venmo")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(61, 149, 206, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="venmo" />
+                      {isIdentityFilled("payment", "venmo") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Venmo</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "cashapp")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 214, 79, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="cashapp" />
+                      {isIdentityFilled("payment", "cashapp") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>CashApp</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "gpay")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(66, 133, 244, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="gpay" />
+                      {isIdentityFilled("payment", "gpay") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>GPay</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "whatsapppay")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(37, 211, 102, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="whatsapppay" />
+                      {isIdentityFilled("payment", "whatsapppay") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>WA Pay</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "wise")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(0, 185, 255, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="wise" />
+                      {isIdentityFilled("payment", "wise") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>Wise</div>
                 </div>
                 <div className={styles.builderGridItem} onClick={() => openPlatformModal("payment", "bank_transfer")}>
                    <div className={styles.builderGridItemIcon} style={{ background: "rgba(113, 128, 150, 0.1)", borderRadius: "12px", padding: "12px" }}>
                       <PlatformIcon platform="bank_transfer" />
+                      {isIdentityFilled("payment", "bank_transfer") && <div className={styles.filledIndicator}><CheckCircle size={10} strokeWidth={3} /></div>}
                    </div>
                    <div className={styles.builderGridItemLabel}>NEFT/IMPS</div>
                 </div>
@@ -1405,6 +1522,24 @@ export default function CardEditorClient({ card }: { card: Card }) {
       </div>
 
       {renderActiveModal()}
+
+      {/* ── Mobile Tab Switcher — always visible on mobile, fixed at bottom ── */}
+      <div className={styles.mobileSwitcher}>
+        <button 
+          type="button"
+          className={`${styles.mobileTab} ${activeMobileTab === "edit" ? styles.mobileTabActive : ""}`}
+          onClick={() => setActiveMobileTab("edit")}
+        >
+          <FileText size={18} /> Edit
+        </button>
+        <button 
+          type="button"
+          className={`${styles.mobileTab} ${activeMobileTab === "preview" ? styles.mobileTabActive : ""}`}
+          onClick={() => setActiveMobileTab("preview")}
+        >
+          <Eye size={18} /> Preview
+        </button>
+      </div>
 
       {/* ── Draft Modal ── */}
       {showDraftModal && (

@@ -449,6 +449,14 @@
     display: none;
   }
 
+  .navCta {
+    display: none;
+  }
+
+  .navRight {
+    gap: 8px;
+  }
+
   .hamburger {
     display: flex;
   }
@@ -516,5 +524,11 @@
 @media (max-width: 480px) {
   .footerGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .logoText {
+    display: none;
   }
 }

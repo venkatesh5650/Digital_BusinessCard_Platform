@@ -12,6 +12,7 @@
   align-items: center;
   background: var(--bg-surface, #f8f9fa);
   padding: 24px 16px;
+  overflow-x: hidden;
 }
 
 .sharedElements {
@@ -52,7 +53,7 @@
   min-height: unset !important;
   background: transparent !important;
   padding: 0 !important;
-  align-items: flex-start !important;
+  align-items: center !important;
 }
 
 /* Ensure the card fits well in the editor preview (but keeps its physical look) */
@@ -717,14 +718,22 @@
 .waveHeader {
   position: relative;
   min-height: 480px;
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
+  overflow: hidden; /* Contain the absolute Image component */
+}
+
+.waveHeaderImage {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: auto;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cardWave:hover .waveHeaderImage {
+  transform: scale(1.05); /* Subtle premium zoom on hover */
 }
 
 .waveHeaderGradient {
@@ -733,7 +742,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,0.3) 100%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%);
   z-index: 1;
   pointer-events: none;
 }

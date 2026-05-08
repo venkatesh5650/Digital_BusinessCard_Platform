@@ -3,10 +3,13 @@
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CreditCard, Users, LogOut, ExternalLink, Moon, Sun } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, ExternalLink, Moon, Sun, Plus } from "lucide-react";
 import styles from "./dashboard.module.css";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 
 type User = {
   id?: string;
@@ -17,11 +20,14 @@ type User = {
 
 export default function DashboardNav({ user }: { user: User }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isLeadsLoading, setIsLeadsLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingStage, setLoadingStage] = useState("Initializing intelligence...");
   const { toggleTheme } = useTheme();
 
   const navItems = [
-    { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-    { href: "/dashboard/cards", label: "My Cards", icon: CreditCard },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/dashboard/leads", label: "Leads", icon: Users },
   ];
 
@@ -40,23 +46,51 @@ export default function DashboardNav({ user }: { user: User }) {
         <span className={styles.logoText}>Imprint</span>
       </div>
 
-      <Link href="/dashboard/cards?create=true" className={styles.createCardBtn}>
-        <CreditCard size={18} />
+      <Link href="/dashboard?create=true" className={styles.createCardBtn}>
+        <Plus size={18} strokeWidth={2.5} />
         Create New Card
       </Link>
 
       {/* Navigation */}
       <nav className={styles.nav}>
         {navItems.map(({ href, label, icon: Icon }) => (
-          <Link
+          <button
             key={href}
-            href={href}
+            onClick={() => {
+              if (href === "/dashboard/leads") {
+                setIsLeadsLoading(true);
+                setLoadingProgress(0);
+                
+                // Simulate progressive loading stages
+                setTimeout(() => {
+                  setLoadingProgress(30);
+                  setLoadingStage("Analyzing contact flow...");
+                }, 400);
+                
+                setTimeout(() => {
+                  setLoadingProgress(65);
+                  setLoadingStage("Syncing lead intelligence...");
+                }, 1000);
+
+                setTimeout(() => {
+                  setLoadingProgress(100);
+                  setLoadingStage("Preparing dashboard...");
+                  router.push(href);
+                  setTimeout(() => {
+                    setIsLeadsLoading(false);
+                  }, 800);
+                }, 2000);
+              } else {
+                router.push(href);
+              }
+            }}
             className={`${styles.navItem} ${pathname === href ? styles.navItemActive : ""}`}
             title={label}
+            style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}
           >
             <Icon size={20} />
             {label}
-          </Link>
+          </button>
         ))}
 
         <div className={styles.navDivider} />
@@ -103,6 +137,29 @@ export default function DashboardNav({ user }: { user: User }) {
           </button>
         </div>
       </div>
+
+      {/* Premium Leads Loading Modal - Rendered via Portal for safety */}
+      {isLeadsLoading && typeof document !== 'undefined' && createPortal(
+        <div className={styles.leadsLoaderOverlay}>
+          <div className={styles.leadsLoaderContent}>
+            <div className={styles.leadsLoaderIconWrap}>
+              <div className={styles.leadsSpinner} />
+              <Users size={32} className={styles.leadsPulseIcon} />
+            </div>
+            <h2 className={styles.leadsLoaderTitle}>Generating Leads</h2>
+            <p className={styles.leadsLoaderSubtitle}>{loadingStage}</p>
+            
+            <div className={styles.leadsProgressBarWrap}>
+              <div 
+                className={styles.leadsProgressBarFill} 
+                style={{ width: `${loadingProgress}%` }}
+              />
+            </div>
+            <div className={styles.leadsProgressLabel}>{loadingProgress}%</div>
+          </div>
+        </div>,
+        document.body
+      )}
     </aside>
   );
 }

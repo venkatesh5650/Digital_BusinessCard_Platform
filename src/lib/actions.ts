@@ -222,7 +222,7 @@ export async function deleteEmail(cardId: string, emailId: string) {
 // ─── SOCIAL LINKS ──────────────────────────────────────────────────
 export async function upsertSocial(
   cardId: string,
-  data: { id?: string; platform: string; url: string; handle?: string; order?: number; isVisible?: boolean }
+  data: { id?: string; platform: string; url: string; handle?: string; label?: string; order?: number; isVisible?: boolean }
 ) {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
@@ -232,9 +232,9 @@ export async function upsertSocial(
   const normalizedUrl = normalizeUrl(data.platform, data.url);
 
   if (data.id) {
-    await db.socialLink.update({ where: { id: data.id }, data: { platform: data.platform, url: normalizedUrl, handle: data.handle, order: data.order ?? 0, isVisible: data.isVisible ?? true } });
+    await db.socialLink.update({ where: { id: data.id }, data: { platform: data.platform, url: normalizedUrl, handle: data.handle, label: data.label, order: data.order ?? 0, isVisible: data.isVisible ?? true } });
   } else {
-    await db.socialLink.create({ data: { vcardId: cardId, platform: data.platform, url: normalizedUrl, handle: data.handle, order: data.order ?? 0, isVisible: data.isVisible ?? true } });
+    await db.socialLink.create({ data: { vcardId: cardId, platform: data.platform, url: normalizedUrl, handle: data.handle, label: data.label, order: data.order ?? 0, isVisible: data.isVisible ?? true } });
   }
   revalidatePath(`/dashboard/card/${cardId}`);
   return { success: true };
