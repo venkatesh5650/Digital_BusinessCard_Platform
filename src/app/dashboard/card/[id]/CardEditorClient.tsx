@@ -606,7 +606,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       if (newPhone.id) {
         setPhones(prev => prev.map(p => p.id === newPhone.id ? { ...p, ...newPhone, sms: true, label: newPhone.label || null } : p));
       } else {
-        setPhones(prev => [...prev, { id: Date.now().toString(), ...newPhone, sms: true, isPrimary: prev.length === 0, label: newPhone.label || null }]);
+        setPhones(prev => [...prev, { ...newPhone, id: Date.now().toString(), sms: true, isPrimary: prev.length === 0, label: newPhone.label || null }]);
       }
       setNewPhone({ id: "", type: "mobile", number: "", label: "", whatsapp: false });
       router.refresh();
@@ -629,7 +629,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       if (newEmail.id) {
         setEmails(prev => prev.map(e => e.id === newEmail.id ? { ...e, ...newEmail, label: newEmail.label || null } : e));
       } else {
-        setEmails(prev => [...prev, { id: Date.now().toString(), ...newEmail, isPrimary: prev.length === 0, label: newEmail.label || null }]);
+        setEmails(prev => [...prev, { ...newEmail, id: Date.now().toString(), isPrimary: prev.length === 0, label: newEmail.label || null }]);
       }
       setNewEmail({ id: "", type: "work", address: "", label: "" });
       router.refresh();
@@ -653,7 +653,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       if (newSocial.id) {
         setSocials(prev => prev.map(s => s.id === newSocial.id ? { ...s, ...newSocial, url: finalUrl, handle: newSocial.handle || null, label: newSocial.label || null } : s));
       } else {
-        setSocials(prev => [...prev, { id: Date.now().toString(), ...newSocial, url: finalUrl, order: prev.length, isVisible: true, handle: newSocial.handle || null, label: newSocial.label || null }]);
+        setSocials(prev => [...prev, { ...newSocial, id: Date.now().toString(), url: finalUrl, order: prev.length, isVisible: true, handle: newSocial.handle || null, label: newSocial.label || null }]);
       }
       setNewSocial({ id: "", platform: "linkedin", url: "", handle: "", label: "" });
       router.refresh();
@@ -676,7 +676,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       if (newAddress.id) {
         setAddresses(prev => prev.map(a => a.id === newAddress.id ? { ...a, ...newAddress, label: newAddress.label || null, street: newAddress.street || null, city: newAddress.city || null, state: newAddress.state || null, postalCode: newAddress.postalCode || null, country: newAddress.country || null, mapUrl: newAddress.mapUrl || null } : a));
       } else {
-        setAddresses(prev => [...prev, { id: Date.now().toString(), ...newAddress, label: newAddress.label || null, street: newAddress.street || null, city: newAddress.city || null, state: newAddress.state || null, postalCode: newAddress.postalCode || null, country: newAddress.country || null, mapUrl: newAddress.mapUrl || null }]);
+        setAddresses(prev => [...prev, { ...newAddress, id: Date.now().toString(), label: newAddress.label || null, street: newAddress.street || null, city: newAddress.city || null, state: newAddress.state || null, postalCode: newAddress.postalCode || null, country: newAddress.country || null, mapUrl: newAddress.mapUrl || null }]);
       }
       setNewAddress({ id: "", type: "work", label: "", street: "", city: "", state: "", postalCode: "", country: "", mapUrl: "" });
       router.refresh();
@@ -699,7 +699,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       if (newWebsite.id) {
         setWebsites(prev => prev.map(w => w.id === newWebsite.id ? { ...w, ...newWebsite } : w));
       } else {
-        setWebsites(prev => [...prev, { id: Date.now().toString(), ...newWebsite }]);
+        setWebsites(prev => [...prev, { ...newWebsite, id: Date.now().toString() }]);
       }
       setNewWebsite({ id: "", label: "", url: "", featured: false });
       router.refresh();
@@ -722,7 +722,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       if (newPayment.id) {
         setPayments(prev => prev.map(p => p.id === newPayment.id ? { ...p, ...newPayment, label: newPayment.label || null, note: newPayment.note || null } : p));
       } else {
-        setPayments(prev => [...prev, { id: Date.now().toString(), ...newPayment, label: newPayment.label || null, note: newPayment.note || null, order: prev.length, isVisible: true }]);
+        setPayments(prev => [...prev, { ...newPayment, id: Date.now().toString(), label: newPayment.label || null, note: newPayment.note || null, order: prev.length, isVisible: true }]);
       }
       setNewPayment({ id: "", platform: "paypal", url: "", label: "", note: "" });
       router.refresh();
@@ -745,7 +745,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
       if (newAction.id) {
         setActions(prev => prev.map(a => a.id === newAction.id ? { ...a, ...newAction, subtitle: newAction.subtitle || null } : a));
       } else {
-        setActions(prev => [...prev, { id: Date.now().toString(), ...newAction, subtitle: newAction.subtitle || null, icon: null, color: null, order: prev.length, isVisible: true }]);
+        setActions(prev => [...prev, { ...newAction, id: Date.now().toString(), subtitle: newAction.subtitle || null, icon: null, color: null, order: prev.length, isVisible: true }]);
       }
       setNewAction({ id: "", platform: "calendly", url: "", label: "", subtitle: "" });
       router.refresh();
