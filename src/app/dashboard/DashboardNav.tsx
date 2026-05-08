@@ -43,24 +43,38 @@ export default function DashboardNav({ user }: { user: User }) {
       {/* ── Mobile Top Header ── */}
       <header className={styles.mobileHeader}>
         <div className={styles.mobileHeaderLeft}>
-          <div className={styles.logoIcon}>N</div>
+          <div className={styles.logoIcon}>I</div>
           <span className={styles.logoText}>Imprint</span>
         </div>
         
         <div className={styles.mobileHeaderRight}>
           <nav className={styles.mobileQuickNav}>
             {navItems.map(({ href, icon: Icon }) => (
-              <Link 
-                key={href} 
-                href={href} 
+              <button
+                key={href}
+                onClick={() => {
+                  if (href === "/dashboard/leads") {
+                    setIsLeadsLoading(true);
+                    setLoadingProgress(0);
+                    setTimeout(() => { setLoadingProgress(30); setLoadingStage("Analyzing contact flow..."); }, 400);
+                    setTimeout(() => { setLoadingProgress(65); setLoadingStage("Syncing lead intelligence..."); }, 1000);
+                    setTimeout(() => {
+                      setLoadingProgress(100);
+                      setLoadingStage("Preparing dashboard...");
+                      router.push(href);
+                      setTimeout(() => setIsLeadsLoading(false), 800);
+                    }, 2000);
+                  } else {
+                    router.push(href);
+                  }
+                }}
                 className={`${styles.mobileQuickNavItem} ${pathname === href ? styles.mobileQuickNavItemActive : ""}`}
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 <Icon size={20} />
-              </Link>
+              </button>
             ))}
-            <button className={styles.mobileQuickNavItem} onClick={toggleTheme}>
-              <ThemeToggle />
-            </button>
+            <ThemeToggle className={styles.mobileQuickNavItem} />
           </nav>
           
           <div className={styles.userAvatar} style={{ width: 32, height: 32, fontSize: 12 }}>
@@ -72,7 +86,7 @@ export default function DashboardNav({ user }: { user: User }) {
       <aside className={styles.sidebar}>
       {/* Logo */}
       <div className={styles.sidebarLogo}>
-        <div className={styles.logoIcon}>N</div>
+        <div className={styles.logoIcon}>I</div>
         <span className={styles.logoText}>Imprint</span>
       </div>
 

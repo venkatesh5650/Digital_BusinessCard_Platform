@@ -46,7 +46,7 @@ export default function LeadsClient({ leads, cards }: { leads: Lead[]; cards: Ca
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `neonglass-leads-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `imprint-leads-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

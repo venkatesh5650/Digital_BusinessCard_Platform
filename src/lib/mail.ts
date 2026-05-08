@@ -58,7 +58,7 @@ export async function sendLeadNotification({
       <div class="wrapper">
         <div class="container">
           <div class="header">
-            <h1>NeonGlass</h1>
+            <h1>Imprint</h1>
           </div>
           <div class="content">
             <div class="tag">New Connection</div>
@@ -97,7 +97,7 @@ export async function sendLeadNotification({
             </div>
           </div>
           <div class="footer">
-            &copy; 2026 NeonGlass. All rights reserved.<br>
+            &copy; 2026 Imprint. All rights reserved.<br>
             Sent via your Digital Business Card Platform.
           </div>
         </div>
