@@ -39,7 +39,37 @@ export default function DashboardNav({ user }: { user: User }) {
     .toUpperCase();
 
   return (
-    <aside className={styles.sidebar}>
+    <>
+      {/* ── Mobile Top Header ── */}
+      <header className={styles.mobileHeader}>
+        <div className={styles.mobileHeaderLeft}>
+          <div className={styles.logoIcon}>N</div>
+          <span className={styles.logoText}>Imprint</span>
+        </div>
+        
+        <div className={styles.mobileHeaderRight}>
+          <nav className={styles.mobileQuickNav}>
+            {navItems.map(({ href, icon: Icon }) => (
+              <Link 
+                key={href} 
+                href={href} 
+                className={`${styles.mobileQuickNavItem} ${pathname === href ? styles.mobileQuickNavItemActive : ""}`}
+              >
+                <Icon size={20} />
+              </Link>
+            ))}
+            <button className={styles.mobileQuickNavItem} onClick={toggleTheme}>
+              <ThemeToggle />
+            </button>
+          </nav>
+          
+          <div className={styles.userAvatar} style={{ width: 32, height: 32, fontSize: 12 }}>
+            {initials}
+          </div>
+        </div>
+      </header>
+
+      <aside className={styles.sidebar}>
       {/* Logo */}
       <div className={styles.sidebarLogo}>
         <div className={styles.logoIcon}>N</div>
@@ -160,6 +190,7 @@ export default function DashboardNav({ user }: { user: User }) {
         </div>,
         document.body
       )}
-    </aside>
+      </aside>
+    </>
   );
 }
