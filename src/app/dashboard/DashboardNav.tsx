@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, LogOut, ExternalLink, Moon, Sun, Plus } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, ExternalLink, Moon, Sun, Plus, Shield } from "lucide-react";
 import styles from "./dashboard.module.css";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
@@ -16,6 +16,7 @@ type User = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  role?: string;
 };
 
 export default function DashboardNav({ user }: { user: User }) {
@@ -99,6 +100,20 @@ export default function DashboardNav({ user }: { user: User }) {
                   </div>
                 </div>
                 <div className={styles.mobileDropdownDivider} />
+                {user.role === "ADMIN" && (
+                  <>
+                    <Link
+                      href="/admin/dashboard"
+                      className={styles.mobileLogoutBtn}
+                      style={{ color: "var(--accent)" }}
+                      onClick={() => setIsMobileUserMenuOpen(false)}
+                    >
+                      <Shield size={18} />
+                      <span>Admin Portal</span>
+                    </Link>
+                    <div className={styles.mobileDropdownDivider} />
+                  </>
+                )}
                 <button
                   className={styles.mobileLogoutBtn}
                   onClick={() => {
@@ -169,8 +184,6 @@ export default function DashboardNav({ user }: { user: User }) {
           </button>
         ))}
 
-        <div className={styles.navDivider} />
-        
         <div 
           className={styles.navItem} 
           onClick={toggleTheme}
@@ -182,6 +195,20 @@ export default function DashboardNav({ user }: { user: User }) {
           </div>
           <span style={{ marginLeft: '12px', fontSize: '14px', fontWeight: 500 }}>Switch Theme</span>
         </div>
+
+        {user.role === "ADMIN" && (
+          <>
+            <div className={styles.navDivider} />
+            <Link 
+              href="/admin/dashboard" 
+              className={styles.navItem}
+              style={{ color: "var(--accent)", fontWeight: 600 }}
+            >
+              <Shield size={20} />
+              Admin Portal
+            </Link>
+          </>
+        )}
       </nav>
 
       <div className={styles.sidebarFooter}>
