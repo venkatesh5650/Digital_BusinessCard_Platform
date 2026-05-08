@@ -22,6 +22,7 @@ export default function DashboardNav({ user }: { user: User }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isLeadsLoading, setIsLeadsLoading] = useState(false);
+  const [isMobileUserMenuOpen, setIsMobileUserMenuOpen] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingStage, setLoadingStage] = useState("Initializing intelligence...");
   const { toggleTheme } = useTheme();
@@ -77,9 +78,40 @@ export default function DashboardNav({ user }: { user: User }) {
             <ThemeToggle className={styles.mobileQuickNavItem} />
           </nav>
           
-          <div className={styles.userAvatar} style={{ width: 32, height: 32, fontSize: 12 }}>
+          <div 
+            className={styles.userAvatar} 
+            style={{ width: 32, height: 32, fontSize: 12, cursor: 'pointer' }}
+            onClick={() => setIsMobileUserMenuOpen(!isMobileUserMenuOpen)}
+          >
             {initials}
           </div>
+
+          {/* ── Mobile User Dropdown Menu ── */}
+          {isMobileUserMenuOpen && (
+            <>
+              <div className={styles.mobileMenuOverlay} onClick={() => setIsMobileUserMenuOpen(false)} />
+              <div className={styles.mobileUserDropdown}>
+                <div className={styles.mobileDropdownHeader}>
+                  <div className={styles.mobileDropdownAvatar}>{initials}</div>
+                  <div className={styles.mobileDropdownInfo}>
+                    <div className={styles.mobileDropdownName}>{user.name ?? "User"}</div>
+                    <div className={styles.mobileDropdownEmail}>{user.email}</div>
+                  </div>
+                </div>
+                <div className={styles.mobileDropdownDivider} />
+                <button
+                  className={styles.mobileLogoutBtn}
+                  onClick={() => {
+                    setIsMobileUserMenuOpen(false);
+                    signOut({ callbackUrl: "/" });
+                  }}
+                >
+                  <LogOut size={18} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </header>
 
