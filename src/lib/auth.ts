@@ -15,7 +15,11 @@ if (!hasGoogleOAuth) {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
+  session: { 
+    strategy: "jwt",
+    maxAge: 5 * 60 * 60, // 5 Hours (Hard Limit)
+    updateAge: 0,        // Ensure logout occurs exactly after time limit
+  },
   trustHost: true,
   debug: true,
   secret: process.env.AUTH_SECRET || "neonglass-default-secret",
