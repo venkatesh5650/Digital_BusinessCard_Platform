@@ -49,7 +49,7 @@ const AVATAR_GRADIENTS = [
   "linear-gradient(135deg, #ff6b00 0%, #000000 100%)",
   "linear-gradient(135deg, #ff8c3a 0%, #ff6b00 100%)",
   "linear-gradient(135deg, #000000 0%, #333333 100%)",
-  "linear-gradient(135deg, #ff5c00 0%, #ff8c3a 100%)",
+  "linear-gradient(135deg, #ffffff 0%, #ff6b00 100%)",
   "linear-gradient(135deg, #111111 0%, #444444 100%)",
 ];
 
@@ -109,6 +109,10 @@ function timeAgo(date: Date): string {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
+import { motion, AnimatePresence } from "framer-motion";
+
+// ── Main component ─────────────────────────────────────────────────────────────
+
 export default function DashboardClient({
   firstName,
   initialStats,
@@ -119,7 +123,7 @@ export default function DashboardClient({
   const [stats, setStats] = useState<DashboardStats>(initialStats);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
   const [mounted, setMounted] = useState(false);
-  const [, setTick] = useState(0); // forces re-render for timeAgo display
+  const [, setTick] = useState(0); 
   const [draftModalCard, setDraftModalCard] = useState<CardData | null>(null);
   const [cardToDelete, setCardToDelete] = useState<string | null>(null);
   const [activeAction, setActiveAction] = useState<"create" | "delete" | null>(null);
@@ -130,11 +134,8 @@ export default function DashboardClient({
 
   useEffect(() => {
     setMounted(true);
-    
-    // Handle 'create=true' from sidebar
     if (searchParams.get("create") === "true") {
       handleCreateNewCard();
-      // Remove the param without full navigation
       const newUrl = window.location.pathname;
       window.history.replaceState({}, "", newUrl);
     }
@@ -175,7 +176,6 @@ export default function DashboardClient({
         alert(result.error);
         setActiveAction(null);
       } else {
-        // Optimistic UI update
         setStats(prev => ({
           ...prev,
           cards: prev.cards.filter(c => c.id !== id),
@@ -187,20 +187,10 @@ export default function DashboardClient({
   };
 
   useEffect(() => {
-    // Poll every 30 seconds (only when tab is visible)
-    const poll = setInterval(() => {
-      if (!document.hidden) fetchStats();
-    }, 30_000);
-
-    // Re-fetch on tab focus
-    const onVisible = () => {
-      if (!document.hidden) fetchStats();
-    };
+    const poll = setInterval(() => { if (!document.hidden) fetchStats(); }, 30_000);
+    const onVisible = () => { if (!document.hidden) fetchStats(); };
     document.addEventListener("visibilitychange", onVisible);
-
-    // Tick every 10s so timeAgo display updates
     const tick = setInterval(() => setTick((t) => t + 1), 10_000);
-
     return () => {
       clearInterval(poll);
       clearInterval(tick);
@@ -209,315 +199,177 @@ export default function DashboardClient({
   }, [fetchStats]);
 
   const statItems = [
-    {
-      label: "Total Cards",
-      value: stats.totalCards,
-      color: "#ff6b00",
-      dimColor: "rgba(255, 107, 0, 0.10)",
-      Icon: CreditCard,
-    },
-    {
-      label: "Total Views",
-      value: stats.totalViews,
-      color: "#ff6b00",
-      dimColor: "rgba(255, 107, 0, 0.10)",
-      Icon: Eye,
-    },
-    {
-      label: "Total Clicks",
-      value: stats.totalClicks,
-      color: "#ff6b00",
-      dimColor: "rgba(255, 107, 0, 0.10)",
-      Icon: MousePointerClick,
-    },
-    {
-      label: "Leads Collected",
-      value: stats.totalLeads,
-      color: "#ff6b00",
-      dimColor: "rgba(255, 107, 0, 0.10)",
-      Icon: Users,
-    },
+    { label: "Active Assets", value: stats.totalCards, icon: CreditCard, color: "#ff6b00" },
+    { label: "Total Views", value: stats.totalViews, icon: Eye, color: "#ff6b00" },
+    { label: "Total Clicks", value: stats.totalClicks, icon: MousePointerClick, color: "#ff6b00" },
+    { label: "Leads Collected", value: stats.totalLeads, icon: Users, color: "#ff6b00" },
   ];
 
   return (
     <>
       {/* ── Page Header ── */}
-      <div className={styles.pageHeader}>
-        <div>
-          <h1 className={styles.pageTitle}>
-            {mounted ? getGreeting() : "Welcome back"}, {firstName} 👋
-          </h1>
-          <p className={styles.pageSubtitle}>
-            Real-time overview of your digital card performance.
-          </p>
-        </div>
-        <div className={styles.headerActions}>
-          <div className={styles.liveIndicator}>
-            <span className={styles.livePulse} />
-            Live
-            <span className={styles.refreshTime} suppressHydrationWarning>
-              · {timeAgo(lastRefreshed)}
-            </span>
-          </div>
-          <button 
-            id="btn-create-card"
-            className={styles.btnPrimary}
-            style={{ flex: "none", whiteSpace: "nowrap" }}
-            onClick={handleCreateNewCard}
-            disabled={isPending}
-          >
-            <Plus size={15} strokeWidth={2.5} /> Create Card
-          </button>
-        </div>
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={styles.pageHeader}
+      >
+        <h1 className={styles.pageTitle}>
+          {mounted ? getGreeting() : "Welcome back"}, {firstName} <span className={styles.wave}>👋</span>
+        </h1>
+        <button 
+          className={styles.btnPrimary}
+          style={{ 
+            padding: '12px 24px', 
+            borderRadius: '14px', 
+            boxShadow: '0 10px 30px rgba(255, 107, 0, 0.2), inset 0 1px 1px rgba(255,255,255,0.3)',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }}
+          onClick={handleCreateNewCard}
+          disabled={isPending}
+        >
+          <Plus size={18} strokeWidth={3} /> 
+          <span style={{ fontWeight: 800 }}>CREATE NEW DIGITAL CARD</span>
+        </button>
+      </motion.div>
 
-      {/* ── Stat Cards ── */}
-      <div className={styles.statsGrid}>
-        {statItems.map((item, i) => (
-          <div
-            key={item.label}
-            className={styles.statCard}
-            data-delay={i}
-            style={{ "--card-accent": item.color } as React.CSSProperties}
-          >
-            <div
-              className={styles.statIconWrap}
-              style={{ background: item.dimColor }}
+      {/* ── Intelligence Grid (Industry Standard 4-Col) ── */}
+      <div className={styles.intelligenceStage}>
+          {statItems.map((item, i) => (
+            <motion.div 
+              key={item.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className={styles.subInsightCard}
             >
-              <item.Icon size={20} color={item.color} strokeWidth={2} />
-            </div>
-            <div className={styles.statContent}>
-              <div className={styles.statValue}>
-                <AnimatedNumber value={item.value} />
-              </div>
-              <div className={styles.statLabel}>{item.label}</div>
-            </div>
-          </div>
-        ))}
+                <div className={styles.subInsightIcon} style={{ background: `${item.color}15`, color: item.color }}>
+                  <item.icon size={22} />
+                </div>
+                <div className={styles.subInsightContent}>
+                  <div className={styles.subInsightValue}>
+                    <AnimatedNumber value={item.value} />
+                  </div>
+                  <div className={styles.subInsightLabel}>{item.label}</div>
+                </div>
+            </motion.div>
+          ))}
       </div>
 
       {/* ── Cards Section ── */}
       <div className={styles.cardsSection}>
         <div className={styles.cardsSectionHeader}>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <span className={styles.cardsSectionTitle}>Your Cards</span>
-            <span className={styles.cardCount}>{stats.totalCards}</span>
-          </div>
+           <h2 className={styles.cardsSectionTitle} style={{ fontSize: '24px', fontWeight: 800 }}>Your Collection</h2>
+           <span className={styles.cardCountBadge}>{stats.totalCards} cards</span>
         </div>
 
         {stats.cards.length === 0 ? (
-          <div className={styles.emptyState}>
-            <span className={styles.emptyIcon}>💳</span>
-            <div className={styles.emptyTitle}>No cards yet</div>
-            <p className={styles.emptyDesc}>
-              Create your first digital business card and start sharing it instantly.
-            </p>
-            <button 
-              id="btn-create-first-card"
-              className={styles.btnPrimary}
-              style={{ flex: "none", display: "inline-flex" }}
-              onClick={handleCreateNewCard}
-              disabled={isPending}
-            >
-              <Plus size={15} strokeWidth={2.5} /> Create My First Card
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={styles.emptyState}>
+            <div className={styles.emptyIcon}>💳</div>
+            <h3 className={styles.emptyTitle}>Your wallet is empty</h3>
+            <p className={styles.emptyDesc}>Design your first professional identity in seconds.</p>
+            <button className={styles.btnPrimary} onClick={handleCreateNewCard} disabled={isPending}>
+              <Plus size={18} /> Start Designing
             </button>
-          </div>
+          </motion.div>
         ) : (
           <div className={styles.cardsGrid}>
-            {stats.cards.map((card, idx) => {
-              const name =
-                card.displayName ?? `${card.firstName} ${card.lastName}`;
-              const initials = name
-                .split(" ")
-                .slice(0, 2)
-                .map((w: string) => w[0])
-                .join("")
-                .toUpperCase();
-              const avatarGradient = AVATAR_GRADIENTS[idx % AVATAR_GRADIENTS.length];
+            <AnimatePresence mode="popLayout">
+              {stats.cards.map((card, idx) => {
+                const name = card.displayName ?? `${card.firstName} ${card.lastName}`;
+                const initials = name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+                
+                return (
+                  <motion.div 
+                    layout
+                    key={card.id} 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className={styles.vCardContainer}
+                    style={{ "--vcard-glow": card.colorPrimary } as any}
+                  >
+                    <div className={styles.vCardTop}>
+                       <div className={styles.vCardHeader}>
+                          <div className={styles.vCardAvatar} style={{ background: `linear-gradient(135deg, ${card.colorPrimary}, #000)` }}>
+                             {card.avatarUrl ? <img src={card.avatarUrl} alt="" /> : initials}
+                          </div>
+                          <div className={styles.vCardMeta}>
+                             <div className={styles.vCardName}>{name}</div>
+                             <div className={styles.vCardTitle}>{card.jobTitle || "Professional Identity"}</div>
+                          </div>
+                          <div className={styles.vCardStatusWrapper}>
+                             <div className={`${styles.vCardStatus} ${card.isPublished ? styles.vCardLive : styles.vCardDraft}`}>
+                                {card.isPublished ? "LIVE" : "DRAFT"}
+                             </div>
+                          </div>
+                       </div>
 
-              return (
-                <div key={card.id} className={styles.cardItem}>
-                  {/* Header row */}
-                  <div className={styles.cardItemHeader}>
-                    <div
-                      className={styles.cardAvatar}
-                      style={{ background: avatarGradient }}
-                    >
-                      {initials}
+                       <div className={styles.vCardStatsMini}>
+                          <div className={styles.vCardStatMini}>
+                             <span><AnimatedNumber value={card.totalViews} /></span>
+                             <label>Views</label>
+                          </div>
+                          <div className={styles.vCardStatMini}>
+                             <span><AnimatedNumber value={card.totalClicks} /></span>
+                             <label>Clicks</label>
+                          </div>
+                          <div className={styles.vCardStatMini}>
+                             <span><AnimatedNumber value={card.leadsCollected} /></span>
+                             <label>Leads</label>
+                          </div>
+                       </div>
                     </div>
-                    <div className={styles.cardInfo}>
-                      <div className={styles.cardName}>{name}</div>
-                      <div className={styles.cardTitle}>
-                        {card.jobTitle || "No title set"}
-                      </div>
-                    </div>
-                    <span
-                      className={`${styles.publishedBadge} ${
-                        card.isPublished ? styles.live : styles.draft
-                      }`}
-                    >
-                      {card.isPublished ? "● Live" : "Draft"}
-                    </span>
-                  </div>
 
-                  {/* Per-card analytics */}
-                  <div className={styles.cardStats}>
-                    <div className={styles.cardStat}>
-                      <Eye size={16} color="#ff6b00" />
-                      <div className={styles.cardStatValue}>
-                        <AnimatedNumber value={card.totalViews} />
-                      </div>
-                      <div className={styles.cardStatLabel}>Views</div>
+                    <div className={styles.vCardBottom}>
+                       <div className={styles.vCardActions}>
+                          <Link href={`/dashboard/card/${card.id}`} className={styles.vCardEditBtn}>
+                             Edit Identity
+                          </Link>
+                          <ShareQRButton slug={card.slug} layout={card.layout} primaryColor={card.colorPrimary} />
+                          <button 
+                            className={styles.vCardDeleteBtn}
+                            onClick={() => setCardToDelete(card.id)}
+                            disabled={isPending}
+                          >
+                             <Trash2 size={18} />
+                          </button>
+                       </div>
                     </div>
-                    <div className={styles.cardStat}>
-                      <MousePointerClick size={16} color="#ff6b00" />
-                      <div className={styles.cardStatValue}>
-                        <AnimatedNumber value={card.totalClicks} />
-                      </div>
-                      <div className={styles.cardStatLabel}>Clicks</div>
-                    </div>
-                    <div className={styles.cardStat}>
-                      <Users size={16} color="#ff6b00" />
-                      <div className={styles.cardStatValue}>
-                        <AnimatedNumber value={card.leadsCollected} />
-                      </div>
-                      <div className={styles.cardStatLabel}>Leads</div>
-                    </div>
-                  </div>
-
-                  {/* Public URL */}
-                  <div className={styles.cardSlug}>
-                    <a
-                      href={`/${card.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => handlePreviewClick(e, card)}
-                    >
-                      imprint.cards/{card.slug}
-                    </a>
-                  </div>
-
-                  {/* Actions */}
-                  <div className={styles.cardActions}>
-                    <Link
-                      href={`/dashboard/card/${card.id}`}
-                      className={styles.btnPrimary}
-                    >
-                      Edit Card
-                    </Link>
-                    <a
-                      href={`/${card.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => handlePreviewClick(e, card)}
-                      className={styles.btnSecondary}
-                    >
-                      Preview
-                    </a>
-                    <button 
-                      className={styles.btnDangerIcon}
-                      onClick={() => setCardToDelete(card.id)}
-                      title="Delete Card"
-                      disabled={isPending}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                    <ShareQRButton 
-                      slug={card.slug} 
-                      layout={card.layout} 
-                      primaryColor={card.colorPrimary} 
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                    <div className={styles.vCardGlow} />
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         )}
       </div>
 
-      {/* ── Delete Confirmation Modal ── */}
-      {cardToDelete && (
-        <div className={styles.modalOverlay} onClick={() => setCardToDelete(null)}>
-          <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🗑️</div>
-            <h2 className={styles.modalTitle}>Delete this card?</h2>
-            <p className={styles.modalSubtitle} style={{ marginTop: '12px' }}>
-              Are you sure? This action is permanent and cannot be undone.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-              <button 
-                className={styles.btnSecondary} 
-                onClick={() => setCardToDelete(null)}
-                style={{ flex: 1, padding: '14px' }}
-              >
-                Cancel
-              </button>
-              <button 
-                className={styles.btnDanger} 
-                onClick={() => handleDeleteCard(cardToDelete)}
-                style={{ flex: 1, padding: '14px' }}
-                disabled={isPending && activeAction === "delete"}
-              >
-                {isPending && activeAction === "delete" ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modals remain similarly styled but with framer-motion AnimatePresence for smoothness if needed */}
+      <AnimatePresence>
+        {cardToDelete && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.modalOverlay} onClick={() => setCardToDelete(null)}>
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className={styles.modalContent} onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px', textAlign: 'center' }}>🗑️</div>
+              <h2 className={styles.modalTitle} style={{ textAlign: 'center' }}>Permanently remove identity?</h2>
+              <p className={styles.modalSubtitle} style={{ textAlign: 'center', marginTop: '12px' }}>This will destroy all analytics and leads for this card.</p>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                <button className={styles.btnSecondary} onClick={() => setCardToDelete(null)} style={{ flex: 1 }}>Keep it</button>
+                <button className={styles.btnDanger} onClick={() => handleDeleteCard(cardToDelete)} style={{ flex: 1 }}>Confirm Delete</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* ── Draft Modal ── */}
-      {draftModalCard && (
-        <div className={styles.modalOverlay} onClick={() => setDraftModalCard(null)}>
-          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-            <button className={styles.modalClose} onClick={() => setDraftModalCard(null)}>✕</button>
-            <div className={styles.modalHeader}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
-              <h2 className={styles.modalTitle}>Card is Not Live!</h2>
-              <p className={styles.modalSubtitle} style={{ marginTop: 12, lineHeight: 1.5 }}>
-                <strong>{draftModalCard.displayName ?? draftModalCard.firstName}</strong> is currently set to <strong>Draft</strong>. 
-                You must publish it in the Editor before it can be viewed by others!
-              </p>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
-              <Link 
-                href={`/dashboard/card/${draftModalCard.id}`}
-                className={styles.btnPrimary} 
-                style={{ width: "100%", padding: "14px", textDecoration: 'none' }}
-              >
-                Open Editor to Publish 🚀
-              </Link>
-              <button 
-                className={styles.btnSecondary} 
-                onClick={() => setDraftModalCard(null)} 
-                style={{ width: "100%", padding: "14px" }}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* ── Creating Modal ── */}
-      {isPending && activeAction === "create" && (
+      {/* Progress Modals */}
+      {(isPending && activeAction) && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent} style={{ textAlign: "center", padding: "40px" }}>
             <div className={styles.loader} style={{ margin: "0 auto 20px" }}></div>
             <h2 className={styles.modalTitle}>
-              Creating your card<span className={styles.loadingDots}></span>
+              {activeAction === "create" ? "Architecting your VCard..." : "Securely wiping data..."}
             </h2>
-            <p className={styles.modalSubtitle}>Please wait while we set up your profile.</p>
-          </div>
-        </div>
-      )}
-      {/* ── Deleting Progress Modal ── */}
-      {isPending && activeAction === "delete" && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent} style={{ textAlign: "center", padding: "40px" }}>
-            <div className={styles.loader} style={{ margin: "0 auto 20px" }}></div>
-            <h2 className={styles.modalTitle}>
-              Permanently deleting your card<span className={styles.loadingDots}></span>
-            </h2>
-            <p className={styles.modalSubtitle}>Cleaning up your data. This won't take long.</p>
           </div>
         </div>
       )}

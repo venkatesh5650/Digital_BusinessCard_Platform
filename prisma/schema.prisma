@@ -213,6 +213,7 @@ model MediaEmbed {
   vcard        VCard   @relation(fields: [vcardId], references: [id], onDelete: Cascade)
 }
 
+
 model Lead {
   id        String   @id @default(cuid())
   vcardId   String
@@ -224,4 +225,15 @@ model Lead {
   jobTitle  String?
   note      String?
   vcard     VCard    @relation(fields: [vcardId], references: [id], onDelete: Cascade)
+}
+
+model SystemSettings {
+  id               String   @id @default("global")
+  defaultTemplate  String   @default("classic")
+  customDomains    Boolean  @default(false)
+  whiteLabel       Boolean  @default(false)
+  ipWhitelisting   Boolean  @default(false)
+  googleOAuth      Boolean  @default(true)
+  maintenanceMode  Boolean  @default(false)
+  updatedAt        DateTime @updatedAt
 }

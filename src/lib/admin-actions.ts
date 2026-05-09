@@ -164,6 +164,7 @@ export async function bulkDeleteUsers(userIds: string[]) {
   revalidatePath("/admin", "layout");
 }
 
+
 export async function bulkUpdateUserRoles(userIds: string[], role: "ADMIN" | "USER") {
   await ensureAdmin();
 
@@ -173,4 +174,40 @@ export async function bulkUpdateUserRoles(userIds: string[], role: "ADMIN" | "US
   });
   
   revalidatePath("/admin", "layout");
+}
+
+/**
+ * Fetches the global platform settings.
+ */
+export async function getSystemSettings() {
+  await ensureAdmin();
+  
+  let settings = await db.systemSettings.findUnique({
+    where: { id: "global" }
+  });
+
+  // Initialize if not exists
+  if (!settings) {
+    settings = await db.systemSettings.create({
+      data: { id: "global" }
+    });
+  }
+
+  return settings;
+}
+
+/**
+ * Updates global platform settings.
+ */
+export async function updateSystemSettings(data: any) {
+  await ensureAdmin();
+
+  const settings = await db.systemSettings.upsert({
+    where: { id: "global" },
+    update: data,
+    create: { id: "global", ...data }
+  });
+
+  revalidatePath("/admin/settings");
+  return settings;
 }

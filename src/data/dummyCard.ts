@@ -1,6 +1,6 @@
 /**
  * ============================================================
- *  NeonGlass — Digital Business Card Platform
+ *  Imprint — Digital Business Card Platform
  *  Dummy Card Data — exercises every field in the VCard schema
  * ============================================================
  *

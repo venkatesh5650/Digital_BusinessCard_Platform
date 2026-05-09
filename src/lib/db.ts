@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { Pool, PoolConfig } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
+// Bumping Prisma Singleton for HMR (reloads generated models)
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };

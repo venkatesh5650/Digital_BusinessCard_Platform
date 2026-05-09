@@ -1,6 +1,6 @@
 /**
  * ============================================================
- *  NeonGlass — Digital Business Card Platform
+ *  Imprint — Digital Business Card Platform
  *  Core Type Definitions (vCard Schema)
  * ============================================================
  */
@@ -295,7 +295,7 @@ export interface CardProfile {
    ------------------------------------------------------- */
 
 export interface CardSettings {
-  /** Public URL slug, e.g. "ravikumar" → neonglass.me/ravikumar */
+  /** Public URL slug, e.g. "ravikumar" → imprint.me/ravikumar */
   slug: string;
   isPublished: boolean;
   /** Allow viewers to exchange their contact info (lead capture) */

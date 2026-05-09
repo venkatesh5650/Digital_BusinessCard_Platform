@@ -60,6 +60,10 @@
   --text-muted:       var(--text-3);
   --radius-lg:        var(--r-md);
   --radius-2xl:       var(--r-xl);
+
+  /* Skeleton */
+  --skeleton-base:      rgba(0, 0, 0, 0.05);
+  --skeleton-highlight: rgba(0, 0, 0, 0.12);
 }
 
 /* ── Dark Mode ────────────────────────────────────────────────── */
@@ -97,6 +101,10 @@
   --text-primary:     var(--text-1);
   --text-secondary:   var(--text-2);
   --text-muted:       var(--text-3);
+
+  /* Skeleton */
+  --skeleton-base:      rgba(255, 255, 255, 0.03);
+  --skeleton-highlight: rgba(255, 255, 255, 0.08);
 }
 
 /* ── Reset ────────────────────────────────────────────────────── */
