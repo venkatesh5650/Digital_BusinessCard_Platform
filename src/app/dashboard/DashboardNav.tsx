@@ -103,7 +103,7 @@ export default function DashboardNav({ user }: { user: User }) {
                 {user.role === "ADMIN" && (
                   <>
                     <Link
-                      href="/admin/dashboard"
+                      href="/admin"
                       className={styles.mobileLogoutBtn}
                       style={{ color: "var(--accent)" }}
                       onClick={() => setIsMobileUserMenuOpen(false)}
@@ -200,7 +200,7 @@ export default function DashboardNav({ user }: { user: User }) {
           <>
             <div className={styles.navDivider} />
             <Link 
-              href="/admin/dashboard" 
+              href="/admin" 
               className={styles.navItem}
               style={{ color: "var(--accent)", fontWeight: 600 }}
             >

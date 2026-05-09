@@ -170,8 +170,184 @@
 .negative { color: #ef4444; }
 
 /* ── Mobile Overrides ─────────────────────────────────────────────── */
+/* ── Mobile Responsive Design ───────────────────────────────────────── */
+.mobileHeader {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--bg-surface);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+}
+
+.hamburger {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-1);
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.hamburger:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.drawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1001;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @media (max-width: 1024px) {
-  .sidebar {
-    display: none; /* Simplified for phase 2 initial implementation */
+  .mobileHeader {
+    display: flex;
   }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1002;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 20px 0 60px rgba(0, 0, 0, 0.3);
+    border-right: 1px solid var(--border);
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .main {
+    padding: 84px 20px 40px 20px; /* Top padding for fixed header */
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  /* ── Responsive Table Overhaul ── */
+  .tableContainer {
+    overflow-x: auto;
+    padding: 0;
+    margin: 0; /* Remove bleed as it's now inside CyberGlassCard */
+    border-radius: 12px;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .responsiveTable, 
+  .responsiveTable thead, 
+  .responsiveTable tbody, 
+  .responsiveTable th, 
+  .responsiveTable td, 
+  .responsiveTable tr {
+    display: block;
+  }
+
+  .responsiveTable thead {
+    display: none; /* Hide headers on mobile */
+  }
+
+  .responsiveTable tr {
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+  }
+
+  .responsiveTable td {
+    padding: 12px 0 !important;
+    border: none !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+    min-height: 44px;
+  }
+
+  .responsiveTable td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    flex: 1;
+    text-align: left;
+  }
+
+  /* Checkbox and User identity should be left-aligned and without labels */
+  .responsiveTable td:first-child,
+  .responsiveTable td:nth-child(2) {
+    display: flex;
+    justify-content: flex-start;
+    text-align: left;
+    padding-bottom: 12px !important;
+  }
+  
+  .responsiveTable td:first-child {
+    border-bottom: 1px dashed rgba(255,255,255,0.05) !important;
+    margin-bottom: 12px;
+  }
+
+  .responsiveTable td:first-child::before,
+  .responsiveTable td:nth-child(2)::before {
+    display: none;
+  }
+
+  .adminGrid {
+    grid-template-columns: 1fr !important; 
+    gap: 16px;
+  }
+}
+
+/* ── Skeleton Shimmer ── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.adminGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
 }
