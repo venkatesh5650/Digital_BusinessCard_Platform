@@ -71,9 +71,13 @@ export default function DashboardNav({ user }: { user: User }) {
           <span>Leads</span>
         </button>
         
-        <Link href="/dashboard?create=true" className={styles.hubCreateBtn}>
-          <Plus size={24} strokeWidth={3} />
-        </Link>
+        <button 
+          onClick={() => router.push(`/dashboard?create=${Date.now()}`)} 
+          className={styles.hubCreateBtn}
+          style={{ background: 'var(--orange)', border: 'none', cursor: 'pointer' }}
+        >
+          <Plus size={24} strokeWidth={3} color="white" />
+        </button>
 
         <Link href="/dashboard/legal" className={`${styles.hubItem} ${pathname === "/dashboard/legal" ? styles.hubItemActive : ""}`}>
           <Scale size={22} />
@@ -122,10 +126,14 @@ export default function DashboardNav({ user }: { user: User }) {
           <span className={styles.logoText}>Imprint</span>
         </div>
 
-        <Link href="/dashboard?create=true" className={styles.createCardBtn}>
+        <button 
+          onClick={() => router.push(`/dashboard?create=${Date.now()}`)} 
+          className={styles.createCardBtn}
+          style={{ background: '#000', color: '#fff', border: 'none', cursor: 'pointer', width: '100%' }}
+        >
           <Plus size={18} strokeWidth={2.5} />
           <span>Create New Card</span>
-        </Link>
+        </button>
 
         <nav className={styles.nav}>
           <Link href="/dashboard" className={`${styles.navItem} ${pathname === "/dashboard" ? styles.navItemActive : ""}`}>

@@ -134,10 +134,8 @@ export default function DashboardClient({
 
   useEffect(() => {
     setMounted(true);
-    if (searchParams.get("create") === "true") {
+    if (searchParams.get("create")) {
       handleCreateNewCard();
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, "", newUrl);
     }
   }, [searchParams]);
 
