@@ -322,8 +322,16 @@ export default function DashboardClient({
                     <div className={styles.vCardBottom}>
                        <div className={styles.vCardActions}>
                           <Link href={`/dashboard/card/${card.id}`} className={styles.vCardEditBtn}>
-                             Edit Identity
+                             Edit
                           </Link>
+                          <a 
+                            href={`/${card.slug}`} 
+                            target="_blank" 
+                            className={styles.vCardPreviewBtn}
+                            onClick={(e) => handlePreviewClick(e, card)}
+                          >
+                             <Eye size={18} />
+                          </a>
                           <ShareQRButton slug={card.slug} layout={card.layout} primaryColor={card.colorPrimary} />
                           <button 
                             className={styles.vCardDeleteBtn}

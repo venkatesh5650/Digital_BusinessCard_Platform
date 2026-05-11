@@ -212,6 +212,11 @@
   .bottomHub {
     display: flex;
   }
+
+  /* Hide dashboard nav when card editor is active — editor has its own Edit/Preview switcher */
+  :global(.card-editor-active) .bottomHub {
+    display: none !important;
+  }
 }
 
 .hubItem {
@@ -830,13 +835,39 @@
   font-size: 14px;
   text-decoration: none;
   transition: opacity 0.2s;
+  white-space: nowrap;
+  padding: 0 16px;
+  min-width: 0;
 }
 
 .vCardEditBtn:hover { opacity: 0.9; }
 
+.vCardPreviewBtn {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  background: var(--bg-hover);
+  color: var(--text-1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.vCardPreviewBtn:hover {
+  background: var(--text-1);
+  color: var(--bg-surface);
+  border-color: var(--text-1);
+}
+
 .vCardDeleteBtn {
   width: 48px;
   height: 48px;
+  flex-shrink: 0;
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
   border: none;
@@ -868,7 +899,26 @@
   .cardsGrid { grid-template-columns: 1fr; }
   .vCardTop { padding: 24px; }
   .vCardBottom { padding: 16px 24px 24px; }
+
+  .vCardActions {
+    gap: 10px;
+  }
+
+  .vCardEditBtn {
+    font-size: 13px;
+    height: 44px;
+    border-radius: 12px;
+    padding: 0 14px;
+  }
+
+  .vCardPreviewBtn,
+  .vCardDeleteBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
 }
+
 
 .cardCountBadge {
   padding: 6px 14px;
@@ -1090,14 +1140,15 @@
     bottom: 20px;
     left: 20px;
     right: 20px;
-    z-index: 2000;
+    z-index: 2500;
     background: var(--bg-elevated);
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 8px;
     gap: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 4px 8px rgba(0, 0, 0, 0.08);
     animation: slideUpNav 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 

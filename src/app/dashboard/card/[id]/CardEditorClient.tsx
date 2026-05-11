@@ -372,13 +372,18 @@ export default function CardEditorClient({ card }: { card: Card }) {
   // Toggle page-level immersive class for full top-to-bottom mobile preview
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Signal to dashboard layout that editor is active (hides bottomHub on mobile)
+      document.body.classList.add("card-editor-active");
       if (activeMobileTab === "preview") {
         document.body.classList.add("mobile-immersive-active");
       } else {
         document.body.classList.remove("mobile-immersive-active");
       }
     }
-    return () => document.body.classList.remove("mobile-immersive-active");
+    return () => {
+      document.body.classList.remove("mobile-immersive-active");
+      document.body.classList.remove("card-editor-active");
+    };
   }, [activeMobileTab]);
 
   // Helper to open modal with pre-filled data if exists
@@ -1140,7 +1145,7 @@ export default function CardEditorClient({ card }: { card: Card }) {
         <div className={styles.headerActions}>
            <button onClick={() => setActiveModal('settings')} className={styles.btnSecondary}><Settings size={15}/> Settings</button>
            <a href={`/${slug}`} target="_blank" onClick={handlePreviewClick} className={styles.btnSecondary} style={{ display: "flex", gap: 6 }}>
-             <ExternalLink size={15} /> View
+             <Eye size={15} /> Preview
            </a>
         </div>
       </div>
